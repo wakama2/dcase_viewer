@@ -51,9 +51,11 @@ function drawMain() {
 	//document.body.appendChild(D);
 
 	var root = createNode();
-	root.view.updateLocation(200, 0);
-	root.view.move();
-	root.view.updateLocation(0, 0);
-	root.view.animateSec(250);
+	View.prototype.repaintAll = function() {
+		var p = root.view.updateLocation(0, 0);
+		root.view.updateLocation(($(document).width()-p.x)/2, 0);
+		root.view.animateSec(250);
+	}
+	root.view.repaintAll();
 }
 
