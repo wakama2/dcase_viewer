@@ -1,0 +1,13 @@
+.node-name {
+	position: absolute;
+	font-weight: bold;
+	font-size: 14px;
+	text-align: left;
+}
+.node-text {
+	position: absolute;
+	font-size: 12px;
+	text-align: left;
+	padding: 0px 4px;
+}
+
