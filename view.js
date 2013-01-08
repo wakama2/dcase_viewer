@@ -94,13 +94,14 @@ var View = function(node) {
 
 	var self = this;
 	this.divText.onclick = function(e) {
+		console.log(name + " click");
 		self.setChildVisible(!self.childVisible);
 		self.repaintAll(ANIME_MSEC);
 	}
 }
 
 View.prototype.repaintAll = function(ms) {
-	alert("View.repaintAll not overrided");
+	throw "View.repaintAll not overrided";
 }
 
 View.prototype.getX = function() { return this.location.x; }
@@ -152,16 +153,17 @@ View.prototype.setLocation = function(x, y) {
 }
 
 View.prototype.setSize = function(w, h) {
-	var n = 20;
 	this.svg.setBounds(this.bounds.x, this.bounds.y, w, h);
-	this.divName.style.width  = w + "px";
-	this.divName.style.height = h + "px";
-	this.divName.width  = w;
-	this.divName.height = h;
-	this.divText.style.width  = w + "px";
-	this.divText.style.height = (h-n) + "px";
-	this.divText.width = w;
-	this.divText.height = (h-n);
+	this.divName.style.width  = (w - this.svg.offset.x * 2) + "px";
+	this.divName.style.height = (h - this.svg.offset.y * 2) + "px";
+	this.divName.width  = (w - this.svg.offset.x * 2);
+	this.divName.height = (h - this.svg.offset.y * 2);
+	h -= 20;
+	this.divText.style.width  = (w - this.svg.offset.x * 2) + "px";
+	this.divText.style.height = (h - this.svg.offset.y * 2) + "px";
+	this.divText.width  = (w - this.svg.offset.x * 2);
+	this.divText.height = (h - this.svg.offset.y * 2);
+	console.log(this.divText);
 }
 
 View.prototype.updateLocation = function(x, y) {

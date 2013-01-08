@@ -15,9 +15,15 @@ function createNode() {
 	var topNode = new Node(0, "TopGoal", "goal",
 			"ウェブショッピングデモ<br>" +
 			"システムはDEOSプロセスにより運用され，ODSを満たしている");
-	var str = new Node(1, "Strategy", "strategy", "description");
-	topNode.addChild(new Node(2, "Context", "context", "this is context"));
-	topNode.addChild(new Node(2, "Context2", "context", "this is context"));
+	var str = new Node(1, "Strategy", "strategy", "DEOSプロセスによって議論する");
+	topNode.addChild(new Node(2, "Context", "context",
+		"サービス用件:<br>" +
+		"・アクセス数の定格は2500件/分<br>" +
+		"・応答時間は1件あたり3秒以内<br>" +
+		"・一回の障害あたりの復旧時間は5分以内"
+		));
+	topNode.addChild(new Node(2, "Context2", "context", "現在のシステムの運用状態"));
+	topNode.addChild(new Node(2, "Context2", "context", "Risk分析の結果<br>・アクセス数の増大<br>応答遅延"));
 	topNode.addChild(str);
 	str.addChild(new Node(1, "SubGoal 1", "goal", "description"));
 	str.addChild(new Node(1, "SubGoal 2", "goal", "description"));

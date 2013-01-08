@@ -3,6 +3,7 @@ function setMouseDragHandler(root, rv) {
 	var y0 = 0;
 	var flag = false;
 	root.onmousedown = function(e) {
+		console.log("root down");
 		x0 = e.pageX;
 		y0 = e.pageY;
 		flag = true;
@@ -13,16 +14,17 @@ function setMouseDragHandler(root, rv) {
 			var dy = e.pageY - y0;
 			dragX = dx;
 			dragY = dy;
-			rv.repaintAll();
+			rv.repaintAll(0);
 		}
 	}
 	root.onmouseup = function(e) {
+		console.log("root up");
 		if(flag) {
 			shiftX += e.pageX - x0;
 			shiftY += e.pageY - y0;
 			dragX = 0;
 			dragY = 0;
-			rv.repaintAll();
+			rv.repaintAll(0);
 			flag = false;
 		}
 	}
@@ -48,9 +50,10 @@ function setTouchHandler(root, rv) {
 }
 
 function setEventHandler(root, rv) {
-	setMouseDragHander(root, rv);
+	setMouseDragHandler(root, rv);
+	setTouchHandler(root, rv);
 	root.onresize = function(e) {
-		rv.repaintAll();
+		rv.repaintAll(ANIME_MSEC);
 	}
 }
 
