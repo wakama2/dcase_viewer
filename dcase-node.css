@@ -2,14 +2,15 @@
 	position: absolute;
 	padding: 2px;
 	height: auto;
+	font-size: 12px;
 }
 .node-name {
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 120%;
 	text-align: left;
 }
 .node-text {
-	font-size: 12px;
+	font-size: 100%;
 	text-align: left;
 }
 

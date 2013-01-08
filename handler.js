@@ -51,7 +51,7 @@ function setTouchHandler(root, rv) {
 			scale0 = scale;
 			d = dist(e.touches[0].pageX - e.touches[1].pageX, 
 					e.touches[0].pageY - e.touches[1].pageY);
-			sx0 = shiftX;
+			sx0 = shiftX;// + ($(rootcv).width()-rv.updateLocation(0, 0).x)/2;
 			sy0 = shiftY;
 		}
 	}

@@ -5,6 +5,14 @@ function newSvg(name) {
 	return obj;
 }
 
+function newDiv(className) {
+	var root = document.getElementById("divroot");
+	var obj = document.createElement("div");
+	obj.className = className;
+	root.appendChild(obj);
+	return obj;
+}
+
 function newGSNObject(type) {
 	var o = null;
 	if(type == "goal") {
@@ -58,29 +66,17 @@ function newGSNObject(type) {
 
 /* class View */
 var View = function(node) {
-
-	function newDiv(className) {
-		var root = document.getElementById("divroot");
-		var obj = document.createElement("div");
-		obj.className = className;
-		root.appendChild(obj);
-		return obj;
-	}
-
-	this.node = node;
-
 	// node
+	this.node = node;
 	this.svg = newGSNObject(node.type);
 	this.divText = newDiv("node-container");
 	this.divText.innerHTML =
 			"<a class=\"node-name\">" + node.name + "</a><br/>" +
 			"<a class=\"node-text\">" + node.text + "</a>";
 	this.location = { x: 0, y: 0 };
-
 	// line
 	this.lines = [];
 	this.contextLines = [];
-
 	// for animation
 	this.bounds = { x: 0, y: 0, w: 200, h: 120 };
 	this.visible = true;
@@ -89,15 +85,13 @@ var View = function(node) {
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
 
-	this.setLocation(0, 0);
-	this.setSize(200, 120);
-
 	var self = this;
 	this.divText.onclick = function(e) {
 		console.log(name + " click");
 		self.setChildVisible(!self.childVisible);
 		self.repaintAll(ANIME_MSEC);
 	}
+	this.setBounds(0, 0, 200, 120);
 }
 
 View.prototype.repaintAll = function(ms) {
@@ -142,20 +136,16 @@ View.prototype.addChild = function(node) {
 	}
 }
 
-View.prototype.setLocation = function(x, y) {
+View.prototype.setBounds = function(x, y, w, h) {
 	this.location = { x: x, y: y };
-	this.svg.setBounds(x * scale, y * scale, this.bounds.w * scale, this.bounds.h * scale);
+	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
 	this.divText.style.left = (x + this.svg.offset.x) * scale + "px";
 	this.divText.style.top  = (y + this.svg.offset.y) * scale + "px";
-}
-
-View.prototype.setSize = function(w, h) {
-	this.svg.setBounds(this.bounds.x * scale, this.bounds.y * scale, w * scale, h * scale);
+	this.divText.style.fontSize = (12 * scale) + "px";
 	this.divText.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
 	this.divText.style.height = (h - this.svg.offset.y * 2) * scale + "px";
 	this.divText.width  = (w - this.svg.offset.x * 2) * scale;
 	this.divText.height = (h - this.svg.offset.y * 2) * scale;
-	console.log(this.divText);
 }
 
 View.prototype.updateLocation = function(x, y) {
@@ -205,12 +195,7 @@ View.prototype.updateLocation = function(x, y) {
 	var y1 = y;
 
 	// set this bounds
-	this.bounds = { 
-		x: x0 + (x-x0-w)/2,
-		y: y0,
-		w: w,
-		h: h
-	};
+	this.bounds = { x: x0 + (x-x0-w)/2, y: y0, w: w, h: h };
 
 	// contents (second)
 	x = this.bounds.x + w + Y_MARGIN;
@@ -249,10 +234,9 @@ View.prototype.animateSec = function(sec) {
 
 View.prototype.animate = function(r) {
 	function mid(x0, x1) { return (x1-x0) * r + x0; }
-	var x = mid(this.bounds0.x, this.bounds.x);
-	var y = mid(this.bounds0.y, this.bounds.y);
-	this.setLocation(x, y);
-
+	this.setBounds(
+			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
+			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
 	if(this.visible != this.visible0) {
 		if(this.visible) {
 			this.svg.setAttribute("display", "block");
@@ -281,7 +265,7 @@ View.prototype.animate = function(r) {
 		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
 		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
 		l.setAttribute("y2", (e.getY()) * scale);
-		if(this.visible != this.visible0) {
+		if(this.childVisible0 != this.childVisible) {
 			l.setAttribute("display", "block");
 			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
@@ -294,7 +278,7 @@ View.prototype.animate = function(r) {
 		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
 		l.setAttribute("x2", (e.getX()) * scale);
 		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
-		if(this.visible != this.visible0) {
+		if(this.childVisible0 != this.childVisible) {
 			l.setAttribute("display", "block");
 			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
@@ -302,7 +286,7 @@ View.prototype.animate = function(r) {
 }
 
 View.prototype.move = function() {
-	this.setLocation(this.bounds.x, this.bounds.y);
+	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
 	this.divText.style.display = this.visible ? "block" : "none";
 	var contexts = this.node.contexts;
