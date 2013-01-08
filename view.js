@@ -1,6 +1,3 @@
-var X_MARGIN = 30;
-var Y_MARGIN = 60;
-
 function newSvg(name) {
 	var root = document.getElementById("svgroot");
 	var obj = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -98,11 +95,11 @@ var View = function(node) {
 	var self = this;
 	this.divText.onclick = function(e) {
 		self.setChildVisible(!self.childVisible);
-		self.repaintAll();
+		self.repaintAll(ANIME_MSEC);
 	}
 }
 
-View.prototype.repaintAll = function() {
+View.prototype.repaintAll = function(ms) {
 	alert("View.repaintAll not overrided");
 }
 
@@ -238,6 +235,10 @@ View.prototype.updateLocation = function(x, y) {
 }
 
 View.prototype.animateSec = function(sec) {
+	if(sec == 0) {
+		this.move();
+		return;
+	}
 	var self = this;
 	var begin = new Date();
 	var id = setInterval(function() {

@@ -1,3 +1,16 @@
+//-------------------------------------
+// const
+var ANIME_MSEC = 250;
+var X_MARGIN = 30;
+var Y_MARGIN = 60;
+
+//-------------------------------------
+// global
+var shiftX = 0;
+var shiftY = 0;
+var dragX = 0;
+var dragY = 0;
+
 function createNode() {
 	var topNode = new Node(0, "TopGoal", "goal",
 			"ウェブショッピングデモ<br>" +
@@ -51,13 +64,14 @@ function drawMain() {
 	//document.body.appendChild(D);
 
 	var root = createNode();
-	var animetime = 0;
-	View.prototype.repaintAll = function() {
+	View.prototype.repaintAll = function(ms) {
 		var p = root.view.updateLocation(0, 0);
-		root.view.updateLocation(($(document).width()-p.x)/2, 0);
-		root.view.animateSec(animetime);
+		root.view.updateLocation(
+				($(rootcv).width()-p.x)/2 + shiftX + dragX, shiftY + dragY);
+		root.view.animateSec(ms);
 	}
-	root.view.repaintAll();
-	animetime = 250;
+	root.view.repaintAll(0);
+
+	setEventHandler(rootcv, root.view);
 }
 
