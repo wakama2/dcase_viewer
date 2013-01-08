@@ -10,6 +10,7 @@ var shiftX = 0;
 var shiftY = 0;
 var dragX = 0;
 var dragY = 0;
+var scale = 1.0;
 
 function createNode() {
 	var topNode = new Node(0, "TopGoal", "goal",

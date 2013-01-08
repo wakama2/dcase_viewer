@@ -12,16 +12,16 @@ function setMouseDragHandler(root, rv) {
 		if(flag) {
 			var dx = e.pageX - x0;
 			var dy = e.pageY - y0;
-			dragX = dx;
-			dragY = dy;
+			dragX = dx / scale;
+			dragY = dy / scale;
 			rv.repaintAll(0);
 		}
 	}
 	root.onmouseup = function(e) {
 		console.log("root up");
 		if(flag) {
-			shiftX += e.pageX - x0;
-			shiftY += e.pageY - y0;
+			shiftX += dragX;
+			shiftY += dragY;
 			dragX = 0;
 			dragY = 0;
 			rv.repaintAll(0);

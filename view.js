@@ -144,17 +144,17 @@ View.prototype.addChild = function(node) {
 
 View.prototype.setLocation = function(x, y) {
 	this.location = { x: x, y: y };
-	this.svg.setBounds(x, y, this.bounds.w, this.bounds.h);
-	this.divText.style.left = x + this.svg.offset.x + "px";
-	this.divText.style.top  = y + this.svg.offset.y + "px";
+	this.svg.setBounds(x * scale, y * scale, this.bounds.w * scale, this.bounds.h * scale);
+	this.divText.style.left = (x + this.svg.offset.x) * scale + "px";
+	this.divText.style.top  = (y + this.svg.offset.y) * scale + "px";
 }
 
 View.prototype.setSize = function(w, h) {
-	this.svg.setBounds(this.bounds.x, this.bounds.y, w, h);
-	this.divText.style.width  = (w - this.svg.offset.x * 2) + "px";
-	this.divText.style.height = (h - this.svg.offset.y * 2) + "px";
-	this.divText.width  = (w - this.svg.offset.x * 2);
-	this.divText.height = (h - this.svg.offset.y * 2);
+	this.svg.setBounds(this.bounds.x * scale, this.bounds.y * scale, w * scale, h * scale);
+	this.divText.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
+	this.divText.style.height = (h - this.svg.offset.y * 2) * scale + "px";
+	this.divText.width  = (w - this.svg.offset.x * 2) * scale;
+	this.divText.height = (h - this.svg.offset.y * 2) * scale;
 	console.log(this.divText);
 }
 
@@ -277,10 +277,10 @@ View.prototype.animate = function(r) {
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
 		var e = this.node.children[i].view;
-		l.setAttribute("x1", this.getX() + this.bounds.w/2);
-		l.setAttribute("y1", this.getY() + this.bounds.h);
-		l.setAttribute("x2", e.getX() + e.bounds.w/2);
-		l.setAttribute("y2", e.getY());
+		l.setAttribute("x1", (this.getX() + this.bounds.w/2) * scale);
+		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
+		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
+		l.setAttribute("y2", (e.getY()) * scale);
 		if(this.visible != this.visible0) {
 			l.setAttribute("display", "block");
 			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
@@ -290,10 +290,10 @@ View.prototype.animate = function(r) {
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
 		var e = this.node.contexts[i].view;
-		l.setAttribute("x1", this.getX() + this.bounds.w);
-		l.setAttribute("y1", this.getY() + this.bounds.h/2);
-		l.setAttribute("x2", e.getX());
-		l.setAttribute("y2", e.getY() + e.bounds.h/2);
+		l.setAttribute("x1", (this.getX() + this.bounds.w) * scale);
+		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
+		l.setAttribute("x2", (e.getX()) * scale);
+		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
 		if(this.visible != this.visible0) {
 			l.setAttribute("display", "block");
 			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
@@ -320,20 +320,20 @@ View.prototype.move = function() {
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
 		var e = this.node.children[i].view;
-		l.setAttribute("x1", this.getX() + this.bounds.w/2);
-		l.setAttribute("y1", this.getY() + this.bounds.h);
-		l.setAttribute("x2", e.getX() + e.bounds.w/2);
-		l.setAttribute("y2", e.getY());
+		l.setAttribute("x1", (this.getX() + this.bounds.w/2) * scale);
+		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
+		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
+		l.setAttribute("y2", (e.getY()) * scale);
 		l.setAttribute("display", this.childVisible ? "block" : "none");
 	}
 	var lines = this.contextLines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
 		var e = this.node.contexts[i].view;
-		l.setAttribute("x1", this.getX() + this.bounds.w);
-		l.setAttribute("y1", this.getY() + this.bounds.h/2);
-		l.setAttribute("x2", e.getX());
-		l.setAttribute("y2", e.getY() + e.bounds.h/2);
+		l.setAttribute("x1", (this.getX() + this.bounds.w) * scale);
+		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
+		l.setAttribute("x2", (e.getX()) * scale);
+		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
 		l.setAttribute("display", this.childVisible ? "block" : "none");
 	}
 	this.bounds0 = this.bounds;
