@@ -3,6 +3,7 @@
 var ANIME_MSEC = 250;
 var X_MARGIN = 30;
 var Y_MARGIN = 60;
+var SCALE_MIN = 0.2;
 
 //-------------------------------------
 // global
@@ -73,10 +74,10 @@ function drawMain() {
 	var root = createNode();
 	View.prototype.repaintAll = function(ms) {
 		var p = root.view.updateLocation(0, 0);
-		root.view.updateLocation(
-				($(rootcv).width()-p.x)/2 + shiftX + dragX, shiftY + dragY);
+		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY)/scale);
 		root.view.animateSec(ms);
 	}
+	shiftX = ($(rootcv).width() - root.view.updateLocation(0, 0).x)/2;
 	root.view.repaintAll(0);
 
 	setEventHandler(rootcv, root.view);
