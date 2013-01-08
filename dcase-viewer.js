@@ -10,7 +10,7 @@ function createNode() {
 	str.addChild(new Node(1, "SubGoal 2", "goal", "description"));
 	str.addChild(new Node(1, "SubGoal 3", "goal", "description"));
 	str.addChild(new Node(1, "SubGoal 4", "goal", "description"));
-
+	str.children[1].addChild(new Node(1, "Evidence", "evidence", "description"));
 	str.children[2].addChild(new Node(1, "SubGoalContext", "context", "description"));
 	return topNode;
 }
@@ -51,11 +51,13 @@ function drawMain() {
 	//document.body.appendChild(D);
 
 	var root = createNode();
+	var animetime = 0;
 	View.prototype.repaintAll = function() {
 		var p = root.view.updateLocation(0, 0);
 		root.view.updateLocation(($(document).width()-p.x)/2, 0);
-		root.view.animateSec(250);
+		root.view.animateSec(animetime);
 	}
 	root.view.repaintAll();
+	animetime = 250;
 }
 

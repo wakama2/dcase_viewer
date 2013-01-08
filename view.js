@@ -1,11 +1,62 @@
-var X_MARGIN = 10;
-var Y_MARGIN = 40;
+var X_MARGIN = 30;
+var Y_MARGIN = 60;
 
 function newSvg(name) {
 	var root = document.getElementById("svgroot");
 	var obj = document.createElementNS("http://www.w3.org/2000/svg", name);
 	root.appendChild(obj);
 	return obj;
+}
+
+function newGSNObject(type) {
+	var o = null;
+	if(type == "goal") {
+		o = newSvg("rect");
+		o.setBounds = function(x, y, w, h) {
+			this.setAttribute("x", x);
+			this.setAttribute("y", y);
+			this.setAttribute("width", w);
+			this.setAttribute("height", h);
+		}
+		o.offset = { x: 4, y: 4 };
+	} else if(type == "context") {
+		o = newSvg("rect");
+		var n = 20;
+		o.setAttribute("rx", n);
+		o.setAttribute("ry", n);
+		o.setBounds = function(x, y, w, h) {
+			this.setAttribute("x", x);
+			this.setAttribute("y", y);
+			this.setAttribute("width", w);
+			this.setAttribute("height", h);
+		}
+		o.offset = { x: n/2, y: n/2 };
+	//} else if(type == "undevelop") {
+	//	o = newSvg("rect");
+	} else if(type == "strategy") {
+		o = newSvg("polygon");
+		var n = 20;
+		o.setBounds = function(x, y, w, h) {
+			this.setAttribute("points", 
+					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
+		}
+		o.offset = { x: n, y: 4 };
+	} else if(type == "evidence" || type == "monitor") {
+		o = newSvg("ellipse");
+		o.setBounds = function(x, y, w, h) {
+			this.setAttribute("cx", x + w/2);
+			this.setAttribute("cy", y + h/2);
+			this.setAttribute("rx", w/2);
+			this.setAttribute("ry", h/2);
+			o.offset = { x: w/8, y: h/8 };
+		}
+		o.offset = { x: 0, y: 0 };
+	} else {
+		throw type + " is not GSN type";
+	}
+	o.setAttribute("stroke", "black");
+	o.setAttribute("fill"  , "#F0F0F0");
+	return o;
 }
 	
 /* class View */
@@ -20,24 +71,26 @@ var View = function(node) {
 	}
 
 	this.node = node;
-	this.svg = newSvg("rect");
-	this.svg.setAttribute("stroke", "black");
-	this.svg.setAttribute("fill"  , "white");
+
+	// node
+	this.svg = newGSNObject(node.type);
 	this.divName = newDiv("node-name");
 	this.divName.innerHTML = node.name;
 	this.divText = newDiv("node-text");
 	this.divText.innerHTML = node.text;
+	this.location = { x: 0, y: 0 };
 
+	// line
+	this.lines = [];
+	this.contextLines = [];
+
+	// for animation
 	this.bounds = { x: 0, y: 0, w: 200, h: 120 };
 	this.visible = true;
 	this.childVisible = true;
-
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
-
-	this.lines = [];
-	this.contextLines = [];
 
 	this.setLocation(0, 0);
 	this.setSize(200, 120);
@@ -53,8 +106,8 @@ View.prototype.repaintAll = function() {
 	alert("View.repaintAll not overrided");
 }
 
-View.prototype.getX = function() { return parseInt(this.svg.getAttribute("x")); }
-View.prototype.getY = function() { return parseInt(this.svg.getAttribute("y")); }
+View.prototype.getX = function() { return this.location.x; }
+View.prototype.getY = function() { return this.location.y; }
 
 View.prototype.setChildVisible = function(b) {
 	this.childVisible = b;
@@ -92,19 +145,18 @@ View.prototype.addChild = function(node) {
 }
 
 View.prototype.setLocation = function(x, y) {
-	this.svg.setAttribute("x", x);
-	this.svg.setAttribute("y", y);
-	this.divName.style.left = x + "px";
-	this.divName.style.top  = y + "px";
+	this.location = { x: x, y: y };
+	this.svg.setBounds(x, y, this.bounds.w, this.bounds.h);
+	this.divName.style.left = x + this.svg.offset.x + "px";
+	this.divName.style.top  = y + this.svg.offset.y + "px";
 	var n = 20;
-	this.divText.style.left = x + "px";
-	this.divText.style.top  = (y+n) + "px";
+	this.divText.style.left = x     + this.svg.offset.x + "px";
+	this.divText.style.top  = (y+n) + this.svg.offset.y + "px";
 }
 
 View.prototype.setSize = function(w, h) {
 	var n = 20;
-	this.svg.setAttribute("width" , w);
-	this.svg.setAttribute("height", h);
+	this.svg.setBounds(this.bounds.x, this.bounds.y, w, h);
 	this.divName.style.width  = w + "px";
 	this.divName.style.height = h + "px";
 	this.divName.width = w;
@@ -236,7 +288,7 @@ View.prototype.animate = function(r) {
 		l.setAttribute("y1", this.getY() + this.bounds.h);
 		l.setAttribute("x2", e.getX() + e.bounds.w/2);
 		l.setAttribute("y2", e.getY());
-		l.setAttribute("display", this.childVisible ? "block" : "none");
+		l.setAttribute("display", "block");
 		l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 	}
 	var lines = this.contextLines;
@@ -247,7 +299,7 @@ View.prototype.animate = function(r) {
 		l.setAttribute("y1", this.getY() + this.bounds.h/2);
 		l.setAttribute("x2", e.getX());
 		l.setAttribute("y2", e.getY() + e.bounds.h/2);
-		l.setAttribute("display", this.childVisible ? "block" : "none");
+		l.setAttribute("display", "block");
 		l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 	}
 }
