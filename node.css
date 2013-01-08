@@ -1,13 +1,15 @@
-.node-name {
+.node-container {
 	position: absolute;
+	padding: 2px;
+	height: auto;
+}
+.node-name {
 	font-weight: bold;
 	font-size: 14px;
 	text-align: left;
 }
 .node-text {
-	position: absolute;
 	font-size: 12px;
 	text-align: left;
-	padding: 0px 4px;
 }
 

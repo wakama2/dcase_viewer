@@ -15,7 +15,7 @@ function newGSNObject(type) {
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
 		}
-		o.offset = { x: 4, y: 4 };
+		o.offset = { x: 0, y: 0 };
 	} else if(type == "context") {
 		o = newSvg("rect");
 		var n = 20;
@@ -27,7 +27,7 @@ function newGSNObject(type) {
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
 		}
-		o.offset = { x: n/2, y: n/2 };
+		o.offset = { x: n/3, y: n/3 };
 	//} else if(type == "undevelop") {
 	//	o = newSvg("rect");
 	} else if(type == "strategy") {
@@ -37,7 +37,7 @@ function newGSNObject(type) {
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
 		}
-		o.offset = { x: n, y: 4 };
+		o.offset = { x: n, y: 0 };
 	} else if(type == "evidence" || type == "monitor") {
 		o = newSvg("ellipse");
 		o.setBounds = function(x, y, w, h) {
@@ -71,10 +71,10 @@ var View = function(node) {
 
 	// node
 	this.svg = newGSNObject(node.type);
-	this.divName = newDiv("node-name");
-	this.divName.innerHTML = node.name;
-	this.divText = newDiv("node-text");
-	this.divText.innerHTML = node.text;
+	this.divText = newDiv("node-container");
+	this.divText.innerHTML =
+			"<a class=\"node-name\">" + node.name + "</a><br/>" +
+			"<a class=\"node-text\">" + node.text + "</a>";
 	this.location = { x: 0, y: 0 };
 
 	// line
@@ -145,20 +145,12 @@ View.prototype.addChild = function(node) {
 View.prototype.setLocation = function(x, y) {
 	this.location = { x: x, y: y };
 	this.svg.setBounds(x, y, this.bounds.w, this.bounds.h);
-	this.divName.style.left = x + this.svg.offset.x + "px";
-	this.divName.style.top  = y + this.svg.offset.y + "px";
-	var n = 20;
-	this.divText.style.left = x     + this.svg.offset.x + "px";
-	this.divText.style.top  = (y+n) + this.svg.offset.y + "px";
+	this.divText.style.left = x + this.svg.offset.x + "px";
+	this.divText.style.top  = y + this.svg.offset.y + "px";
 }
 
 View.prototype.setSize = function(w, h) {
 	this.svg.setBounds(this.bounds.x, this.bounds.y, w, h);
-	this.divName.style.width  = (w - this.svg.offset.x * 2) + "px";
-	this.divName.style.height = (h - this.svg.offset.y * 2) + "px";
-	this.divName.width  = (w - this.svg.offset.x * 2);
-	this.divName.height = (h - this.svg.offset.y * 2);
-	h -= 20;
 	this.divText.style.width  = (w - this.svg.offset.x * 2) + "px";
 	this.divText.style.height = (h - this.svg.offset.y * 2) + "px";
 	this.divText.width  = (w - this.svg.offset.x * 2);
@@ -264,11 +256,9 @@ View.prototype.animate = function(r) {
 	if(this.visible != this.visible0) {
 		if(this.visible) {
 			this.svg.setAttribute("display", "block");
-			this.divName.style.display = "block";
 			this.divText.style.display = "block";
 		}
 		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
-		this.divName.style.opacity = this.visible ? r : 1.0 - r;
 		this.divText.style.opacity = this.visible ? r : 1.0 - r;
 	}
 
@@ -314,7 +304,6 @@ View.prototype.animate = function(r) {
 View.prototype.move = function() {
 	this.setLocation(this.bounds.x, this.bounds.y);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
-	this.divName.style.display = this.visible ? "block" : "none";
 	this.divText.style.display = this.visible ? "block" : "none";
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
