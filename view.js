@@ -58,7 +58,7 @@ function newGSNObject(type) {
 	o.setAttribute("fill"  , "#F0F0F0");
 	return o;
 }
-	
+
 /* class View */
 var View = function(node) {
 
@@ -159,7 +159,7 @@ View.prototype.setSize = function(w, h) {
 	this.svg.setBounds(this.bounds.x, this.bounds.y, w, h);
 	this.divName.style.width  = w + "px";
 	this.divName.style.height = h + "px";
-	this.divName.width = w;
+	this.divName.width  = w;
 	this.divName.height = h;
 	this.divText.style.width  = w + "px";
 	this.divText.style.height = (h-n) + "px";
@@ -288,8 +288,10 @@ View.prototype.animate = function(r) {
 		l.setAttribute("y1", this.getY() + this.bounds.h);
 		l.setAttribute("x2", e.getX() + e.bounds.w/2);
 		l.setAttribute("y2", e.getY());
-		l.setAttribute("display", "block");
-		l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
+		if(this.visible != this.visible0) {
+			l.setAttribute("display", "block");
+			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
+		}
 	}
 	var lines = this.contextLines;
 	for(var i=0; i<lines.length; i++) {
@@ -299,8 +301,10 @@ View.prototype.animate = function(r) {
 		l.setAttribute("y1", this.getY() + this.bounds.h/2);
 		l.setAttribute("x2", e.getX());
 		l.setAttribute("y2", e.getY() + e.bounds.h/2);
-		l.setAttribute("display", "block");
-		l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
+		if(this.visible != this.visible0) {
+			l.setAttribute("display", "block");
+			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
+		}
 	}
 }
 
