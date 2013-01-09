@@ -1,3 +1,6 @@
+var FONT_SIZE = 12;
+var MIN_DISP_SCALE = 6 / FONT_SIZE;
+
 function newSvg(name) {
 	var root = document.getElementById("svgroot");
 	var obj = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -26,26 +29,26 @@ function newGSNObject(type) {
 		o.offset = { x: 0, y: 0 };
 	} else if(type == "Context") {
 		o = newSvg("rect");
-		var n = 20;
-		o.setAttribute("rx", n);
-		o.setAttribute("ry", n);
 		o.setBounds = function(x, y, w, h) {
+			var n = 20 * scale;
+			this.setAttribute("rx", n);
+			this.setAttribute("ry", n);
 			this.setAttribute("x", x);
 			this.setAttribute("y", y);
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
+			o.offset = { x: n/3, y: n/3 };
 		}
-		o.offset = { x: n/3, y: n/3 };
 	//} else if(type == "undevelop") {
 	//	o = newSvg("rect");
 	} else if(type == "Strategy") {
 		o = newSvg("polygon");
-		var n = 20;
 		o.setBounds = function(x, y, w, h) {
+			var n = 20 * scale;
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
+			o.offset = { x: n, y: 0 };
 		}
-		o.offset = { x: n, y: 0 };
 	} else if(type == "Evidence" || type == "Monitor") {
 		o = newSvg("ellipse");
 		o.setBounds = function(x, y, w, h) {
@@ -140,7 +143,7 @@ View.prototype.setBounds = function(x, y, w, h) {
 	this.divText.style.top    = (y + this.svg.offset.y) * scale + "px";
 	this.divText.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
 	this.divText.style.height = (h - this.svg.offset.y * 2) * scale + "px";
-	this.divText.style.fontSize = (12 * scale) + "px";
+	this.divText.style.fontSize = Math.round(FONT_SIZE * scale) + "px";
 }
 
 View.prototype.updateLocation = function(x, y) {
@@ -240,7 +243,6 @@ View.prototype.animate = function(r) {
 		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
 		this.divText.style.opacity = this.visible ? r : 1.0 - r;
 	}
-
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
 		var e = contexts[i].view;
@@ -284,6 +286,9 @@ View.prototype.move = function() {
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
 	this.divText.style.display = this.visible ? "block" : "none";
+	if(scale < MIN_DISP_SCALE) {
+			this.divText.style.display = "none";
+	}
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
 		var e = contexts[i].view;
