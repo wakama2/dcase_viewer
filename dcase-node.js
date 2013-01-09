@@ -4,6 +4,7 @@ var Node = function(id, name, type, text) {
 	this.name = name;
 	this.text = text;
 	this.type = type;
+	this.state = "normal";
 	this.children = [];
 	this.contexts = [];
 	this.parents = [];

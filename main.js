@@ -4,6 +4,7 @@ var ANIME_MSEC = 250;
 var X_MARGIN = 30;
 var Y_MARGIN = 60;
 var SCALE_MIN = 0.2;
+var SCALE_MAX = 6.0;
 
 //-------------------------------------
 // global
@@ -60,6 +61,7 @@ function createNode() {
 	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
 	str.children[2].addChild(new Node(1, "SubGoal 1.4", "Goal", "description"));
 	str.children[1].addChild(new Node(1, "Evidence", "Evidence", "description"));
+	str.children[1].children[0].state = "error";
 	str.children[2].addChild(new Node(1, "SubGoalContext", "Context", "description"));
 	return topNode;
 }

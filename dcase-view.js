@@ -1,5 +1,5 @@
 var FONT_SIZE = 12;
-var MIN_DISP_SCALE = 6 / FONT_SIZE;
+var MIN_DISP_SCALE = 7 / FONT_SIZE;
 
 function newSvg(name) {
 	var root = document.getElementById("svgroot");
@@ -30,7 +30,7 @@ function newGSNObject(type) {
 	} else if(type == "Context") {
 		o = newSvg("rect");
 		o.setBounds = function(x, y, w, h) {
-			var n = 20 * scale;
+			var n = scale < 1.0 ? 20 * scale : 20;
 			this.setAttribute("rx", n);
 			this.setAttribute("ry", n);
 			this.setAttribute("x", x);
@@ -44,7 +44,7 @@ function newGSNObject(type) {
 	} else if(type == "Strategy") {
 		o = newSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
-			var n = 20 * scale;
+			var n = scale < 1.0 ? 20 * scale : 20;
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
 			o.offset = { x: n, y: 0 };
@@ -282,9 +282,18 @@ View.prototype.animate = function(r) {
 	}
 }
 
+function getColorByState(state) {
+	if(state == "normal") {
+		return "#F0F0F0";
+	} else if(state == "error") {
+		return "#FF8080";
+	}
+}
+
 View.prototype.move = function() {
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
+	this.svg.setAttribute("fill", getColorByState(this.node.state));
 	this.divText.style.display = this.visible ? "block" : "none";
 	if(scale < MIN_DISP_SCALE) {
 			this.divText.style.display = "none";

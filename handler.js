@@ -31,9 +31,14 @@ function setMouseDragHandler(root, rv) {
 		}
 	}
 	View.prototype.elementMouseUp = function(e) {
-		if(dragX == 0 && dragY == 0) {
+		if(flag && dragX == 0 && dragY == 0) {
 			flag = false;
+			rv.updateLocation(0, 0);
+			var x0 = this.bounds.x;
 			this.setChildVisible(!this.childVisible);
+			rv.updateLocation(0, 0);
+			var x1 = this.bounds.x;
+			shiftX -= (x1-x0) * scale;
 			this.repaintAll(ANIME_MSEC);
 		}
 	}
@@ -74,8 +79,8 @@ function setTouchHandler(root, rv) {
 		if(touchCount == 2) {
 			var a = dist(e.touches[0].pageX - e.touches[1].pageX, 
 					e.touches[0].pageY - e.touches[1].pageY);
-			scale = Math.max(scale0 * (a / d), SCALE_MIN);
-			if(scale != SCALE_MIN) {
+			scale = Math.min(Math.max(scale0 * (a / d), SCALE_MIN), SCALE_MAX);
+			if(scale != SCALE_MIN && scale != SCALE_MAX) {
 				var x1 = (e.touches[0].pageX + e.touches[1].pageX) / 2;
 				var y1 = (e.touches[0].pageY + e.touches[1].pageY) / 2;
 				shiftX = x1 - (x1 - x0) * (a / d);
@@ -101,7 +106,12 @@ function setTouchHandler(root, rv) {
 	View.prototype.elementTouchEnd = function(e) {
 		if(touchCount == 1 && dragX == 0 && dragY == 0) {
 			touchCount = 0;
+			rv.updateLocation(0, 0);
+			var x0 = this.bounds.x;
 			this.setChildVisible(!this.childVisible);
+			rv.updateLocation(0, 0);
+			var x1 = this.bounds.x;
+			shiftX -= (x1-x0) * scale;
 			this.repaintAll(ANIME_MSEC);
 		}
 	}
