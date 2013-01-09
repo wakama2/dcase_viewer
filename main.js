@@ -14,31 +14,53 @@ var dragY = 0;
 var scale = 1.0;
 
 //-------------------------------------
+function createNodeFromJson() {
+	var json = samplejson;
+	console.log(json);
+	var nodes = [];
+	for(var i=0; i<json.nodes.length; i++) {
+		var c = json.nodes[i];
+		nodes[c.name] = c;
+	}
+	function createRec(l, node) {
+		for(var i=0; i<l.children.length; i++) {
+			var child = l.children[i];
+			var n = nodes[child.name];
+			var newNode = new Node(0, n.name, n.DBNodeType, n.description);
+			node.addChild(newNode);
+			createRec(child, newNode);
+		}
+	}
+	var topNode = new Node(0, "TopGoal", "Goal", "");
+	createRec(json.links, topNode);
+	return topNode;
+}
+
 function createNode() {
-	var topNode = new Node(0, "TopGoal", "goal",
+	var topNode = new Node(0, "TopGoal", "Goal",
 			"ウェブショッピングデモ<br>" +
 			"システムはDEOSプロセスにより運用され，ODSを満たしている");
-	var str = new Node(1, "Strategy", "strategy", "DEOSプロセスによって議論する");
-	topNode.addChild(new Node(2, "Context", "context",
+	var str = new Node(1, "Strategy", "Strategy", "DEOSプロセスによって議論する");
+	topNode.addChild(new Node(2, "Context", "Context",
 		"サービス用件:<br>" +
 		"・アクセス数の定格は2500件/分<br>" +
 		"・応答時間は1件あたり3秒以内<br>" +
 		"・一回の障害あたりの復旧時間は5分以内"
 		));
-	topNode.addChild(new Node(2, "Context2", "context", "現在のシステムの運用状態"));
-	topNode.addChild(new Node(2, "Context2", "context", "Risk分析の結果<br>・アクセス数の増大<br>応答遅延"));
+	topNode.addChild(new Node(2, "Context2", "Context", "現在のシステムの運用状態"));
+	topNode.addChild(new Node(2, "Context2", "Context", "Risk分析の結果<br>・アクセス数の増大<br>応答遅延"));
 	topNode.addChild(str);
-	str.addChild(new Node(1, "SubGoal 1", "goal", "description"));
-	str.addChild(new Node(1, "SubGoal 2", "goal", "description"));
-	str.addChild(new Node(1, "SubGoal 3", "goal", "description"));
-	str.addChild(new Node(1, "SubGoal 4", "goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.1", "goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.2", "goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.3", "goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.3", "goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.4", "goal", "description"));
-	str.children[1].addChild(new Node(1, "Evidence", "evidence", "description"));
-	str.children[2].addChild(new Node(1, "SubGoalContext", "context", "description"));
+	str.addChild(new Node(1, "SubGoal 1", "Goal", "description"));
+	str.addChild(new Node(1, "SubGoal 2", "Goal", "description"));
+	str.addChild(new Node(1, "SubGoal 3", "Goal", "description"));
+	str.addChild(new Node(1, "SubGoal 4", "Goal", "description"));
+	str.children[2].addChild(new Node(1, "SubGoal 1.1", "Goal", "description"));
+	str.children[2].addChild(new Node(1, "SubGoal 1.2", "Goal", "description"));
+	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
+	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
+	str.children[2].addChild(new Node(1, "SubGoal 1.4", "Goal", "description"));
+	str.children[1].addChild(new Node(1, "Evidence", "Evidence", "description"));
+	str.children[2].addChild(new Node(1, "SubGoalContext", "Context", "description"));
 	return topNode;
 }
 

@@ -11,7 +11,7 @@ var Node = function(id, name, type, text) {
 }
 
 Node.prototype.addChild = function(node) {
-	if(node.type != "context") {
+	if(node.type != "Context") {
 		this.children.push(node);
 	} else {
 		this.contexts.push(node);

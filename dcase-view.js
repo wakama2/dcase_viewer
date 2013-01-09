@@ -15,7 +15,7 @@ function newDiv(className) {
 
 function newGSNObject(type) {
 	var o = null;
-	if(type == "goal") {
+	if(type == "Goal") {
 		o = newSvg("rect");
 		o.setBounds = function(x, y, w, h) {
 			this.setAttribute("x", x);
@@ -24,7 +24,7 @@ function newGSNObject(type) {
 			this.setAttribute("height", h);
 		}
 		o.offset = { x: 0, y: 0 };
-	} else if(type == "context") {
+	} else if(type == "Context") {
 		o = newSvg("rect");
 		var n = 20;
 		o.setAttribute("rx", n);
@@ -38,7 +38,7 @@ function newGSNObject(type) {
 		o.offset = { x: n/3, y: n/3 };
 	//} else if(type == "undevelop") {
 	//	o = newSvg("rect");
-	} else if(type == "strategy") {
+	} else if(type == "Strategy") {
 		o = newSvg("polygon");
 		var n = 20;
 		o.setBounds = function(x, y, w, h) {
@@ -46,7 +46,7 @@ function newGSNObject(type) {
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
 		}
 		o.offset = { x: n, y: 0 };
-	} else if(type == "evidence" || type == "monitor") {
+	} else if(type == "Evidence" || type == "Monitor") {
 		o = newSvg("ellipse");
 		o.setBounds = function(x, y, w, h) {
 			this.setAttribute("cx", x + w/2);
@@ -126,7 +126,7 @@ View.prototype.setVisible = function(b) {
 View.prototype.addChild = function(node) {
 	var l = newSvg("line");
 	l.setAttribute("stroke", "#404040");
-	if(node.type != "context") {
+	if(node.type != "Context") {
 		this.lines.push(l);
 	} else {
 		this.contextLines.push(l);
