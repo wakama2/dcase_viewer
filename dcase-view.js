@@ -86,11 +86,8 @@ var View = function(node) {
 	this.childVisible0 = this.childVisible;
 
 	var self = this;
-	this.divText.onclick = function(e) {
-		console.log(name + " click");
-		self.setChildVisible(!self.childVisible);
-		self.repaintAll(ANIME_MSEC);
-	}
+	this.divText.onmouseup = function(e) { self.elementMouseUp(e); }
+	this.divText.ontouchend = function(e) { self.elementTouchEnd(e); }
 	this.setBounds(0, 0, 200, 120);
 }
 
@@ -139,13 +136,11 @@ View.prototype.addChild = function(node) {
 View.prototype.setBounds = function(x, y, w, h) {
 	this.location = { x: x, y: y };
 	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	this.divText.style.left = (x + this.svg.offset.x) * scale + "px";
-	this.divText.style.top  = (y + this.svg.offset.y) * scale + "px";
-	this.divText.style.fontSize = (12 * scale) + "px";
+	this.divText.style.left   = (x + this.svg.offset.x) * scale + "px";
+	this.divText.style.top    = (y + this.svg.offset.y) * scale + "px";
 	this.divText.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
 	this.divText.style.height = (h - this.svg.offset.y * 2) * scale + "px";
-	this.divText.width  = (w - this.svg.offset.x * 2) * scale;
-	this.divText.height = (h - this.svg.offset.y * 2) * scale;
+	this.divText.style.fontSize = (12 * scale) + "px";
 }
 
 View.prototype.updateLocation = function(x, y) {

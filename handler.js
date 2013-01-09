@@ -2,11 +2,12 @@ function setMouseDragHandler(root, rv) {
 	var x0 = 0;
 	var y0 = 0;
 	var flag = false;
+	var dragged = false;
 	root.onmousedown = function(e) {
-		console.log("root down");
 		x0 = e.pageX;
 		y0 = e.pageY;
 		flag = true;
+		dragged = false;
 	}
 	root.onmousemove = function(e) {
 		if(flag) {
@@ -18,14 +19,22 @@ function setMouseDragHandler(root, rv) {
 		}
 	}
 	root.onmouseup = function(e) {
-		console.log("root up");
 		if(flag) {
 			shiftX += dragX;
 			shiftY += dragY;
 			dragX = 0;
 			dragY = 0;
-			rv.repaintAll(0);
+			if(dragX == 0 && dragY == 0) {
+				rv.repaintAll(0);
+			}
 			flag = false;
+		}
+	}
+	View.prototype.elementMouseUp = function(e) {
+		if(dragX == 0 && dragY == 0) {
+			flag = false;
+			this.setChildVisible(!this.childVisible);
+			this.repaintAll(ANIME_MSEC);
 		}
 	}
 }
@@ -34,8 +43,6 @@ function setTouchHandler(root, rv) {
 	var touchCount = 0;
 	var d = 0;
 	var scale0 = 0;
-	var sx0 = 0;
-	var sy0 = 0;
 	var x0 = 0;
 	var y0 = 0;
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
@@ -51,8 +58,8 @@ function setTouchHandler(root, rv) {
 			scale0 = scale;
 			d = dist(e.touches[0].pageX - e.touches[1].pageX, 
 					e.touches[0].pageY - e.touches[1].pageY);
-			sx0 = shiftX;// + ($(rootcv).width()-rv.updateLocation(0, 0).x)/2;
-			sy0 = shiftY;
+			x0 = shiftX;
+			y0 = shiftY;
 		}
 	}
 	root.ontouchmove = function(e) {
@@ -68,11 +75,13 @@ function setTouchHandler(root, rv) {
 			var a = dist(e.touches[0].pageX - e.touches[1].pageX, 
 					e.touches[0].pageY - e.touches[1].pageY);
 			scale = Math.max(scale0 * (a / d), SCALE_MIN);
-			var x1 = (e.touches[0].pageX + e.touches[1].pageX) / 2;
-			var y1 = (e.touches[0].pageY + e.touches[1].pageY) / 2;
-			shiftX = x1 - (x1 - sx0) * (a / d);
-			shiftY = y1 - (y1 - sy0) * (a / d);
-			rv.repaintAll(0);
+			if(scale != SCALE_MIN) {
+				var x1 = (e.touches[0].pageX + e.touches[1].pageX) / 2;
+				var y1 = (e.touches[0].pageY + e.touches[1].pageY) / 2;
+				shiftX = x1 - (x1 - x0) * (a / d);
+				shiftY = y1 - (y1 - y0) * (a / d);
+				rv.repaintAll(0);
+			}
 		}
 	}
 	root.ontouchend = function(e) {
@@ -89,13 +98,19 @@ function setTouchHandler(root, rv) {
 		}
 		touchCount = 0;
 	}
+	View.prototype.elementTouchEnd = function(e) {
+		if(touchCount == 1 && dragX == 0 && dragY == 0) {
+			touchCount = 0;
+			this.setChildVisible(!this.childVisible);
+			this.repaintAll(ANIME_MSEC);
+		}
+	}
 }
 
 function setEventHandler(root, rv) {
 	setMouseDragHandler(root, rv);
 	setTouchHandler(root, rv);
-	root.onresize = function(e) {
-		rv.repaintAll(ANIME_MSEC);
-	}
+	//root.onresize = function(e) {
+	//}
 }
 
