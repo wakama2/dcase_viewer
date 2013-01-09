@@ -77,6 +77,7 @@ var View = function(node) {
 			"<a class=\"node-name\">" + node.name + "</a><br/>" +
 			"<a class=\"node-text\">" + node.text + "</a>";
 	this.location = { x: 0, y: 0 };
+	this.childOpen = true;
 	// line
 	this.lines = [];
 	this.contextLines = [];
@@ -103,6 +104,7 @@ View.prototype.getY = function() { return this.location.y; }
 
 View.prototype.setChildVisible = function(b) {
 	this.childVisible = b;
+	this.childOpen = b;
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
 		contexts[i].view.setVisible(b);
@@ -115,6 +117,9 @@ View.prototype.setChildVisible = function(b) {
 
 View.prototype.setVisible = function(b) {
 	this.visible = b;
+	if(b) {
+		b = this.childOpen;
+	}
 	this.childVisible = b;
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
