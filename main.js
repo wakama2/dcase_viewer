@@ -92,7 +92,8 @@ function drawMain() {
 		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
 		root.view.animateSec(ms);
 	}
-	shiftX = ($(rootcv).width() - root.view.updateLocation(0, 0).x)/2;
+	shiftX = ($(rootcv).width() - root.view.updateLocation(0, 0).x * scale)/2;
+	shiftY = 20;
 	root.view.repaintAll(0);
 
 	setEventHandler(rootcv, root.view);

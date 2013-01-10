@@ -197,19 +197,21 @@ View.prototype.updateLocation = function(x, y) {
 		y -= X_MARGIN;
 	}
 	y = Math.max(y0 + h, y);
+	var y1 = y;
 
 	// children
 	if(this.node.children.length != 0) {
 		var children = this.node.children;
 		for(var i=0; i<children.length; i++) {
 			var e = children[i].view;
-			x = e.updateLocation(x, y + Y_MARGIN).x + X_MARGIN;
+			var size = e.updateLocation(x, y + Y_MARGIN);
+			x = size.x + X_MARGIN;
+			y1 = Math.max(y1, size.y);
 		}
 		x -= X_MARGIN;
 	}
 	x = Math.max(x0 + w, x);
 	var x1 = x;
-	var y1 = y;
 
 	// set this bounds
 	this.bounds = { x: x0 + (x-x0-w)/2, y: y0, w: w, h: h };

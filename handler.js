@@ -1,20 +1,30 @@
+function getDragLimit(root, rv) {
+	var size = rv.updateLocation(0, 0);
+	return {
+		l : 20 - size.x * scale - shiftX,
+		r : $(root).width() - 20 - shiftX,
+		t : 20 - size.y * scale - shiftY,
+		b : $(root).height() - 20 - shiftY
+	};
+}
+
 function setMouseDragHandler(root, rv) {
 	var x0 = 0;
 	var y0 = 0;
 	var flag = false;
-	var dragged = false;
+	var bounds = {};
 	root.onmousedown = function(e) {
 		x0 = e.pageX;
 		y0 = e.pageY;
 		flag = true;
-		dragged = false;
+		bounds = getDragLimit(root, rv);
 	}
 	root.onmousemove = function(e) {
 		if(flag) {
 			var dx = e.pageX - x0;
 			var dy = e.pageY - y0;
-			dragX = dx;
-			dragY = dy;
+			dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
+			dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
 			rv.repaintAll(0);
 		}
 	}
@@ -50,6 +60,7 @@ function setTouchHandler(root, rv) {
 	var scale0 = 0;
 	var x0 = 0;
 	var y0 = 0;
+	var bounds = {};
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
 	root.ontouchstart = function(e) {
 		e.preventDefault();
@@ -57,6 +68,7 @@ function setTouchHandler(root, rv) {
 			touchCount = 1;
 			x0 = e.touches[0].pageX;
 			y0 = e.touches[0].pageY;
+			bounds = getDragLimit(root, rv);
 		} else
 		if(e.touches.length == 2) {
 			touchCount = 2;
@@ -72,8 +84,8 @@ function setTouchHandler(root, rv) {
 		if(touchCount == 1) {
 			var dx = e.touches[0].pageX - x0;
 			var dy = e.touches[0].pageY - y0;
-			dragX = dx;
-			dragY = dy;
+			dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
+			dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
 			rv.repaintAll(0);
 		} else
 		if(touchCount == 2) {
