@@ -2,7 +2,7 @@
 // const
 var ANIME_MSEC = 250;
 var X_MARGIN = 30;
-var Y_MARGIN = 60;
+var Y_MARGIN = 100;
 var SCALE_MIN = 0.2;
 var SCALE_MAX = 6.0;
 
@@ -52,6 +52,7 @@ function createNode() {
 	topNode.addChild(new Node(2, "Context2", "Context", "Risk分析の結果<br>・アクセス数の増大<br>応答遅延"));
 	topNode.addChild(str);
 	str.addChild(new Node(1, "SubGoal 1", "Goal", "description"));
+	str.children[0].addChild(new Node(1, "test", "Context", "description"));
 	str.addChild(new Node(1, "SubGoal 2", "Goal", "description"));
 	str.addChild(new Node(1, "SubGoal 3", "Goal", "description"));
 	str.addChild(new Node(1, "SubGoal 4", "Goal", "description"));

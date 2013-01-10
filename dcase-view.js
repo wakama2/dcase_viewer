@@ -149,10 +149,10 @@ View.prototype.addChild = function(node) {
 	l.setAttribute("stroke", "#404040");
 	if(node.type != "Context") {
 		this.lines.push(l);
-		this.divNodes.innerHTML = this.lines.length + " nodes...";
 	} else {
 		this.contextLines.push(l);
 	}
+	this.divNodes.innerHTML = (this.lines.length + this.contextLines.length) + " nodes...";
 }
 
 View.prototype.setBounds = function(x, y, w, h) {
@@ -196,7 +196,7 @@ View.prototype.updateLocation = function(x, y) {
 		}
 		y -= X_MARGIN;
 	}
-	y = Math.max(y0 + h, y);
+	y = Math.max(y0 + h + Y_MARGIN, y);
 	var y1 = y;
 
 	// children
@@ -204,11 +204,14 @@ View.prototype.updateLocation = function(x, y) {
 		var children = this.node.children;
 		for(var i=0; i<children.length; i++) {
 			var e = children[i].view;
-			var size = e.updateLocation(x, y + Y_MARGIN);
+			var size = e.updateLocation(x, y);
 			x = size.x + X_MARGIN;
 			y1 = Math.max(y1, size.y);
 		}
 		x -= X_MARGIN;
+	} else {
+		y -= Y_MARGIN;
+		y1 -= Y_MARGIN;
 	}
 	x = Math.max(x0 + w, x);
 	var x1 = x;
