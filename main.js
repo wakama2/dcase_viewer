@@ -67,19 +67,22 @@ function createNode() {
 	return topNode;
 }
 
-function drawMain() {
-	var rootcv = document.body;
+function drawMain(rootcv) {
 	rootcv.className = "viewer-body";
 
-	var divroot = document.getElementById("divroot");
-	divroot.className = "viewer-body";
-
-	var svgroot = document.getElementById("svgroot");
+	var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	svgroot.id = "svgroot";
 	svgroot.style.position = "absolute";
 	svgroot.style.left = 0;
 	svgroot.style.top  = 0;
 	svgroot.style.width  = "100%";
 	svgroot.style.height = "100%";
+	rootcv.appendChild(svgroot);
+
+	var divroot = document.createElement("divroot");
+	divroot.className = "viewer-body";
+	divroot.id = "divroot";
+	rootcv.appendChild(divroot);
 
 	//var D = document.createElement("div");//for debug
 	//D.style.left = 0;
