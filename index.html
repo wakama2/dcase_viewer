@@ -1,6 +1,7 @@
 <html lang="ja">
 <head>
-<meta http-equiv="Content-Type" context="text/html; charset=UTF-8"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>D-CASE VIEWER</title>
 <link rel="stylesheet" type="text/css" href="dcase-node.css"/>
 <script type="text/javascript" src="jquery.min.js"></script>
@@ -9,14 +10,16 @@
 <script type="text/javascript" src="dcase-view.js"></script>
 <script type="text/javascript" src="handler.js"></script>
 <script type="text/javascript">
-$(document.body).ready(function() {
+window.addEventListener("load",function() {
 	drawMain(document.body);
+	setTimeout(function(){
+		window.scrollTo(0, 0);
+	}, 0);
 });
-window.onload = function() {
-  // for hide URL bar
-  setTimeout(scrollTo, 100, 0, 1);
-}
 </script>
+<style>
+ body { min-height: 480px; }
+</style>
 </head>
 <body>
 </body>
