@@ -16,7 +16,7 @@ var scale = 1.0;
 
 //-------------------------------------
 function createNodeFromJson() {
-	var json = samplejson;
+	var json = JSON.parse(samplejson);
 	console.log(json);
 	var nodes = [];
 	for(var i=0; i<json.nodes.length; i++) {
@@ -87,6 +87,7 @@ function drawMain() {
 	//document.body.appendChild(D);
 
 	var root = createNode();
+	//var root = createNodeFromJson();
 	View.prototype.repaintAll = function(ms) {
 		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
 		root.view.animateSec(ms);
