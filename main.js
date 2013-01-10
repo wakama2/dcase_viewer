@@ -88,7 +88,7 @@ function createNode() {
 	return topNode;
 }
 
-function drawMain(rootcv) {
+function createDCaseViewer(rootcv, url) {
 	rootcv.className = "viewer-body";
 
 	var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -111,8 +111,12 @@ function drawMain(rootcv) {
 	//D.innerHTML = "";
 	//document.body.appendChild(D);
 
-	//var root = createNode();
-	var root = createNodeFromURL("getjson.cgi");
+	var root;
+	if(typeof url === "undefined") {
+		root = createNode();
+	} else {
+		root = createNodeFromURL(url);
+	}
 	View.prototype.repaintAll = function(ms) {
 		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
 		root.view.animateSec(ms);
