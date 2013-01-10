@@ -10,6 +10,7 @@
 .node-container {
 	position: absolute;
 	font-size: 12px;
+	z-index: 1;
 }
 .node-name {
 	font-weight: bold;
@@ -29,4 +30,12 @@
 	text-align: center;
 	display: hidden;
 	border-radius: 4px;
+}
+.argument-border {
+	position: absolute;
+	border-color: #8080D0;
+	border-style: dashed;
+	border-width: 4px;
+	border-radius: 20px;
+	z-index: 0;
 }

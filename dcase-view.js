@@ -73,6 +73,9 @@ var View = function(node) {
 	this.node = node;
 	this.svg = newGSNObject(node.type);
 	this.div = newDiv("node-container");
+	this.argumentBorder = newDiv("div");
+	this.argumentBorder.className = "argument-border";
+	this.argumentBounds = {};
 
 	this.divName = document.createElement("div");
 	this.divName.className = "node-name";
@@ -183,8 +186,10 @@ View.prototype.updateLocation = function(x, y) {
 			x: x, y: y, w: this.bounds.w, h: this.bounds.h
 		};
 		if(this.visible) {
+			this.argumentBounds = { x:x0, y:y0, x1:x+w, y1:y+h };
 			return { x: x+w, y: y+h };
 		}
+		this.argumentBounds = { x:x0, y:y0, x1:x, y1:y };
 		return { x: x, y: y };
 	}
 	// contents
@@ -232,6 +237,7 @@ View.prototype.updateLocation = function(x, y) {
 	
 	x = Math.max(x1, this.bounds.x + w);
 	y = Math.max(y1, this.bounds.y + h);
+	this.argumentBounds = { x:x0, y:y0, x1:x, y1:y };
 	return { x: x, y: y };
 }
 
@@ -305,6 +311,10 @@ View.prototype.animate = function(r) {
 			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
 	}
+	//this.argumentBorder.style.left = this.argumentBounds.x;
+	//this.argumentBorder.style.top  = this.argumentBounds.y;
+	//this.argumentBorder.style.right  = this.argumentBounds.x1;
+	//this.argumentBorder.style.bottom = this.argumentBounds.y1;
 }
 
 function getColorByState(state) {
@@ -355,6 +365,12 @@ View.prototype.move = function() {
 		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
 		l.setAttribute("display", this.childVisible ? "block" : "none");
 	}
+	var n = 10;
+	this.argumentBorder.style.left = scale * (this.argumentBounds.x-n) + "px";
+	this.argumentBorder.style.top  = scale * (this.argumentBounds.y-n) + "px";
+	this.argumentBorder.style.width  = scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px";
+	this.argumentBorder.style.height = scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px";
+	this.argumentBorder.style.display = (this.lines.length != 0 && this.node.type == "Goal" && this.childVisible) ? "block" : "none";
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
