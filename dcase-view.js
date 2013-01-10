@@ -62,8 +62,8 @@ function newGSNObject(type) {
 	} else {
 		throw type + " is not GSN type";
 	}
-	o.setAttribute("stroke", "black");
-	o.setAttribute("fill"  , "#F0F0F0");
+	//o.setAttribute("stroke", "black");
+	o.setAttribute("fill"  , "#CCCCCC");
 	return o;
 }
 
@@ -196,7 +196,7 @@ View.prototype.updateLocation = function(x, y) {
 		}
 		y -= X_MARGIN;
 	}
-	y = Math.max(y0 + h + Y_MARGIN, y);
+	y = Math.max(y0 + h + Y_MARGIN, y + X_MARGIN);
 	var y1 = y;
 
 	// children

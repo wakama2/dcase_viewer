@@ -3,7 +3,7 @@
 var ANIME_MSEC = 250;
 var X_MARGIN = 30;
 var Y_MARGIN = 100;
-var SCALE_MIN = 0.2;
+var SCALE_MIN = 0.1;
 var SCALE_MAX = 6.0;
 
 //-------------------------------------
@@ -36,6 +36,17 @@ function createNodeFromJson() {
 	createRec(json.links, topNode);
 	return topNode;
 }
+
+//function createBinNode(n) {
+//	if(n > 0) {
+//		var node = new Node(0, "Goal", "Goal", "description");
+//		node.addChild(createBinNode(n-1));
+//		node.addChild(createBinNode(n-1));
+//		return node;
+//	} else {
+//		return new Node(0, "Goal", "Goal", "description");
+//	}
+//}
 
 function createNode() {
 	var topNode = new Node(0, "TopGoal", "Goal",
