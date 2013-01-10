@@ -1,5 +1,5 @@
 var FONT_SIZE = 12;
-var MIN_DISP_SCALE = 7 / FONT_SIZE;
+var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
 function newSvg(name) {
 	var root = document.getElementById("svgroot");

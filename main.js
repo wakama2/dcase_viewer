@@ -15,8 +15,17 @@ var dragY = 0;
 var scale = 1.0;
 
 //-------------------------------------
-function createNodeFromJson() {
-	var json = JSON.parse(samplejson);
+function createNodeFromURL(url) {
+	var a = $.ajax({
+		type: "GET",
+		url : url,
+		async: false,
+		dataType: "json",
+	});
+	return createNodeFromJson(JSON.parse(a.responseText));
+}
+
+function createNodeFromJson(json) {
 	console.log(json);
 	var nodes = [];
 	for(var i=0; i<json.nodes.length; i++) {
@@ -32,7 +41,8 @@ function createNodeFromJson() {
 			createRec(child, newNode);
 		}
 	}
-	var topNode = new Node(0, "TopGoal", "Goal", "");
+	var n = nodes[json.links.name];
+	var topNode = new Node(0, n.name, n.DBNodeType, n.description);
 	createRec(json.links, topNode);
 	return topNode;
 }
@@ -101,8 +111,8 @@ function drawMain(rootcv) {
 	//D.innerHTML = "";
 	//document.body.appendChild(D);
 
-	var root = createNode();
-	//var root = createNodeFromJson();
+	//var root = createNode();
+	var root = createNodeFromURL("getjson.cgi");
 	View.prototype.repaintAll = function(ms) {
 		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
 		root.view.animateSec(ms);
