@@ -88,8 +88,6 @@ function drawMain() {
 
 	var root = createNode();
 	View.prototype.repaintAll = function(ms) {
-		//var p = root.view.updateLocation(0, 0);
-		//var m = ($(rootcv).width() - root.view.updateLocation(0, 0).x)/2;
 		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
 		root.view.animateSec(ms);
 	}

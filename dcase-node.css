@@ -9,8 +9,6 @@
 }
 .node-container {
 	position: absolute;
-	padding: 2px;
-	height: auto;
 	font-size: 12px;
 }
 .node-name {
@@ -21,4 +19,13 @@
 .node-text {
 	font-size: 100%;
 	text-align: left;
+}
+.node-closednodes {
+	background: #F0A0A0;
+	position: absolute;
+	left  : 4px;
+	right : 4px;
+	bottom: 4px;
+	text-align: center;
+	display: hidden;
 }

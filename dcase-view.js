@@ -72,10 +72,23 @@ var View = function(node) {
 	// node
 	this.node = node;
 	this.svg = newGSNObject(node.type);
-	this.divText = newDiv("node-container");
-	this.divText.innerHTML =
-			"<a class=\"node-name\">" + node.name + "</a><br/>" +
-			"<a class=\"node-text\">" + node.text + "</a>";
+	this.div = newDiv("node-container");
+
+	this.divName = document.createElement("div");
+	this.divName.className = "node-name";
+	this.divName.innerHTML = node.name;
+	this.div.appendChild(this.divName);
+
+	this.divText = document.createElement("div");
+	this.divText.className = "node-text";
+	this.divText.innerHTML = node.text;
+	this.div.appendChild(this.divText);
+
+	this.divNodes = document.createElement("div");
+	this.divNodes.className = "node-closednodes";
+	this.divNodes.innerHTML = "";
+	this.div.appendChild(this.divNodes);
+	
 	this.location = { x: 0, y: 0 };
 	this.childOpen = true;
 	// line
@@ -90,8 +103,8 @@ var View = function(node) {
 	this.childVisible0 = this.childVisible;
 
 	var self = this;
-	this.divText.onmouseup = function(e) { self.elementMouseUp(e); }
-	this.divText.ontouchend = function(e) { self.elementTouchEnd(e); }
+	this.div.onmouseup = function(e) { self.elementMouseUp(e); }
+	this.div.ontouchend = function(e) { self.elementTouchEnd(e); }
 	this.setBounds(0, 0, 200, 120);
 }
 
@@ -136,6 +149,7 @@ View.prototype.addChild = function(node) {
 	l.setAttribute("stroke", "#404040");
 	if(node.type != "Context") {
 		this.lines.push(l);
+		this.divNodes.innerHTML = this.lines.length + " nodes...";
 	} else {
 		this.contextLines.push(l);
 	}
@@ -144,11 +158,11 @@ View.prototype.addChild = function(node) {
 View.prototype.setBounds = function(x, y, w, h) {
 	this.location = { x: x, y: y };
 	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	this.divText.style.left   = (x + this.svg.offset.x) * scale + "px";
-	this.divText.style.top    = (y + this.svg.offset.y) * scale + "px";
-	this.divText.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
-	this.divText.style.height = (h - this.svg.offset.y * 2) * scale + "px";
-	this.divText.style.fontSize = Math.round(FONT_SIZE * scale) + "px";
+	this.div.style.left   = (x + this.svg.offset.x) * scale + "px";
+	this.div.style.top    = (y + this.svg.offset.y) * scale + "px";
+	this.div.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
+	this.div.style.height = (h - this.svg.offset.y * 2) * scale + "px";
+	this.div.style.fontSize = Math.round(FONT_SIZE * scale) + "px";
 }
 
 View.prototype.updateLocation = function(x, y) {
@@ -243,10 +257,10 @@ View.prototype.animate = function(r) {
 	if(this.visible != this.visible0) {
 		if(this.visible) {
 			this.svg.setAttribute("display", "block");
-			this.divText.style.display = "block";
+			this.div.style.display = "block";
 		}
 		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
-		this.divText.style.opacity = this.visible ? r : 1.0 - r;
+		this.div.style.opacity = this.visible ? r : 1.0 - r;
 	}
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
@@ -258,6 +272,7 @@ View.prototype.animate = function(r) {
 		var e = children[i].view;
 		e.animate(r);
 	}
+	this.divNodes.style.display = !this.childVisible ? "block" : "none";
 	// line
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
@@ -299,9 +314,9 @@ View.prototype.move = function() {
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
 	this.svg.setAttribute("fill", getColorByState(this.node.state));
-	this.divText.style.display = this.visible ? "block" : "none";
+	this.div.style.display = this.visible ? "block" : "none";
 	if(scale < MIN_DISP_SCALE) {
-			this.divText.style.display = "none";
+			this.div.style.display = "none";
 	}
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
@@ -313,6 +328,7 @@ View.prototype.move = function() {
 		var e = children[i].view;
 		e.move();
 	}
+	this.divNodes.style.display = !this.childVisible ? "block" : "none";
 	// line
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
