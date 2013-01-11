@@ -52,6 +52,18 @@ function setMouseDragHandler(root, rv) {
 			this.repaintAll(ANIME_MSEC);
 		}
 	}
+	root.addEventListener("DOMMouseScroll", function(e) {
+		var delta = e.detail;
+		var b = delta > 0 ? 0.9 : 1.1;
+		scale = Math.min(Math.max(scale * b, SCALE_MIN), SCALE_MAX);
+		if(scale != SCALE_MIN && scale != SCALE_MAX) {
+			var x1 = e.pageX;
+			var y1 = e.pageY;
+			shiftX = x1 - (x1 - shiftX) * b;
+			shiftY = y1 - (y1 - shiftY) * b;
+		}
+		rv.repaintAll(0);
+	}, false);
 }
 
 function setTouchHandler(root, rv) {
