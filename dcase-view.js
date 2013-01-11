@@ -75,6 +75,7 @@ var View = function(node) {
 	this.div = newDiv("node-container");
 	this.argumentBorder = newDiv("div");
 	this.argumentBorder.className = "argument-border";
+	this.argumentBorder.style.zIndex = -99;
 	this.argumentBounds = {};
 
 	this.divName = document.createElement("div");

@@ -1,7 +1,6 @@
 .node-container {
 	position: absolute;
 	font-size: 12px;
-	z-index: 1;
 }
 .node-name {
 	font-weight: bold;
@@ -25,8 +24,6 @@
 .argument-border {
 	position: absolute;
 	border-color: #8080D0;
-	border-style: dashed;
-	border-width: 4px;
-	border-radius: 20px;
-	z-index: 0;
+	border-style: dotted;
+	border-width: 2px;
 }
