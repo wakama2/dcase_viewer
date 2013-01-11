@@ -14,6 +14,7 @@ function setMouseDragHandler(root, rv) {
 	var flag = false;
 	var bounds = {};
 	root.onmousedown = function(e) {
+		if(e.detail == 2) return;
 		if(moving) return;
 		x0 = e.pageX;
 		y0 = e.pageY;
