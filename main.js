@@ -89,8 +89,8 @@ function createNode() {
 	return topNode;
 }
 
-function createDCaseViewer(rootcv, url) {
-	rootcv.className = "viewer-body";
+function createDCaseViewer(url) {
+	var root = document.getElementById("viewer-root");
 
 	var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	svgroot.id = "svgroot";
@@ -99,12 +99,7 @@ function createDCaseViewer(rootcv, url) {
 	svgroot.style.top  = 0;
 	svgroot.style.width  = "100%";
 	svgroot.style.height = "100%";
-	rootcv.appendChild(svgroot);
-
-	var divroot = document.createElement("divroot");
-	divroot.className = "viewer-body";
-	divroot.id = "divroot";
-	rootcv.appendChild(divroot);
+	root.appendChild(svgroot);
 
 	//var D = document.createElement("div");//for debug
 	//D.style.left = 0;
@@ -112,20 +107,16 @@ function createDCaseViewer(rootcv, url) {
 	//D.innerHTML = "";
 	//document.body.appendChild(D);
 
-	var root;
-	if(typeof url === "undefined") {
-		root = createNode();
-	} else {
-		root = createNodeFromURL(url);
-	}
+	var node = typeof url === "undefined" ?
+			createNode() : createNodeFromURL(url);
 	View.prototype.repaintAll = function(ms) {
-		root.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
-		root.view.animateSec(ms);
+		node.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
+		node.view.animateSec(ms);
 	}
-	shiftX = ($(rootcv).width() - root.view.updateLocation(0, 0).x * scale)/2;
+	shiftX = ($(root).width() - node.view.updateLocation(0, 0).x * scale)/2;
 	shiftY = 20;
-	root.view.repaintAll(0);
+	node.view.repaintAll(0);
 
-	setEventHandler(rootcv, root.view);
+	setEventHandler(node.view);
 }
 

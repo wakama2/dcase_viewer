@@ -6,15 +6,16 @@
 <link rel="stylesheet" type="text/css" href="dcase-node.css"/>
 <link rel="stylesheet" type="text/css" href="viewer.css"/>
 <script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.mousewheel.min.js"></script>
 <script type="text/javascript" src="main.js" charset="utf-8"></script>
 <script type="text/javascript" src="dcase-node.js"></script>
 <script type="text/javascript" src="dcase-view.js"></script>
 <script type="text/javascript" src="handler.js"></script>
 <script type="text/javascript">
 window.addEventListener("load",function() {
-	//createDCaseViewer(document.body, "getjson.cgi");
-	createDCaseViewer(document.body);
-	setTimeout(function(){
+	//createDCaseViewer("getjson.cgi");
+	createDCaseViewer();
+	setTimeout(function(){ // hide url bar for ipod touch
 		window.scrollTo(0, 0);
 	}, 0);
 });
@@ -23,6 +24,6 @@ window.addEventListener("load",function() {
  body { min-height: 480px; }
 </style>
 </head>
-<body>
+<body id="viewer-root" class="viewer-root">
 </body>
 </html>

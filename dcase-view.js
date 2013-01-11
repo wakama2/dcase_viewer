@@ -9,7 +9,7 @@ function newSvg(name) {
 }
 
 function newDiv(className) {
-	var root = document.getElementById("divroot");
+	var root = document.getElementById("viewer-root");
 	var obj = document.createElement("div");
 	obj.className = className;
 	root.appendChild(obj);
@@ -73,6 +73,7 @@ var View = function(node) {
 	this.node = node;
 	this.svg = newGSNObject(node.type);
 	this.div = newDiv("node-container");
+	this.div.dcaseview = this;
 	this.argumentBorder = newDiv("div");
 	this.argumentBorder.className = "argument-border";
 	this.argumentBorder.style.zIndex = -99;
@@ -109,8 +110,6 @@ var View = function(node) {
 	this.childVisible0 = this.childVisible;
 
 	var self = this;
-	this.div.onmouseup = function(e) { self.elementMouseUp(e); }
-	this.div.ontouchend = function(e) { self.elementTouchEnd(e); }
 	this.setBounds(0, 0, 200, 120);
 }
 
