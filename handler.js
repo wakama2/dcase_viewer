@@ -60,6 +60,8 @@ function setTouchHandler(root, rv) {
 	var scale0 = 0;
 	var x0 = 0;
 	var y0 = 0;
+	var sx = 0;
+	var sx = 0;
 	var bounds = {};
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
 	root.ontouchstart = function(e) {
@@ -73,10 +75,12 @@ function setTouchHandler(root, rv) {
 		if(e.touches.length == 2) {
 			touchCount = 2;
 			scale0 = scale;
+			x0 = (e.touches[0].pageX + e.touches[1].pageX) / 2;
+			y0 = (e.touches[0].pageY + e.touches[1].pageY) / 2;
 			d = dist(e.touches[0].pageX - e.touches[1].pageX, 
 					e.touches[0].pageY - e.touches[1].pageY);
-			x0 = shiftX;
-			y0 = shiftY;
+			sx0 = shiftX;
+			sy0 = shiftY;
 		}
 	}
 	root.ontouchmove = function(e) {
@@ -95,8 +99,13 @@ function setTouchHandler(root, rv) {
 			if(scale != SCALE_MIN && scale != SCALE_MAX) {
 				var x1 = (e.touches[0].pageX + e.touches[1].pageX) / 2;
 				var y1 = (e.touches[0].pageY + e.touches[1].pageY) / 2;
-				shiftX = x1 - (x1 - x0) * (a / d);
-				shiftY = y1 - (y1 - y0) * (a / d);
+				shiftX = x1 - (x1 - sx0) * (a / d);
+				shiftY = y1 - (y1 - sy0) * (a / d);
+
+				var dx = (x1 - x0) * (a / d);
+				var dy = (y1 - y0) * (a / d);
+				dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
+				dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
 				rv.repaintAll(0);
 			}
 		}
@@ -111,6 +120,10 @@ function setTouchHandler(root, rv) {
 			rv.repaintAll(0);
 		} else
 		if(touchCount == 2) {
+			shiftX += dragX;
+			shiftY += dragY;
+			dragX = 0;
+			dragY = 0;
 			rv.repaintAll(0);
 		}
 		touchCount = 0;
