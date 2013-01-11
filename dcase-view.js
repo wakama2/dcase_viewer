@@ -241,8 +241,8 @@ View.prototype.updateLocation = function(x, y) {
 	return { x: x, y: y };
 }
 
-View.prototype.animateSec = function(sec) {
-	if(sec == 0) {
+View.prototype.animateSec = function(ms) {
+	if(ms == 0) {
 		this.move();
 		return;
 	}
@@ -250,7 +250,7 @@ View.prototype.animateSec = function(sec) {
 	var begin = new Date();
 	var id = setInterval(function() {
 		var time = new Date() - begin;
-		var r = time / sec;
+		var r = time / ms;
 		if(r < 1.0) {
 			self.animate(r);
 		} else {
