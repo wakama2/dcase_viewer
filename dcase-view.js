@@ -91,6 +91,8 @@ var View = function(node) {
 	this.divNodes.className = "node-closednodes";
 	this.divNodes.innerHTML = "";
 	this.div.appendChild(this.divNodes);
+	this.divNodesText = "";
+	this.divNodesVisible = false;
 	
 	this.location = { x: 0, y: 0 };
 	this.childOpen = true;
@@ -155,7 +157,8 @@ View.prototype.addChild = function(node) {
 	} else {
 		this.contextLines.push(l);
 	}
-	this.divNodes.innerHTML = (this.lines.length + this.contextLines.length) + " nodes...";
+	this.divNodesText = (this.lines.length + this.contextLines.length) + " nodes...";
+	this.divNodesVisible = true;
 }
 
 View.prototype.setBounds = function(x, y, w, h) {
@@ -333,7 +336,17 @@ View.prototype.move = function() {
 	this.svg.setAttribute("fill", getColorByState(this.node.state));
 	this.div.style.display = this.visible ? "block" : "none";
 	if(scale < MIN_DISP_SCALE) {
-			this.div.style.display = "none";
+		this.divText.style.display = "none";
+		this.divName.style.display = "none";
+		if(this.divNodesVisible) {
+			this.divNodes.innerHTML = "<p></p>";
+		}
+	} else {
+		this.divText.style.display = "block";
+		this.divName.style.display = "block";
+		if(this.divNodesVisible) {
+			this.divNodes.innerHTML = this.divNodesText;
+		}
 	}
 	var contexts = this.node.contexts;
 	for(var i=0; i<contexts.length; i++) {
