@@ -246,6 +246,7 @@ View.prototype.animateSec = function(ms) {
 		this.move();
 		return;
 	}
+	moving = true;
 	var self = this;
 	var begin = new Date();
 	var id = setInterval(function() {
@@ -256,6 +257,7 @@ View.prototype.animateSec = function(ms) {
 		} else {
 			clearInterval(id);
 			self.move();
+			moving = false;
 		}
 	}, 1000/60);
 }

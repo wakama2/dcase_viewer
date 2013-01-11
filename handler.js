@@ -14,6 +14,7 @@ function setMouseDragHandler(root, rv) {
 	var flag = false;
 	var bounds = {};
 	root.onmousedown = function(e) {
+		if(moving) return;
 		x0 = e.pageX;
 		y0 = e.pageY;
 		flag = true;
@@ -77,6 +78,7 @@ function setTouchHandler(root, rv) {
 	var bounds = {};
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
 	root.ontouchstart = function(e) {
+		if(moving) return;
 		e.preventDefault();
 		if(e.touches.length == 1) {
 			touchCount = 1;

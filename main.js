@@ -13,6 +13,7 @@ var shiftY = 0;
 var dragX = 0;
 var dragY = 0;
 var scale = 1.0;
+var moving = false;
 
 //-------------------------------------
 function createNodeFromURL(url) {
