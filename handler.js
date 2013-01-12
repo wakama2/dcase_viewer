@@ -1,3 +1,52 @@
+var Dragger = function(rv) {
+	var x0 = 0;
+	var y0 = 0;
+	var flag = false;
+	var bounds = {};
+
+	this.dragStart = function(x, y) {
+		if(flag) {
+			//TODO
+		}
+		x0 = x;
+		y0 = y;
+		flag = true;
+		bounds = getDragLimit(rv);
+	}
+	this.drag = function(x, y) {
+		if(flag) {
+			var dx = x - x0;
+			var dy = y - y0;
+			dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
+			dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
+			rv.repaintAll(0);
+		}
+	}
+	this.dragEnd = function(view) {
+		if(flag) {
+			if(dragX == 0 && dragY == 0) {
+				if(view != null) {
+					rv.updateLocation(0, 0);
+					var x0 = view.bounds.x;
+					view.setChildVisible(!view.childVisible);
+					rv.updateLocation(0, 0);
+					var x1 = view.bounds.x;
+					shiftX -= (x1-x0) * scale;
+					view.repaintAll(ANIME_MSEC);
+				}
+			} else {
+				shiftX += dragX;
+				shiftY += dragY;
+				dragX = 0;
+				dragY = 0;
+				rv.repaintAll(0);
+			}
+			flag = false;
+		}
+
+	}
+}
+
 function getDragLimit(rv) {
 	var root = $(".viewer-root");
 	var size = rv.updateLocation(0, 0);
@@ -9,52 +58,20 @@ function getDragLimit(rv) {
 	};
 }
 
-function setMouseDragHandler(rv) {
-	var x0 = 0;
-	var y0 = 0;
-	var flag = false;
-	var bounds = {};
+function setMouseDragHandler(dragInfo, rv) {
 	$(".viewer-root").mousedown(function(e) {
 		if(e.originalEvent.detail == 2) return;
 		if(moving) return;
-		x0 = e.pageX;
-		y0 = e.pageY;
-		flag = true;
-		bounds = getDragLimit(rv);
+		dragInfo.dragStart(e.pageX, e.pageY);
 	});
 	$(".viewer-root").mousemove(function(e) {
-		if(flag) {
-			var dx = e.pageX - x0;
-			var dy = e.pageY - y0;
-			dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
-			dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
-			rv.repaintAll(0);
-		}
+		dragInfo.drag(e.pageX, e.pageY);
 	});
 	$(".viewer-root").mouseup(function(e) {
-		if(flag) {
-			shiftX += dragX;
-			shiftY += dragY;
-			dragX = 0;
-			dragY = 0;
-			if(dragX == 0 && dragY == 0) {
-				rv.repaintAll(0);
-			}
-			flag = false;
-		}
+		dragInfo.dragEnd(null);
 	});
 	$(".node-container").mouseup(function(e) {
-		if(flag && dragX == 0 && dragY == 0) {
-			flag = false;
-			rv.updateLocation(0, 0);
-			var view = this.dcaseview;
-			var x0 = view.bounds.x;
-			view.setChildVisible(!view.childVisible);
-			rv.updateLocation(0, 0);
-			var x1 = view.bounds.x;
-			shiftX -= (x1-x0) * scale;
-			view.repaintAll(ANIME_MSEC);
-		}
+		dragInfo.dragEnd(this.dcaseview);
 	});
 	$(".viewer-root").mousewheel(function(e, delta) {
 		var b = delta < 0 ? 0.95 : 1.05;
@@ -69,7 +86,7 @@ function setMouseDragHandler(rv) {
 	});
 }
 
-function setTouchHandler(rv) {
+function setTouchHandler(dragInfo, rv) {
 	var touchCount = 0;
 	var d = 0;
 	var scale0 = 0;
@@ -163,8 +180,9 @@ function setTouchHandler(rv) {
 }
 
 function setEventHandler(rv) {
-	setMouseDragHandler(rv);
-	setTouchHandler(rv);
+	var dragInfo = new Dragger(rv);
+	setMouseDragHandler(dragInfo, rv);
+	setTouchHandler(dragInfo, rv);
 	//root.onresize = function(e) {
 	//}
 }
