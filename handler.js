@@ -4,19 +4,31 @@ var Dragger = function(rv) {
 	var flag = false;
 	var bounds = {};
 
+	function getDragLimit(rv) {
+		var root = $(".viewer-root");
+		var size = rv.updateLocation(0, 0);
+		return {
+			l : 20 - size.x * scale - shiftX,
+			r : root.width() - 20 - shiftX,
+			t : 20 - size.y * scale - shiftY,
+			b : root.height() - 20 - shiftY
+		};
+	}
+
 	this.dragStart = function(x, y) {
 		if(flag) {
-			//TODO
+			this.dragEnd();
 		}
 		x0 = x;
 		y0 = y;
 		flag = true;
 		bounds = getDragLimit(rv);
 	}
-	this.drag = function(x, y) {
+	this.drag = function(x, y, scale) {
+		if(typeof scale == "undefined") scale = 1.0;
 		if(flag) {
-			var dx = x - x0;
-			var dy = y - y0;
+			var dx = (x - x0) * scale;
+			var dy = (y - y0) * scale;
 			dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
 			dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
 			rv.repaintAll(0);
@@ -25,7 +37,7 @@ var Dragger = function(rv) {
 	this.dragEnd = function(view) {
 		if(flag) {
 			if(dragX == 0 && dragY == 0) {
-				if(view != null) {
+				if(typeof view != "undefined") {
 					rv.updateLocation(0, 0);
 					var x0 = view.bounds.x;
 					view.setChildVisible(!view.childVisible);
@@ -43,35 +55,23 @@ var Dragger = function(rv) {
 			}
 			flag = false;
 		}
-
 	}
 }
 
-function getDragLimit(rv) {
-	var root = $(".viewer-root");
-	var size = rv.updateLocation(0, 0);
-	return {
-		l : 20 - size.x * scale - shiftX,
-		r : root.width() - 20 - shiftX,
-		t : 20 - size.y * scale - shiftY,
-		b : root.height() - 20 - shiftY
-	};
-}
-
-function setMouseDragHandler(dragInfo, rv) {
+function setMouseDragHandler(drag, rv) {
 	$(".viewer-root").mousedown(function(e) {
 		if(e.originalEvent.detail == 2) return;
 		if(moving) return;
-		dragInfo.dragStart(e.pageX, e.pageY);
+		drag.dragStart(e.pageX, e.pageY);
 	});
 	$(".viewer-root").mousemove(function(e) {
-		dragInfo.drag(e.pageX, e.pageY);
+		drag.drag(e.pageX, e.pageY);
 	});
 	$(".viewer-root").mouseup(function(e) {
-		dragInfo.dragEnd(null);
+		drag.dragEnd();
 	});
 	$(".node-container").mouseup(function(e) {
-		dragInfo.dragEnd(this.dcaseview);
+		drag.dragEnd(this.dcaseview);
 	});
 	$(".viewer-root").mousewheel(function(e, delta) {
 		var b = delta < 0 ? 0.95 : 1.05;
@@ -86,15 +86,12 @@ function setMouseDragHandler(dragInfo, rv) {
 	});
 }
 
-function setTouchHandler(dragInfo, rv) {
+function setTouchHandler(drag, rv) {
 	var touchCount = 0;
 	var d = 0;
 	var scale0 = 0;
-	var x0 = 0;
-	var y0 = 0;
 	var sx = 0;
 	var sx = 0;
-	var bounds = {};
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
 	$(".viewer-root").bind("touchstart", function(e) {
 		var touches = e.originalEvent.touches;
@@ -102,30 +99,29 @@ function setTouchHandler(dragInfo, rv) {
 		e.preventDefault();
 		if(touches.length == 1) {
 			touchCount = 1;
-			x0 = touches[0].pageX;
-			y0 = touches[0].pageY;
-			bounds = getDragLimit(rv);
+			var x = touches[0].pageX;
+			var y = touches[0].pageY;
+			drag.dragStart(x, y);
 		} else
 		if(touches.length == 2) {
 			touchCount = 2;
 			scale0 = scale;
-			x0 = (touches[0].pageX + touches[1].pageX) / 2;
-			y0 = (touches[0].pageY + touches[1].pageY) / 2;
 			d = dist(touches[0].pageX - touches[1].pageX, 
 					touches[0].pageY - touches[1].pageY);
 			sx0 = shiftX;
 			sy0 = shiftY;
+			var x = (touches[0].pageX + touches[1].pageX) / 2;
+			var y = (touches[0].pageY + touches[1].pageY) / 2;
+			drag.dragStart(x, y);
 		}
 	});
 	$(".viewer-root").bind("touchmove", function(e) {
 		e.preventDefault();
 		var touches = e.originalEvent.touches;
 		if(touchCount == 1) {
-			var dx = touches[0].pageX - x0;
-			var dy = touches[0].pageY - y0;
-			dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
-			dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
-			rv.repaintAll(0);
+			var x = touches[0].pageX;
+			var y = touches[0].pageY;
+			drag.drag(x, y);
 		} else
 		if(touchCount == 2) {
 			var a = dist(touches[0].pageX - touches[1].pageX, 
@@ -136,54 +132,24 @@ function setTouchHandler(dragInfo, rv) {
 				var y1 = (touches[0].pageY + touches[1].pageY) / 2;
 				shiftX = x1 - (x1 - sx0) * (a / d);
 				shiftY = y1 - (y1 - sy0) * (a / d);
-
-				var dx = (x1 - x0) * (a / d);
-				var dy = (y1 - y0) * (a / d);
-				dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
-				dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
-				rv.repaintAll(0);
+				drag.drag(x1, y1, a / d);
 			}
 		}
 	});
 	$(".viewer-root").bind("touchend", function(e) {
 		e.preventDefault();
-		if(touchCount == 1) {
-			shiftX += dragX;
-			shiftY += dragY;
-			dragX = 0;
-			dragY = 0;
-			rv.repaintAll(0);
-		} else
-		if(touchCount == 2) {
-			shiftX += dragX;
-			shiftY += dragY;
-			dragX = 0;
-			dragY = 0;
-			rv.repaintAll(0);
-		}
+		drag.dragEnd();
 		touchCount = 0;
 	});
 	$(".node-container").bind("touchend", function(e) {
-	//View.prototype.elementTouchEnd = function(e) {
-		if(touchCount == 1 && dragX == 0 && dragY == 0) {
-			touchCount = 0;
-			rv.updateLocation(0, 0);
-			var view = this.dcaseview;
-			var x0 = view.bounds.x;
-			view.setChildVisible(!view.childVisible);
-			rv.updateLocation(0, 0);
-			var x1 = view.bounds.x;
-			shiftX -= (x1-x0) * scale;
-			view.repaintAll(ANIME_MSEC);
-		}
+		drag.dragEnd(this.dcaseview);
+		touchCount = 0;
 	});
 }
 
 function setEventHandler(rv) {
-	var dragInfo = new Dragger(rv);
-	setMouseDragHandler(dragInfo, rv);
-	setTouchHandler(dragInfo, rv);
-	//root.onresize = function(e) {
-	//}
+	var drag = new Dragger(rv);
+	setMouseDragHandler(drag, rv);
+	setTouchHandler(drag, rv);
 }
 
