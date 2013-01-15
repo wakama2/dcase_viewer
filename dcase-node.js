@@ -48,7 +48,7 @@ function createNodeFromJson(json) {
 	}
 	var n = nodes[json.links.name];
 	var topNode = new Node(0, n.name, n.DBNodeType, n.description);
-	createchildren(json.links, topNode);
+	createChildren(json.links, topNode);
 	return topNode;
 }
 

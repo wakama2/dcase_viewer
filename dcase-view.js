@@ -29,10 +29,10 @@ function newGSNObject(root, type) {
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
-			var n = root.scale < 1.0 ? 20 * root.scale : 20;
+			var n = 20 * root.scale;
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
-			o.offset = { x: n, y: 0 };
+			o.offset = { x: 20, y: 0 };
 		}
 	} else if(type == "Evidence" || type == "Monitor") {
 		o = root.createSvg("ellipse");
@@ -41,7 +41,7 @@ function newGSNObject(root, type) {
 			this.setAttribute("cy", y + h/2);
 			this.setAttribute("rx", w/2);
 			this.setAttribute("ry", h/2);
-			o.offset = { x: w/8, y: h/8 };
+			o.offset = { x: w/8/root.scale, y: h/8/root.scale };
 		}
 		o.offset = { x: 0, y: 0 };
 	} else {
