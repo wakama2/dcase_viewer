@@ -1,10 +1,14 @@
-<html lang="ja">
+<!DOCTYPE html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>D-CASE VIEWER</title>
 <link rel="stylesheet" type="text/css" href="dcase-node.css"/>
 <link rel="stylesheet" type="text/css" href="viewer.css"/>
+<style>
+ body { min-height: 480px; }
+</style>
 <script type="text/javascript" src="jquery.min.js"></script>
 <script type="text/javascript" src="jquery.mousewheel.min.js"></script>
 <script type="text/javascript" src="main.js" charset="utf-8"></script>
@@ -13,17 +17,21 @@
 <script type="text/javascript" src="handler.js"></script>
 <script type="text/javascript">
 window.addEventListener("load",function() {
-	//createDCaseViewer("getjson.cgi");
-	createDCaseViewer();
-	setTimeout(function(){ // hide url bar for ipod touch
+	// create viewer
+	//var opts = {
+	//	data: createSampleNode()
+	//	//data: getFromCGI("getjson.cgi")
+	//};
+	var opts = {};
+	new DCaseViewer(document.getElementById("viewer"), opts);
+
+	// hide url bar for ipod touch
+	setTimeout(function(){
 		window.scrollTo(0, 0);
 	}, 0);
 });
 </script>
-<style>
- body { min-height: 480px; }
-</style>
 </head>
-<body id="viewer-root" class="viewer-root">
+<body id="viewer">
 </body>
 </html>

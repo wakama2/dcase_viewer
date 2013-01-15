@@ -89,8 +89,27 @@ function createNode() {
 	return topNode;
 }
 
-function createDCaseViewer(url) {
-	var root = document.getElementById("viewer-root");
+function createView(root, node) {
+	var v = new View(root, node);
+	for(var i=0; i<node.children.length; i++) {
+		var c = createView(root, node.children[i]);
+		node.children[i].view = c;//FIXME
+		v.addChild(c);
+	}
+	for(var i=0; i<node.contexts.length; i++) {
+		var c = createView(root, node.contexts[i]);
+		node.contexts[i].view = c;//FIXME
+		v.addChild(c);
+	}
+	return v;
+}
+
+var DCaseViewer = function(root, opts) {
+	var node_m = typeof opts.url === "undefined" ?
+			createNode() : createNodeFromURL(opts.url);
+
+	root.className = "viewer-root";
+	this.root = root;
 
 	var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 	svgroot.id = "svgroot";
@@ -100,6 +119,7 @@ function createDCaseViewer(url) {
 	svgroot.style.width  = "100%";
 	svgroot.style.height = "100%";
 	root.appendChild(svgroot);
+	this.svgroot = svgroot;
 
 	//var D = document.createElement("div");//for debug
 	//D.style.left = 0;
@@ -107,16 +127,29 @@ function createDCaseViewer(url) {
 	//D.innerHTML = "";
 	//document.body.appendChild(D);
 
-	var node = typeof url === "undefined" ?
-			createNode() : createNodeFromURL(url);
-	View.prototype.repaintAll = function(ms) {
-		node.view.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
-		node.view.animateSec(ms);
-	}
-	shiftX = ($(root).width() - node.view.updateLocation(0, 0).x * scale)/2;
+	var rootview = createView(this, node_m);
+	this.rootview = rootview;
+	shiftX = ($(root).width() - rootview.updateLocation(0, 0).x * scale)/2;
 	shiftY = 20;
-	node.view.repaintAll(0);
+	this.repaintAll(0);
+	this.addEventHandler(rootview);
+}
 
-	setEventHandler(node.view);
+DCaseViewer.prototype.createDiv = function(className) {
+	var obj = document.createElement("div");
+	obj.className = className;
+	this.root.appendChild(obj);
+	return obj;
+}
+
+DCaseViewer.prototype.createSvg = function(name) {
+	var obj = document.createElementNS("http://www.w3.org/2000/svg", name);
+	this.svgroot.appendChild(obj);
+	return obj;
+}
+
+DCaseViewer.prototype.repaintAll = function(ms) {
+	this.rootview.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
+	this.rootview.animateSec(ms);
 }
 

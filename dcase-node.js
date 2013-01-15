@@ -8,7 +8,6 @@ var Node = function(id, name, type, text) {
 	this.children = [];
 	this.contexts = [];
 	this.parents = [];
-	this.view = new View(this);
 }
 
 Node.prototype.addChild = function(node) {
@@ -17,7 +16,6 @@ Node.prototype.addChild = function(node) {
 	} else {
 		this.contexts.push(node);
 	}
-	this.view.addChild(node);
 	node.parents.push(this);
 }
 

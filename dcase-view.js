@@ -1,25 +1,10 @@
 var FONT_SIZE = 12;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
-function newSvg(name) {
-	var root = document.getElementById("svgroot");
-	var obj = document.createElementNS("http://www.w3.org/2000/svg", name);
-	root.appendChild(obj);
-	return obj;
-}
-
-function newDiv(className) {
-	var root = document.getElementById("viewer-root");
-	var obj = document.createElement("div");
-	obj.className = className;
-	root.appendChild(obj);
-	return obj;
-}
-
-function newGSNObject(type) {
+function newGSNObject(root, type) {
 	var o = null;
 	if(type == "Goal") {
-		o = newSvg("rect");
+		o = root.createSvg("rect");
 		o.setBounds = function(x, y, w, h) {
 			this.setAttribute("x", x);
 			this.setAttribute("y", y);
@@ -28,7 +13,7 @@ function newGSNObject(type) {
 		}
 		o.offset = { x: 0, y: 0 };
 	} else if(type == "Context") {
-		o = newSvg("rect");
+		o = root.createSvg("rect");
 		o.setBounds = function(x, y, w, h) {
 			var n = scale < 1.0 ? 20 * scale : 20;
 			this.setAttribute("rx", n);
@@ -40,9 +25,9 @@ function newGSNObject(type) {
 			o.offset = { x: n/3, y: n/3 };
 		}
 	//} else if(type == "undevelop") {
-	//	o = newSvg("rect");
+	//	o = root.createSvg("rect");
 	} else if(type == "Strategy") {
-		o = newSvg("polygon");
+		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
 			var n = scale < 1.0 ? 20 * scale : 20;
 			this.setAttribute("points", 
@@ -50,7 +35,7 @@ function newGSNObject(type) {
 			o.offset = { x: n, y: 0 };
 		}
 	} else if(type == "Evidence" || type == "Monitor") {
-		o = newSvg("ellipse");
+		o = root.createSvg("ellipse");
 		o.setBounds = function(x, y, w, h) {
 			this.setAttribute("cx", x + w/2);
 			this.setAttribute("cy", y + h/2);
@@ -68,13 +53,14 @@ function newGSNObject(type) {
 }
 
 /* class View */
-var View = function(node) {
+var View = function(root, node) {
 	// node
 	this.node = node;
-	this.svg = newGSNObject(node.type);
-	this.div = newDiv("node-container");
+	this.root = root;
+	this.svg = newGSNObject(root, node.type);
+	this.div = root.createDiv("node-container");
 	this.div.dcaseview = this;
-	this.argumentBorder = newDiv("div");
+	this.argumentBorder = root.createDiv("div");
 	this.argumentBorder.className = "argument-border";
 	this.argumentBorder.style.zIndex = -99;
 	this.argumentBounds = {};
@@ -113,10 +99,6 @@ var View = function(node) {
 	this.setBounds(0, 0, 200, 120);
 }
 
-View.prototype.repaintAll = function(ms) {
-	throw "View.repaintAll not overrided";
-}
-
 View.prototype.getX = function() { return this.location.x; }
 View.prototype.getY = function() { return this.location.y; }
 
@@ -149,8 +131,9 @@ View.prototype.setVisible = function(b) {
 	}
 }
 
-View.prototype.addChild = function(node) {
-	var l = newSvg("line");
+View.prototype.addChild = function(view) {
+	var node = view.node;
+	var l = this.root.createSvg("line");
 	l.setAttribute("stroke", "#404040");
 	if(node.type != "Context") {
 		this.lines.push(l);
