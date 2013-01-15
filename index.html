@@ -7,7 +7,15 @@
 <link rel="stylesheet" type="text/css" href="dcase-node.css"/>
 <link rel="stylesheet" type="text/css" href="viewer.css"/>
 <style>
- body { min-height: 480px; }
+body {
+	min-height: 480px;
+}
+#viewer {
+	left: 0px;
+	top : 0px;
+	width : 100%;
+	height: 100%;
+}
 </style>
 <script type="text/javascript" src="jquery.min.js"></script>
 <script type="text/javascript" src="jquery.mousewheel.min.js"></script>
@@ -17,12 +25,11 @@
 <script type="text/javascript" src="handler.js"></script>
 <script type="text/javascript">
 window.addEventListener("load",function() {
-	// create viewer
-	//var opts = {
-	//	data: createSampleNode()
-	//	//data: getFromCGI("getjson.cgi")
-	//};
-	var opts = {};
+	var opts = {
+		//node: createNodeFromURL("getjson.cgi")
+		//node: createBinNode(4)
+		node: createSampleNode()
+	};
 	new DCaseViewer(document.getElementById("viewer"), opts);
 
 	// hide url bar for ipod touch

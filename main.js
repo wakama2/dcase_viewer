@@ -8,118 +8,19 @@ var SCALE_MAX = 6.0;
 
 //-------------------------------------
 // global
-var shiftX = 0;
-var shiftY = 0;
-var dragX = 0;
-var dragY = 0;
-var scale = 1.0;
-var moving = false;
-
-//-------------------------------------
-function createNodeFromURL(url) {
-	var a = $.ajax({
-		type: "GET",
-		url : url,
-		async: false,
-		dataType: "json",
-	});
-	return createNodeFromJson(JSON.parse(a.responseText));
-}
-
-function createNodeFromJson(json) {
-	console.log(json);
-	var nodes = [];
-	for(var i=0; i<json.nodes.length; i++) {
-		var c = json.nodes[i];
-		nodes[c.name] = c;
-	}
-	function createRec(l, node) {
-		for(var i=0; i<l.children.length; i++) {
-			var child = l.children[i];
-			var n = nodes[child.name];
-			var newNode = new Node(0, n.name, n.DBNodeType, n.description);
-			node.addChild(newNode);
-			createRec(child, newNode);
-		}
-	}
-	var n = nodes[json.links.name];
-	var topNode = new Node(0, n.name, n.DBNodeType, n.description);
-	createRec(json.links, topNode);
-	return topNode;
-}
-
-//function createBinNode(n) {
-//	if(n > 0) {
-//		var node = new Node(0, "Goal", "Goal", "description");
-//		node.addChild(createBinNode(n-1));
-//		node.addChild(createBinNode(n-1));
-//		return node;
-//	} else {
-//		return new Node(0, "Goal", "Goal", "description");
-//	}
-//}
-
-function createNode() {
-	var topNode = new Node(0, "TopGoal", "Goal",
-			"ウェブショッピングデモ<br>" +
-			"システムはDEOSプロセスにより運用され，ODSを満たしている");
-	var str = new Node(1, "Strategy", "Strategy", "DEOSプロセスによって議論する");
-	topNode.addChild(new Node(2, "Context", "Context",
-		"サービス用件:<br>" +
-		"・アクセス数の定格は2500件/分<br>" +
-		"・応答時間は1件あたり3秒以内<br>" +
-		"・一回の障害あたりの復旧時間は5分以内"
-		));
-	topNode.addChild(new Node(2, "Context2", "Context", "現在のシステムの運用状態"));
-	topNode.addChild(new Node(2, "Context2", "Context", "Risk分析の結果<br>・アクセス数の増大<br>応答遅延"));
-	topNode.addChild(str);
-	str.addChild(new Node(1, "SubGoal 1", "Goal", "description"));
-	str.children[0].addChild(new Node(1, "test", "Context", "description"));
-	str.addChild(new Node(1, "SubGoal 2", "Goal", "description"));
-	str.addChild(new Node(1, "SubGoal 3", "Goal", "description"));
-	str.addChild(new Node(1, "SubGoal 4", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.1", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.2", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.4", "Goal", "description"));
-	str.children[1].addChild(new Node(1, "Evidence", "Evidence", "description"));
-	str.children[1].children[0].state = "error";
-	str.children[2].addChild(new Node(1, "SubGoalContext", "Context", "description"));
-	return topNode;
-}
-
-function createView(root, node) {
-	var v = new View(root, node);
-	for(var i=0; i<node.children.length; i++) {
-		var c = createView(root, node.children[i]);
-		node.children[i].view = c;//FIXME
-		v.addChild(c);
-	}
-	for(var i=0; i<node.contexts.length; i++) {
-		var c = createView(root, node.contexts[i]);
-		node.contexts[i].view = c;//FIXME
-		v.addChild(c);
-	}
-	return v;
-}
 
 var DCaseViewer = function(root, opts) {
-	var node_m = typeof opts.url === "undefined" ?
-			createNode() : createNodeFromURL(opts.url);
-
 	root.className = "viewer-root";
 	this.root = root;
 
-	var svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	svgroot.id = "svgroot";
-	svgroot.style.position = "absolute";
-	svgroot.style.left = 0;
-	svgroot.style.top  = 0;
-	svgroot.style.width  = "100%";
-	svgroot.style.height = "100%";
-	root.appendChild(svgroot);
-	this.svgroot = svgroot;
+	this.svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	this.svgroot.id = "svgroot";
+	this.svgroot.style.position = "absolute";
+	this.svgroot.style.left = 0;
+	this.svgroot.style.top  = 0;
+	this.svgroot.style.width  = "100%";
+	this.svgroot.style.height = "100%";
+	root.appendChild(this.svgroot);
 
 	//var D = document.createElement("div");//for debug
 	//D.style.left = 0;
@@ -127,12 +28,27 @@ var DCaseViewer = function(root, opts) {
 	//D.innerHTML = "";
 	//document.body.appendChild(D);
 
-	var rootview = createView(this, node_m);
-	this.rootview = rootview;
-	shiftX = ($(root).width() - rootview.updateLocation(0, 0).x * scale)/2;
-	shiftY = 20;
+	this.moving = false;
+	this.dragX = 0;
+	this.dragY = 0;
+	this.scale = 1.0;
+
+	this.rootview = this.createView(opts.node);
+	this.shiftX = ($(root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
+	this.shiftY = 20;
 	this.repaintAll(0);
-	this.addEventHandler(rootview);
+	this.addEventHandler();
+}
+
+DCaseViewer.prototype.createView = function(node) {
+	var v = new View(this, node);
+	for(var i=0; i<node.children.length; i++) {
+		v.addChild(this.createView(node.children[i]));
+	}
+	for(var i=0; i<node.contexts.length; i++) {
+		v.addChild(this.createView(node.contexts[i]));
+	}
+	return v;
 }
 
 DCaseViewer.prototype.createDiv = function(className) {
@@ -149,7 +65,26 @@ DCaseViewer.prototype.createSvg = function(name) {
 }
 
 DCaseViewer.prototype.repaintAll = function(ms) {
-	this.rootview.updateLocation((shiftX + dragX) / scale, (shiftY + dragY) / scale);
-	this.rootview.animateSec(ms);
+	var self = this;
+	var rootview = self.rootview;
+	rootview.updateLocation(
+			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
+	if(ms == 0) {
+		rootview.move();
+		return;
+	}
+	self.moving = true;
+	var begin = new Date();
+	var id = setInterval(function() {
+		var time = new Date() - begin;
+		var r = time / ms;
+		if(r < 1.0) {
+			rootview.animate(r);
+		} else {
+			clearInterval(id);
+			rootview.move();
+			self.moving = false;
+		}
+	}, 1000/60);
 }
 

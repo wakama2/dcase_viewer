@@ -15,7 +15,7 @@ function newGSNObject(root, type) {
 	} else if(type == "Context") {
 		o = root.createSvg("rect");
 		o.setBounds = function(x, y, w, h) {
-			var n = scale < 1.0 ? 20 * scale : 20;
+			var n = root.scale < 1.0 ? 20 * root.scale : 20;
 			this.setAttribute("rx", n);
 			this.setAttribute("ry", n);
 			this.setAttribute("x", x);
@@ -29,7 +29,7 @@ function newGSNObject(root, type) {
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
-			var n = scale < 1.0 ? 20 * scale : 20;
+			var n = root.scale < 1.0 ? 20 * root.scale : 20;
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
 			o.offset = { x: n, y: 0 };
@@ -55,8 +55,8 @@ function newGSNObject(root, type) {
 /* class View */
 var View = function(root, node) {
 	// node
-	this.node = node;
 	this.root = root;
+	this.node = node;
 	this.svg = newGSNObject(root, node.type);
 	this.div = root.createDiv("node-container");
 	this.div.dcaseview = this;
@@ -84,6 +84,9 @@ var View = function(root, node) {
 	
 	this.location = { x: 0, y: 0 };
 	this.childOpen = true;
+	// child node
+	this.contexts = [];
+	this.children = [];
 	// line
 	this.lines = [];
 	this.contextLines = [];
@@ -95,7 +98,6 @@ var View = function(root, node) {
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
 
-	var self = this;
 	this.setBounds(0, 0, 200, 120);
 }
 
@@ -105,13 +107,13 @@ View.prototype.getY = function() { return this.location.y; }
 View.prototype.setChildVisible = function(b) {
 	this.childVisible = b;
 	this.childOpen = b;
-	var contexts = this.node.contexts;
+	var contexts = this.contexts;
 	for(var i=0; i<contexts.length; i++) {
-		contexts[i].view.setVisible(b);
+		contexts[i].setVisible(b);
 	}
-	var children = this.node.children;
+	var children = this.children;
 	for(var i=0; i<children.length; i++) {
-		children[i].view.setVisible(b);
+		children[i].setVisible(b);
 	}
 }
 
@@ -121,24 +123,25 @@ View.prototype.setVisible = function(b) {
 		b = this.childOpen;
 	}
 	this.childVisible = b;
-	var contexts = this.node.contexts;
+	var contexts = this.contexts;
 	for(var i=0; i<contexts.length; i++) {
-		contexts[i].view.setVisible(b);
+		contexts[i].setVisible(b);
 	}
-	var children = this.node.children;
+	var children = this.children;
 	for(var i=0; i<children.length; i++) {
-		children[i].view.setVisible(b);
+		children[i].setVisible(b);
 	}
 }
 
 View.prototype.addChild = function(view) {
-	var node = view.node;
 	var l = this.root.createSvg("line");
 	l.setAttribute("stroke", "#404040");
-	if(node.type != "Context") {
+	if(view.node.type != "Context") {
 		this.lines.push(l);
+		this.children.push(view);
 	} else {
 		this.contextLines.push(l);
+		this.contexts.push(view);
 	}
 	this.divNodesText = (this.lines.length + this.contextLines.length) + " nodes...";
 	this.divNodesVisible = true;
@@ -146,6 +149,7 @@ View.prototype.addChild = function(view) {
 
 View.prototype.setBounds = function(x, y, w, h) {
 	this.location = { x: x, y: y };
+	var scale = this.root.scale;
 	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
 	this.div.style.left   = (x + this.svg.offset.x) * scale + "px";
 	this.div.style.top    = (y + this.svg.offset.y) * scale + "px";
@@ -160,13 +164,13 @@ View.prototype.updateLocation = function(x, y) {
 	var w = this.bounds.w;
 	var h = this.bounds.h;
 	if(!this.visible || !this.childVisible) {
-		var contexts = this.node.contexts;
+		var contexts = this.contexts;
 		for(var i=0; i<contexts.length; i++) {
-			contexts[i].view.updateLocation(x, y);
+			contexts[i].updateLocation(x, y);
 		}
-		var children = this.node.children;
+		var children = this.children;
 		for(var i=0; i<children.length; i++) {
-			children[i].view.updateLocation(x, y);
+			children[i].updateLocation(x, y);
 		}
 		this.bounds = { 
 			x: x, y: y, w: this.bounds.w, h: this.bounds.h
@@ -174,15 +178,16 @@ View.prototype.updateLocation = function(x, y) {
 		if(this.visible) {
 			this.argumentBounds = { x:x0, y:y0, x1:x+w, y1:y+h };
 			return { x: x+w, y: y+h };
+		} else {
+			this.argumentBounds = { x:x0, y:y0, x1:x, y1:y };
+			return { x: x, y: y };
 		}
-		this.argumentBounds = { x:x0, y:y0, x1:x, y1:y };
-		return { x: x, y: y };
 	}
 	// contents
 	if(this.node.contexts.length != 0) {
-		var contexts = this.node.contexts;
+		var contexts = this.contexts;
 		for(var i=0; i<contexts.length; i++) {
-			var e = contexts[i].view;
+			var e = contexts[i];
 			y = e.updateLocation(x, y).y + X_MARGIN;
 		}
 		y -= X_MARGIN;
@@ -192,9 +197,9 @@ View.prototype.updateLocation = function(x, y) {
 
 	// children
 	if(this.node.children.length != 0) {
-		var children = this.node.children;
+		var children = this.children;
 		for(var i=0; i<children.length; i++) {
-			var e = children[i].view;
+			var e = children[i];
 			var size = e.updateLocation(x, y);
 			x = size.x + X_MARGIN;
 			y1 = Math.max(y1, size.y);
@@ -213,9 +218,9 @@ View.prototype.updateLocation = function(x, y) {
 	// contents (second)
 	x = this.bounds.x + w + Y_MARGIN;
 	y = y0;
-	var contexts = this.node.contexts;
+	var contexts = this.contexts;
 	for(var i=0; i<contexts.length; i++) {
-		var e = contexts[i].view;
+		var e = contexts[i];
 		var p = e.updateLocation(x, y);
 		x1 = Math.max(x1, p.x);
 		y = p.y + X_MARGIN;
@@ -227,28 +232,9 @@ View.prototype.updateLocation = function(x, y) {
 	return { x: x, y: y };
 }
 
-View.prototype.animateSec = function(ms) {
-	if(ms == 0) {
-		this.move();
-		return;
-	}
-	moving = true;
-	var self = this;
-	var begin = new Date();
-	var id = setInterval(function() {
-		var time = new Date() - begin;
-		var r = time / ms;
-		if(r < 1.0) {
-			self.animate(r);
-		} else {
-			clearInterval(id);
-			self.move();
-			moving = false;
-		}
-	}, 1000/60);
-}
-
 View.prototype.animate = function(r) {
+	var scale = this.root.scale;
+	if(this.visible == this.visible0 && !this.visible0) return;
 	function mid(x0, x1) { return (x1-x0) * r + x0; }
 	this.setBounds(
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
@@ -261,14 +247,14 @@ View.prototype.animate = function(r) {
 		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
 		this.div.style.opacity = this.visible ? r : 1.0 - r;
 	}
-	var contexts = this.node.contexts;
+	var contexts = this.contexts;
 	for(var i=0; i<contexts.length; i++) {
-		var e = contexts[i].view;
+		var e = contexts[i];
 		e.animate(r);
 	}
-	var children = this.node.children;
+	var children = this.children;
 	for(var i=0; i<children.length; i++) {
-		var e = children[i].view;
+		var e = children[i];
 		e.animate(r);
 	}
 	this.divNodes.style.display = !this.childVisible ? "block" : "none";
@@ -276,7 +262,7 @@ View.prototype.animate = function(r) {
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
-		var e = this.node.children[i].view;
+		var e = this.children[i];
 		l.setAttribute("x1", (this.getX() + this.bounds.w/2) * scale);
 		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
 		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
@@ -289,7 +275,7 @@ View.prototype.animate = function(r) {
 	var lines = this.contextLines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
-		var e = this.node.contexts[i].view;
+		var e = this.contexts[i];
 		l.setAttribute("x1", (this.getX() + this.bounds.w) * scale);
 		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
 		l.setAttribute("x2", (e.getX()) * scale);
@@ -314,6 +300,7 @@ function getColorByState(state) {
 }
 
 View.prototype.move = function() {
+	var scale = this.root.scale;
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
 	this.svg.setAttribute("fill", getColorByState(this.node.state));
@@ -331,14 +318,14 @@ View.prototype.move = function() {
 			this.divNodes.innerHTML = this.divNodesText;
 		}
 	}
-	var contexts = this.node.contexts;
+	var contexts = this.contexts;
 	for(var i=0; i<contexts.length; i++) {
-		var e = contexts[i].view;
+		var e = contexts[i];
 		e.move();
 	}
-	var children = this.node.children;
+	var children = this.children;
 	for(var i=0; i<children.length; i++) {
-		var e = children[i].view;
+		var e = children[i];
 		e.move();
 	}
 	this.divNodes.style.display = !this.childVisible ? "block" : "none";
@@ -346,7 +333,7 @@ View.prototype.move = function() {
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
-		var e = this.node.children[i].view;
+		var e = this.children[i];
 		l.setAttribute("x1", (this.getX() + this.bounds.w/2) * scale);
 		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
 		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
@@ -356,7 +343,7 @@ View.prototype.move = function() {
 	var lines = this.contextLines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
-		var e = this.node.contexts[i].view;
+		var e = this.contexts[i];
 		l.setAttribute("x1", (this.getX() + this.bounds.w) * scale);
 		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
 		l.setAttribute("x2", (e.getX()) * scale);
