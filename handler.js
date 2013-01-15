@@ -79,8 +79,9 @@ DCaseViewer.prototype.setMouseDragHandler = function(drag) {
 		var b = delta < 0 ? 0.95 : 1.05;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
-			var x1 = e.pageX;
-			var y1 = e.pageY;
+			var r = root.getBoundingClientRect();
+			var x1 = e.pageX - r.left;
+			var y1 = e.pageY - r.top;
 			self.shiftX = x1 - (x1 - self.shiftX) * b;
 			self.shiftY = y1 - (y1 - self.shiftY) * b;
 		}
@@ -96,11 +97,13 @@ DCaseViewer.prototype.setTouchHandler = function(drag) {
 	var scale0 = 0;
 	var sx = 0;
 	var sx = 0;
+	var r = null;
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
 	$(root).bind("touchstart", function(e) {
 		var touches = e.originalEvent.touches;
 		if(self.moving) return;
 		e.preventDefault();
+		r = root.getBoundingClientRect();
 		if(touches.length == 1) {
 			touchCount = 1;
 			var x = touches[0].pageX;
@@ -114,8 +117,8 @@ DCaseViewer.prototype.setTouchHandler = function(drag) {
 					touches[0].pageY - touches[1].pageY);
 			sx0 = self.shiftX;
 			sy0 = self.shiftY;
-			var x = (touches[0].pageX + touches[1].pageX) / 2;
-			var y = (touches[0].pageY + touches[1].pageY) / 2;
+			var x = (touches[0].pageX + touches[1].pageX) / 2 - r.left;
+			var y = (touches[0].pageY + touches[1].pageY) / 2 - r.top;
 			drag.dragStart(x, y);
 		}
 	});
@@ -132,8 +135,8 @@ DCaseViewer.prototype.setTouchHandler = function(drag) {
 					touches[0].pageY - touches[1].pageY);
 			self.scale = Math.min(Math.max(scale0 * (a / d), SCALE_MIN), SCALE_MAX);
 			if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
-				var x1 = (touches[0].pageX + touches[1].pageX) / 2;
-				var y1 = (touches[0].pageY + touches[1].pageY) / 2;
+				var x1 = (touches[0].pageX + touches[1].pageX) / 2 - r.left;
+				var y1 = (touches[0].pageY + touches[1].pageY) / 2 - r.top;
 				self.shiftX = x1 - (x1 - sx0) * (a / d);
 				self.shiftY = y1 - (y1 - sy0) * (a / d);
 				drag.drag(x1, y1, a / d);
