@@ -15,17 +15,15 @@ function newGSNObject(root, type) {
 	} else if(type == "Context") {
 		o = root.createSvg("rect");
 		o.setBounds = function(x, y, w, h) {
-			var n = root.scale < 1.0 ? 20 * root.scale : 20;
+			var n = 20 * root.scale;
 			this.setAttribute("rx", n);
 			this.setAttribute("ry", n);
 			this.setAttribute("x", x);
 			this.setAttribute("y", y);
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
-			o.offset = { x: n/3, y: n/3 };
+			o.offset = { x: n/3/root.scale, y: n/3/root.scale };
 		}
-	//} else if(type == "undevelop") {
-	//	o = root.createSvg("rect");
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
@@ -97,24 +95,28 @@ var View = function(root, node) {
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
-
-	this.setBounds(0, 0, 200, 120);
 }
 
 View.prototype.getX = function() { return this.location.x; }
 View.prototype.getY = function() { return this.location.y; }
 
-View.prototype.setChildVisible = function(b) {
-	this.childVisible = b;
-	this.childOpen = b;
+View.prototype.forEachNode = function(f) {
 	var contexts = this.contexts;
 	for(var i=0; i<contexts.length; i++) {
-		contexts[i].setVisible(b);
+		f(contexts[i]);
 	}
 	var children = this.children;
 	for(var i=0; i<children.length; i++) {
-		children[i].setVisible(b);
+		f(children[i]);
 	}
+}
+
+View.prototype.setChildVisible = function(b) {
+	this.childVisible = b;
+	this.childOpen = b;
+	this.forEachNode(function(e) {
+		e.setVisible(b);
+	});
 }
 
 View.prototype.setVisible = function(b) {
@@ -123,14 +125,9 @@ View.prototype.setVisible = function(b) {
 		b = this.childOpen;
 	}
 	this.childVisible = b;
-	var contexts = this.contexts;
-	for(var i=0; i<contexts.length; i++) {
-		contexts[i].setVisible(b);
-	}
-	var children = this.children;
-	for(var i=0; i<children.length; i++) {
-		children[i].setVisible(b);
-	}
+	this.forEachNode(function(e) {
+		e.setVisible(b);
+	});
 }
 
 View.prototype.addChild = function(view) {
@@ -164,16 +161,11 @@ View.prototype.updateLocation = function(x, y) {
 	var w = this.bounds.w;
 	var h = this.bounds.h;
 	if(!this.visible || !this.childVisible) {
-		var contexts = this.contexts;
-		for(var i=0; i<contexts.length; i++) {
-			contexts[i].updateLocation(x, y);
-		}
-		var children = this.children;
-		for(var i=0; i<children.length; i++) {
-			children[i].updateLocation(x, y);
-		}
+		this.forEachNode(function(e) {
+			e.updateLocation(x, y);
+		});
 		this.bounds = { 
-			x: x, y: y, w: this.bounds.w, h: this.bounds.h
+			x: x, y: y, w: w, h: h
 		};
 		if(this.visible) {
 			this.argumentBounds = { x:x0, y:y0, x1:x+w, y1:y+h };
@@ -247,16 +239,9 @@ View.prototype.animate = function(r) {
 		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
 		this.div.style.opacity = this.visible ? r : 1.0 - r;
 	}
-	var contexts = this.contexts;
-	for(var i=0; i<contexts.length; i++) {
-		var e = contexts[i];
+	this.forEachNode(function(e) {
 		e.animate(r);
-	}
-	var children = this.children;
-	for(var i=0; i<children.length; i++) {
-		var e = children[i];
-		e.animate(r);
-	}
+	});
 	this.divNodes.style.display = !this.childVisible ? "block" : "none";
 	// line
 	var lines = this.lines;
@@ -318,16 +303,9 @@ View.prototype.move = function() {
 			this.divNodes.innerHTML = this.divNodesText;
 		}
 	}
-	var contexts = this.contexts;
-	for(var i=0; i<contexts.length; i++) {
-		var e = contexts[i];
+	this.forEachNode(function(e) {
 		e.move();
-	}
-	var children = this.children;
-	for(var i=0; i<children.length; i++) {
-		var e = children[i];
-		e.move();
-	}
+	});
 	this.divNodes.style.display = !this.childVisible ? "block" : "none";
 	// line
 	var lines = this.lines;
@@ -355,7 +333,7 @@ View.prototype.move = function() {
 	this.argumentBorder.style.top  = scale * (this.argumentBounds.y-n) + "px";
 	this.argumentBorder.style.width  = scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px";
 	this.argumentBorder.style.height = scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px";
-	this.argumentBorder.style.display = (this.lines.length != 0 && this.node.type == "Goal" && this.childVisible) ? "block" : "none";
+	this.argumentBorder.style.display = (this.node.isArgument() && this.childVisible) ? "block" : "none";
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;

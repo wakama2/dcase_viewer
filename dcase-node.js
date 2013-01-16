@@ -19,6 +19,10 @@ Node.prototype.addChild = function(node) {
 	node.parents.push(this);
 }
 
+Node.prototype.isArgument = function() {
+	return this.children.length != 0 && this.type == "Goal";
+}
+
 //-------------------------------------
 function createNodeFromURL(url) {
 	var a = $.ajax({

@@ -5,6 +5,7 @@ var X_MARGIN = 30;
 var Y_MARGIN = 100;
 var SCALE_MIN = 0.1;
 var SCALE_MAX = 6.0;
+var SVG_NS = "http://www.w3.org/2000/svg";
 
 //-------------------------------------
 // global
@@ -13,7 +14,7 @@ var DCaseViewer = function(root, opts) {
 	root.className = "viewer-root";
 	this.root = root;
 
-	this.svgroot = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	this.svgroot = document.createElementNS(SVG_NS, "svg");
 	this.svgroot.id = "svgroot";
 	this.svgroot.style.position = "absolute";
 	this.svgroot.style.left = 0;
@@ -59,7 +60,7 @@ DCaseViewer.prototype.createDiv = function(className) {
 }
 
 DCaseViewer.prototype.createSvg = function(name) {
-	var obj = document.createElementNS("http://www.w3.org/2000/svg", name);
+	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.appendChild(obj);
 	return obj;
 }

@@ -1,19 +1,9 @@
-var Dragger = function(viewer, root) {
+var Dragger = function(viewer) {
 	var self = viewer;//FIXME
 	var x0 = 0;
 	var y0 = 0;
 	var flag = false;
 	var bounds = {};
-
-	function getDragLimit() {
-		var size = viewer.rootview.updateLocation(0, 0);
-		return {
-			l : 20 - size.x * viewer.scale - self.shiftX,
-			r : $(root).width() - 20 - self.shiftX,
-			t : 20 - size.y * viewer.scale - self.shiftY,
-			b : $(root).height() - 20 - self.shiftY
-		};
-	}
 
 	this.dragStart = function(x, y) {
 		if(flag) {
@@ -22,7 +12,13 @@ var Dragger = function(viewer, root) {
 		x0 = x;
 		y0 = y;
 		flag = true;
-		bounds = getDragLimit();
+		var size = viewer.rootview.updateLocation(0, 0);
+		bounds = {
+			l : 20 - size.x * viewer.scale - self.shiftX,
+			r : $(viewer.root).width() - 20 - self.shiftX,
+			t : 20 - size.y * viewer.scale - self.shiftY,
+			b : $(viewer.root).height() - 20 - self.shiftY
+		};
 	}
 	this.drag = function(x, y, scale) {
 		if(typeof scale == "undefined") scale = 1.0;
@@ -37,7 +33,7 @@ var Dragger = function(viewer, root) {
 	this.dragEnd = function(view) {
 		if(flag) {
 			if(self.dragX == 0 && self.dragY == 0) {
-				if(typeof view != "undefined") {
+				if(view != null) {
 					viewer.rootview.updateLocation(0, 0);
 					var x0 = view.bounds.x;
 					view.setChildVisible(!view.childVisible);
@@ -155,7 +151,7 @@ DCaseViewer.prototype.setTouchHandler = function(drag) {
 }
 
 DCaseViewer.prototype.addEventHandler = function() {
-	var drag = new Dragger(this, this.root);
+	var drag = new Dragger(this);
 	this.setMouseDragHandler(drag);
 	this.setTouchHandler(drag);
 }
