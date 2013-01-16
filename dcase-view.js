@@ -89,7 +89,7 @@ var View = function(root, node) {
 	this.lines = [];
 	this.contextLines = [];
 	// for animation
-	this.bounds = { x: 0, y: 0, w: 200, h: 120 };
+	this.bounds = { x: 0, y: 0, w: 200, h: this.div.getBoundingClientRect().height + 60 };
 	this.visible = true;
 	this.childVisible = true;
 	this.bounds0 = this.bounds;
@@ -164,9 +164,7 @@ View.prototype.updateLocation = function(x, y) {
 		this.forEachNode(function(e) {
 			e.updateLocation(x, y);
 		});
-		this.bounds = { 
-			x: x, y: y, w: w, h: h
-		};
+		this.bounds = { x: x, y: y, w: w, h: h };
 		if(this.visible) {
 			this.argumentBounds = { x:x0, y:y0, x1:x+w, y1:y+h };
 			return { x: x+w, y: y+h };
