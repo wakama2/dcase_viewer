@@ -59,7 +59,7 @@ DCaseViewer.prototype.setMouseDragHandler = function(drag) {
 	var root = this.root;
 	$(root).mousedown(function(e) {
 		if(e.originalEvent.detail == 2) return;
-		if(self.moving) return;
+		if(self.moving || !self.drag_flag) return;
 		drag.dragStart(e.pageX, e.pageY);
 	});
 	$(root).mousemove(function(e) {
@@ -72,6 +72,7 @@ DCaseViewer.prototype.setMouseDragHandler = function(drag) {
 		drag.dragEnd(this.dcaseview);
 	});
 	$(root).mousewheel(function(e, delta) {
+		if(self.moving || !self.drag_flag) return;
 		var b = delta < 0 ? 0.95 : 1.05;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
@@ -96,8 +97,8 @@ DCaseViewer.prototype.setTouchHandler = function(drag) {
 	var r = null;
 	function dist(x, y) { return Math.sqrt(x*x + y*y); }
 	$(root).bind("touchstart", function(e) {
+		if(self.moving || !self.drag_flag) return;
 		var touches = e.originalEvent.touches;
-		if(self.moving) return;
 		e.preventDefault();
 		r = root.getBoundingClientRect();
 		if(touches.length == 1) {

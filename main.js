@@ -33,6 +33,7 @@ var DCaseViewer = function(root, opts) {
 	this.dragX = 0;
 	this.dragY = 0;
 	this.scale = 1.0;
+	this.drag_flag = true;
 
 	this.rootview = this.createView(opts.node);
 	this.shiftX = ($(root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
@@ -87,5 +88,9 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 			self.moving = false;
 		}
 	}, 1000/60);
+}
+
+DCaseViewer.prototype.setDragLock = function(b) {
+	this.drag_flag = b;
 }
 
