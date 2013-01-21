@@ -58,9 +58,12 @@ var View = function(root, node) {
 	this.svg = newGSNObject(root, node.type);
 	this.div = root.createDiv("node-container");
 	this.div.dcaseview = this;
-	this.argumentBorder = root.createDiv("div");
-	this.argumentBorder.className = "argument-border";
-	this.argumentBorder.style.zIndex = -99;
+
+	if(node.isArgument()) {
+		this.argumentBorder = root.createDiv("div");
+		this.argumentBorder.className = "argument-border";
+		this.argumentBorder.style.zIndex = -99;
+	}
 	this.argumentBounds = {};
 
 	this.divName = document.createElement("div");
@@ -326,12 +329,14 @@ View.prototype.move = function() {
 		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
 		l.setAttribute("display", this.childVisible ? "block" : "none");
 	}
-	var n = 10;
-	this.argumentBorder.style.left = scale * (this.argumentBounds.x-n) + "px";
-	this.argumentBorder.style.top  = scale * (this.argumentBounds.y-n) + "px";
-	this.argumentBorder.style.width  = scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px";
-	this.argumentBorder.style.height = scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px";
-	this.argumentBorder.style.display = (this.node.isArgument() && this.childVisible) ? "block" : "none";
+	if(this.node.isArgument()) {
+		var n = 10;
+		this.argumentBorder.style.left = scale * (this.argumentBounds.x-n) + "px";
+		this.argumentBorder.style.top  = scale * (this.argumentBounds.y-n) + "px";
+		this.argumentBorder.style.width  = scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px";
+		this.argumentBorder.style.height = scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px";
+		this.argumentBorder.style.display = this.childVisible ? "block" : "none";
+	}
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
