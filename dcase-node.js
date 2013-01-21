@@ -20,7 +20,11 @@ Node.prototype.addChild = function(node) {
 }
 
 Node.prototype.isArgument = function() {
-	return this.children.length != 0 && this.contexts.length != 0 && this.type == "Goal";
+	return this.contexts.length != 0 && this.type == "Goal";
+}
+
+Node.prototype.isUndevelop = function() {
+	return this.children.length == 0 && this.type == "Goal";
 }
 
 //-------------------------------------

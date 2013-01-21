@@ -59,6 +59,11 @@ var View = function(root, node) {
 	this.div = root.createDiv("node-container");
 	this.div.dcaseview = this;
 
+	if(node.isUndevelop()) {
+		this.svgUndevel = root.createSvg("polygon");
+		this.svgUndevel.setAttribute("fill", "none");
+		this.svgUndevel.setAttribute("stroke", "gray");
+	}
 	if(node.isArgument()) {
 		this.argumentBorder = root.createDiv("div");
 		this.argumentBorder.className = "argument-border";
@@ -156,6 +161,15 @@ View.prototype.setBounds = function(x, y, w, h) {
 	this.div.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
 	this.div.style.height = (h - this.svg.offset.y * 2) * scale + "px";
 	this.div.style.fontSize = Math.round(FONT_SIZE * scale) + "px";
+
+	if(this.node.isUndevelop()) {
+		var sx = (x + w/2) * scale;
+		var sy = (y + h) * scale;
+		var n = 20 * scale;
+		function s(x, y) { return x+","+y }
+		this.svgUndevel.setAttribute("points", 
+			s(sx, sy) + " " + s(sx+n, sy+n) + " " + s(sx, sy+n*2) + " " + s(sx-n, sy+n));
+	}
 }
 
 View.prototype.updateLocation = function(x, y) {
@@ -303,6 +317,9 @@ View.prototype.move = function() {
 		if(this.divNodesVisible) {
 			this.divNodes.innerHTML = this.divNodesText;
 		}
+	}
+	if(this.node.isUndevelop()) {
+		this.svgUndevel.setAttribute("display", this.visible ? "block" : "none");
 	}
 	this.forEachNode(function(e) {
 		e.move();
