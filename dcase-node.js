@@ -71,33 +71,60 @@ function createBinNode(n) {
 	}
 }
 
+function createNodeFromJson2(json) {
+	var node = new Node(0, json.name, json.type, json.desc);
+	if(json.children != null) {
+		for(var i=0; i<json.children.length; i++) {
+			var child = createNodeFromJson2(json.children[i]);
+			node.addChild(child);
+		}
+	}
+	return node;
+}
+
 function createSampleNode() {
-	var topNode = new Node(0, "TopGoal", "Goal",
-			"ウェブショッピングデモ<br>" +
-			"システムはDEOSプロセスにより運用され，ODSを満たしている");
-	var str = new Node(1, "Strategy", "Strategy", "DEOSプロセスによって議論する");
-	topNode.addChild(new Node(2, "Context", "Context",
-		"サービス用件:<br>" +
-		"・アクセス数の定格は2500件/分<br>" +
-		"・応答時間は1件あたり3秒以内<br>" +
-		"・一回の障害あたりの復旧時間は5分以内"
-		));
-	topNode.addChild(new Node(2, "Context2", "Context", "現在のシステムの運用状態"));
-	topNode.addChild(new Node(2, "Context2", "Context", "Risk分析の結果<br>・アクセス数の増大<br>応答遅延"));
-	topNode.addChild(str);
-	str.addChild(new Node(1, "SubGoal 1", "Goal", "description"));
-	str.children[0].addChild(new Node(1, "test", "Context", "description"));
-	str.addChild(new Node(1, "SubGoal 2", "Goal", "description"));
-	str.addChild(new Node(1, "SubGoal 3", "Goal", "description"));
-	str.addChild(new Node(1, "SubGoal 4", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.1", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.2", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.3", "Goal", "description"));
-	str.children[2].addChild(new Node(1, "SubGoal 1.4", "Goal", "description"));
-	str.children[1].addChild(new Node(1, "Evidence", "Evidence", "description"));
-	str.children[1].children[0].state = "error";
-	str.children[2].addChild(new Node(1, "SubGoalContext", "Context", "description"));
-	return topNode;
+	var strategy_children = [
+		{
+			name: "SubGoal 1", type: "Goal", desc: "description",
+			children: [ { name: "test", type: "Context", desc: "description" } ]
+		},
+		{
+			name: "SubGoal 2", type: "Goal", desc: "description",
+			children: [ { name: "Evidence 2", type: "Evidence", desc: "description" } ]
+		},
+		{
+			name: "SubGoal 3", type: "Goal", desc: "description",
+			children: [
+				{ name: "Context 3.1", type: "Context", desc: "description" },
+				{ name: "SubGoal 3.1", type: "Goal", desc: "description" },
+				{ name: "SubGoal 3.2", type: "Goal", desc: "description", 
+					children: [ { name: "Evidence 3.2", type: "Evidence", desc: "" } ] },
+				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
+				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
+			]
+		},
+		{ name: "SubGoal 4", type: "Goal", desc: "description" }
+	];
+	return createNodeFromJson2({
+		name: "TopGoal", type: "Goal",
+		desc: "ウェブショッピングデモ<br>" +
+					"システムはDEOSプロセスにより運用され，ODSを満たしている",
+		children: [
+			{
+				name: "Context",
+				type: "Context",
+				desc: "サービス用件:<br>" +
+							"・アクセス数の定格は2500件/分<br>" +
+							"・応答時間は1件あたり3秒以内<br>" +
+							"・一回の障害あたりの復旧時間は5分以内"
+			},
+			{ name: "Context2", type: "Context", desc: "現在のシステムの運用状態" },
+			{ name: "Context2", type: "Context", desc: "Risk分析の結果<br>・アクセス数の増大<br>応答遅延" },
+			{
+				name: "Strategy", type: "Strategy", desc: "DEOSプロセスによって議論する",
+				children: strategy_children
+			}
+		]
+	});
 }
 
