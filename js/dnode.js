@@ -1,5 +1,5 @@
-/* class Node */
-var Node = function(id, name, type, text) {
+/* class DNode */
+var DNode = function(id, name, type, text) {
 	this.id = id;
 	this.name = name;
 	this.text = text;
@@ -10,7 +10,7 @@ var Node = function(id, name, type, text) {
 	this.parents = [];
 }
 
-Node.prototype.addChild = function(node) {
+DNode.prototype.addChild = function(node) {
 	if(node.type != "Context") {
 		this.children.push(node);
 	} else {
@@ -19,11 +19,11 @@ Node.prototype.addChild = function(node) {
 	node.parents.push(this);
 }
 
-Node.prototype.isArgument = function() {
+DNode.prototype.isArgument = function() {
 	return this.contexts.length != 0 && this.type == "Goal";
 }
 
-Node.prototype.isUndevelop = function() {
+DNode.prototype.isUndevelop = function() {
 	return this.children.length == 0 && this.type == "Goal";
 }
 
@@ -49,30 +49,30 @@ function createNodeFromJson(json) {
 		for(var i=0; i<l.children.length; i++) {
 			var child = l.children[i];
 			var n = nodes[child.name];
-			var newNode = new Node(0, n.name, n.DBNodeType, n.description);
+			var newNode = new DNode(0, n.name, n.DBNodeType, n.description);
 			node.addChild(newNode);
 			createChildren(child, newNode);
 		}
 	}
 	var n = nodes[json.links.name];
-	var topNode = new Node(0, n.name, n.DBNodeType, n.description);
+	var topNode = new DNode(0, n.name, n.DBNodeType, n.description);
 	createChildren(json.links, topNode);
 	return topNode;
 }
 
 function createBinNode(n) {
 	if(n > 0) {
-		var node = new Node(0, "Goal", "Goal", "description");
+		var node = new DNode(0, "Goal", "Goal", "description");
 		node.addChild(createBinNode(n-1));
 		node.addChild(createBinNode(n-1));
 		return node;
 	} else {
-		return new Node(0, "Goal", "Goal", "description");
+		return new DNode(0, "Goal", "Goal", "description");
 	}
 }
 
 function createNodeFromJson2(json) {
-	var node = new Node(0, json.name, json.type, json.desc);
+	var node = new DNode(0, json.name, json.type, json.desc);
 	if(json.children != null) {
 		for(var i=0; i<json.children.length; i++) {
 			var child = createNodeFromJson2(json.children[i]);
