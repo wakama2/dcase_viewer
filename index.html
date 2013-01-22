@@ -6,6 +6,7 @@
 <title>D-CASE VIEWER</title>
 <link rel="stylesheet" type="text/css" href="dcase-node.css"/>
 <link rel="stylesheet" type="text/css" href="viewer.css"/>
+<link rel="stylesheet" type="text/css" href="sidemenu.css"/>
 <style>
 body {
 	min-height: 480px;
@@ -23,6 +24,8 @@ body {
 <script type="text/javascript" src="dcase-node.js"></script>
 <script type="text/javascript" src="dcase-view.js"></script>
 <script type="text/javascript" src="handler.js"></script>
+<script type="text/javascript" src="edit.js"></script>
+<script type="text/javascript" src="sidemenu.js"></script>
 <script type="text/javascript">
 window.addEventListener("load",function() {
 	var opts = {
@@ -30,7 +33,8 @@ window.addEventListener("load",function() {
 		//node: createBinNode(4)
 		node: createSampleNode()
 	};
-	new DCaseViewer(document.getElementById("viewer"), opts);
+	var viewer = new DCaseViewer(document.getElementById("viewer"), opts);
+	var menu = new SideMenu(document.getElementById("sidebar"), viewer);
 
 	// hide url bar for ipod touch
 	setTimeout(function(){
@@ -39,6 +43,8 @@ window.addEventListener("load",function() {
 });
 </script>
 </head>
-<body id="viewer">
+<body>
+<div id="viewer" style="z-index: 1;"></div>
+<div id="sidebar" style="z-index: 2;"></div>
 </body>
 </html>

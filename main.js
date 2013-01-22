@@ -66,6 +66,14 @@ DCaseViewer.prototype.createSvg = function(name) {
 	return obj;
 }
 
+DCaseViewer.prototype.centerize = function(view) {
+	this.rootview.updateLocation(0, 0);
+	var b = view.bounds;
+	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
+	this.shiftY = -b.y * this.scale + 20;
+	this.repaintAll(500);
+}
+
 DCaseViewer.prototype.repaintAll = function(ms) {
 	var self = this;
 	var rootview = self.rootview;
@@ -92,5 +100,13 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 
 DCaseViewer.prototype.setDragLock = function(b) {
 	this.drag_flag = b;
+}
+
+DCaseViewer.prototype.getDragLock = function() {
+	return this.drag_flag;
+}
+
+DCaseViewer.prototype.getSelectedNode = function() {
+	return this.rootview;//TODO
 }
 

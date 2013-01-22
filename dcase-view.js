@@ -45,9 +45,15 @@ function newGSNObject(root, type) {
 	} else {
 		throw type + " is not GSN type";
 	}
-	//o.setAttribute("stroke", "black");
-	o.setAttribute("fill"  , "#CCCCCC");
 	return o;
+}
+
+function getColorByState(state) {
+	if(state == "normal") {
+		return "#E0E0E0";
+	} else if(state == "error") {
+		return "#FF8080";
+	}
 }
 
 /* class View */
@@ -57,7 +63,7 @@ var View = function(root, node) {
 	this.node = node;
 	this.svg = newGSNObject(root, node.type);
 	this.div = root.createDiv("node-container");
-	this.div.dcaseview = this;
+	this.div.dcaseview = this;//FIXME
 
 	if(node.isUndevelop()) {
 		this.svgUndevel = root.createSvg("polygon");
@@ -103,6 +109,12 @@ var View = function(root, node) {
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
+}
+
+View.prototype.modified = function() {
+	this.divName.innerHTML = this.node.name;
+	this.divText.innerHTML = this.node.text;
+	this.root.repaintAll();
 }
 
 View.prototype.getX = function() { return this.location.x; }
@@ -289,14 +301,6 @@ View.prototype.animate = function(r) {
 	//this.argumentBorder.style.top  = this.argumentBounds.y;
 	//this.argumentBorder.style.right  = this.argumentBounds.x1;
 	//this.argumentBorder.style.bottom = this.argumentBounds.y1;
-}
-
-function getColorByState(state) {
-	if(state == "normal") {
-		return "#F0F0F0";
-	} else if(state == "error") {
-		return "#FF8080";
-	}
 }
 
 View.prototype.move = function() {
