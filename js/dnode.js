@@ -27,6 +27,12 @@ DNode.prototype.isUndevelop = function() {
 	return this.children.length == 0 && this.type == "Goal";
 }
 
+DNode.getTypes = function() {
+	return [
+			"Goal", "Context", "Strategy", "Evidence", "Monitor", "DScript"
+	];
+}
+
 //-------------------------------------
 function createNodeFromURL(url) {
 	var a = $.ajax({

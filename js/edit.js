@@ -15,7 +15,21 @@ var DNodeEditWindow = function(viewer, node, do_ok) {
 	})
 
 	var inputName = $("<input></input>").attr({type: "text", value: node.name});
-	var inputType = $("<input></input>").attr({type: "text", value: node.type});
+
+	var typeSelected = node.type;
+	var inputType = $("<select></select>").change(function() {
+		$("select option:selected").each(function() {
+			typeSelected = this.text;
+		});
+	});
+	var types = DNode.getTypes();
+	for(var i=0; i<types.length; i++) {
+		var type = types[i];
+		inputType.append($("<option></option>").attr({
+			value: "type" + i, selected: type == typeSelected
+		}).html(type));
+	}
+
 	var inputDesc = $("<textarea></textarea>").attr({
 		type: "text", value: node.text
 	}).css({
@@ -40,7 +54,7 @@ var DNodeEditWindow = function(viewer, node, do_ok) {
 
 	this.applyAndClose = function() {
 		node.name = $(inputName).attr("value");
-		node.type = $(inputType).attr("value");
+		node.type = typeSelected;
 		node.text = $(inputDesc).attr("value");
 		do_ok();
 		self.close();

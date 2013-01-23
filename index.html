@@ -10,6 +10,7 @@
 <style>
 body {
 	min-height: 480px;
+	margin: 0px;
 }
 #viewer {
 	left: 0px;
@@ -34,7 +35,7 @@ window.addEventListener("load",function() {
 		node: createSampleNode()
 	};
 	var viewer = new DCaseViewer(document.getElementById("viewer"), opts);
-	var menu = new SideMenu(document.getElementById("sidebar"), viewer);
+	var menu = new SideMenu(document.getElementById("sidemenu"), viewer);
 
 	// hide url bar for ipod touch
 	setTimeout(function(){
@@ -45,6 +46,6 @@ window.addEventListener("load",function() {
 </head>
 <body>
 <div id="viewer" style="z-index: 1;"></div>
-<div id="sidebar" style="z-index: 2;"></div>
+<div id="sidemenu" style="z-index: 2;"></div>
 </body>
 </html>

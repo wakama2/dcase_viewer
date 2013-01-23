@@ -37,7 +37,7 @@ var SideMenu = function(root, viewer) {
 	}).click(function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			var newNode = new Node(0, "", "", "");
+			var newNode = new DNode(0, "", "", "");
 			new DNodeEditWindow(viewer, newNode, function() {
 				view.node.addChild(newNode);
 				viewer.repaintAll();
@@ -45,7 +45,7 @@ var SideMenu = function(root, viewer) {
 		}
 	}));
 
-	$(root).append($("<input></input>").addClass("sidebar-search-text").attr({
+	$(root).append($("<input></input>").addClass("sidemenu-search-text").attr({
 		type: "text", value: "",
 	}).focus(function(e) {
 		var area = this;
@@ -57,12 +57,12 @@ var SideMenu = function(root, viewer) {
 		delete this.interval_id;
 	}));
 
-	var searchResult = $("<ul></ul>").attr({ id: "search-result" });
+	var searchResult = $("<ul></ul>").addClass("sidemenu-search-result");
+	searchResult.height($(root).height() - searchResult.css("top") - 16);
 	$(root).append(searchResult);
 
 	this.divgrip = $("<div></div>").addClass("sidemenu-grip").css({
-		left: "0px", top: "0px", display: "block",
-		zIndex: 20,
+		left: "0px", top: "0px", display: "block", zIndex: 20,
 	}).click(function(e) {
 		self.open();
 	}).bind("touchstart", function(e) {

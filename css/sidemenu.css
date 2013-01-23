@@ -5,8 +5,8 @@
 	background: #D0F0D0;
 	opacity: 0.90;
 	margin: 0px;
+	padding: 0px;
 	overflow: hidden;
-	z-index: 1;
 }
 
 .sidemenu-grip {
@@ -17,8 +17,16 @@
 	opacity: 0.6;
 }
 
+.sidemenu-search-text {
+
+}
+
+.sidemenu-search-result {
+	overflow: scroll;
+}
+
 .sidemenu-result {
-	background: #F0F0F0;
+	height: 0.8cm;
 }
 
 .sidemenu-result:hover {
