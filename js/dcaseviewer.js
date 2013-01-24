@@ -116,14 +116,15 @@ DCaseViewer.prototype.actExpandBranch = function(view, b) {
 	}
 }
 
-// duplicated
-DCaseViewer.prototype.createDiv = function(className) {
-	var obj = document.createElement("div");
-	obj.className = className;
-	this.root.appendChild(obj);
-	return obj;
+DCaseViewer.prototype.appendElem = function(e) {
+	$(this.root).append(e);
 }
 
+DCaseViewer.prototype.appendSvg = function(e) {
+	$(this.svgroot).append(e);
+}
+
+// duplicated
 DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.append(obj);
