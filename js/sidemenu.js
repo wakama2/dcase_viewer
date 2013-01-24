@@ -27,7 +27,7 @@ var SideMenu = function(root, viewer) {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			new DNodeEditWindow(viewer, view.node, function() {
-				view.modified();
+				viewer.setModel(viewer.model);
 			});
 		}
 	}));
@@ -59,7 +59,13 @@ var SideMenu = function(root, viewer) {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			if(confirm("ノードを削除しますか？")) {
-				
+				var ps = view.node.parents;
+				if(ps.length > 0) {
+					var p = ps[0];
+					var n = p.children.indexOf(view.node);
+					p.children.splice(n, 1);
+					viewer.setModel(viewer.model);
+				}
 			}
 		}
 	}));

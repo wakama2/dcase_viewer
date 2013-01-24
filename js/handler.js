@@ -89,7 +89,6 @@ DCaseViewer.prototype.setTouchHandler = function() {
 	$(root).bind("touchstart", function(e) {
 		if(self.moving || !self.drag_flag) return;
 		var touches = e.originalEvent.touches;
-		console.log("start " + touches.length);
 		e.preventDefault();
 		r = root.getBoundingClientRect();
 		if(touches.length == 1) {
@@ -113,7 +112,6 @@ DCaseViewer.prototype.setTouchHandler = function() {
 	$(root).bind("touchmove", function(e) {
 		e.preventDefault();
 		var touches = e.originalEvent.touches;
-		console.log("move " + touches.length);
 		if(touchCount == 1) {
 			var x = touches[0].pageX;
 			var y = touches[0].pageY;
@@ -135,7 +133,6 @@ DCaseViewer.prototype.setTouchHandler = function() {
 	$(root).bind("touchend", function(e) {
 		e.preventDefault();
 		self.dragEnd();
-		console.log("end " + e);
 		touchCount = 0;
 	});
 }

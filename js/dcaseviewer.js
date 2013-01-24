@@ -137,15 +137,16 @@ function callAPI(method, params) {
 		version: "1",
 		params: params
 	};
-	var result = $.ajax({
+	$.ajax({
 		type: "POST",
 		url: "http://192.168.59.251/dcase_cloud/interface.cgi",
 		data: JSON.stringify(cmd),
-		async: false,
-		dataType: "json"
+		dataType: "json",
+		success: function(text) {
+			console.log(text);
+			//var r = JSON.parse(text);
+		}
 	});
 
-	console.log(result.responseText);
-	var r = JSON.parse(result.responseText);
 }
 
