@@ -7,7 +7,7 @@ DCaseViewer.prototype.setDragHandler = function() {
 
 	this.dragStart = function(x, y) {
 		if(flag) {
-			this.dragEnd();
+			this.dragCancel();
 		}
 		x0 = x;
 		y0 = y;
@@ -31,6 +31,16 @@ DCaseViewer.prototype.setDragHandler = function() {
 			self.repaintAll(0);
 		}
 	}
+
+	this.dragCancel = function() {
+		self.shiftX += self.dragX;
+		self.shiftY += self.dragY;
+		self.dragX = 0;
+		self.dragY = 0;
+		self.repaintAll(0);
+		flag = false;
+	}
+
 	this.dragEnd = function(view) {
 		if(flag) {
 			if(self.dragX == 0 && self.dragY == 0) {
@@ -67,8 +77,8 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
 			var r = root.getBoundingClientRect();
-			var x1 = e.pageX - r.left;
-			var y1 = e.pageY - r.top;
+			var x1 = self.drag_flag ? e.pageX - r.left : $(root).width()/2;
+			var y1 = self.drag_flag ? e.pageY - r.top  : $(root).height()/2;
 			self.shiftX = x1 - (x1 - self.shiftX) * b;
 			self.shiftY = y1 - (y1 - self.shiftY) * b;
 		}

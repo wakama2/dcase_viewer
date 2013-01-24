@@ -28,6 +28,7 @@ var DCaseViewer = function(root, model, opts) {
 	this.model = model;
 	this.setModel(model);
 	this.addEventHandler();
+	this.setTextSelectable(false);
 }
 
 DCaseViewer.prototype.setModel = function(model) {
@@ -114,6 +115,15 @@ DCaseViewer.prototype.actExpandBranch = function(view, b) {
 		this.shiftX -= (x1-x0) * this.scale;
 		this.repaintAll(ANIME_MSEC);
 	}
+}
+
+DCaseViewer.prototype.setTextSelectable = function(b) {
+	var p = b ? "auto" : "none";
+	$(this.root).css({
+		"user-select": p,
+		"-moz-user-select": p,
+		"-webkit-user-select": p
+	});
 }
 
 DCaseViewer.prototype.appendElem = function(e) {

@@ -16,9 +16,10 @@ var SideMenu = function(root, viewer) {
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "lock",
 	}).click(function() {
-		var flag = viewer.getDragLock();
-		viewer.setDragLock(!flag);
-		this.value = flag ? "unlock" : "lock";
+		var flag = !viewer.getDragLock();
+		viewer.setDragLock(flag);
+		this.value = flag ? "lock" : "unlock";
+		viewer.setTextSelectable(!flag);
 	}));
 
 	$(root).append($("<input></input>").attr({
