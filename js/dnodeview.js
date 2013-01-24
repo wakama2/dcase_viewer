@@ -14,24 +14,24 @@ function newGSNObject(root, type) {
 		o.offset = { x: 0, y: 0 };
 	} else if(type == "Context") {
 		o = root.createSvg("rect");
+		var n = 20;
 		o.setBounds = function(x, y, w, h) {
-			var n = 20 * root.scale;
-			this.setAttribute("rx", n);
-			this.setAttribute("ry", n);
+			this.setAttribute("rx", n * root.scale);
+			this.setAttribute("ry", n * root.scale);
 			this.setAttribute("x", x);
 			this.setAttribute("y", y);
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
-			o.offset = { x: n/3/root.scale, y: n/3/root.scale };
 		}
+		o.offset = { x: n/3, y: n/3 };
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
 			var n = 20 * root.scale;
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
-			o.offset = { x: 20, y: 0 };
 		}
+		o.offset = { x: 20, y: 0 };
 	} else if(type == "Evidence" || type == "Monitor") {
 		o = root.createSvg("ellipse");
 		o.setBounds = function(x, y, w, h) {
@@ -77,20 +77,15 @@ var View = function(root, node) {
 	}
 	this.argumentBounds = {};
 
-	this.divName = document.createElement("div");
-	this.divName.className = "node-name";
-	this.divName.innerHTML = node.name;
-	this.div.appendChild(this.divName);
+	this.divName = $("<div></div>").addClass("node-name").html(node.name);
+	$(this.div).append(this.divName);
 
-	this.divText = document.createElement("div");
-	this.divText.className = "node-text";
-	this.divText.innerHTML = node.text;
-	this.div.appendChild(this.divText);
+	this.divText = $("<div></div>").addClass("node-text").html(node.text);
+	$(this.div).append(this.divText);
 
-	this.divNodes = document.createElement("div");
-	this.divNodes.className = "node-closednodes";
-	this.divNodes.innerHTML = "";
-	this.div.appendChild(this.divNodes);
+	this.divNodes = $("<div></div>").addClass("node-closednodes");
+	$(this.div).append(this.divNodes);
+
 	this.divNodesText = "";
 	this.divNodesVisible = false;
 	
@@ -112,8 +107,8 @@ var View = function(root, node) {
 }
 
 View.prototype.modified = function() {
-	this.divName.innerHTML = this.node.name;
-	this.divText.innerHTML = this.node.text;
+	this.divName.html(this.node.name);
+	this.divText.html(this.node.text);
 	this.root.repaintAll();
 }
 
@@ -168,12 +163,13 @@ View.prototype.setBounds = function(x, y, w, h) {
 	this.location = { x: x, y: y };
 	var scale = this.root.scale;
 	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	this.div.style.left   = (x + this.svg.offset.x) * scale + "px";
-	this.div.style.top    = (y + this.svg.offset.y) * scale + "px";
-	this.div.style.width  = (w - this.svg.offset.x * 2) * scale + "px";
-	this.div.style.height = (h - this.svg.offset.y * 2) * scale + "px";
-	this.div.style.fontSize = Math.round(FONT_SIZE * scale) + "px";
-
+	$(this.div).css({
+		left  : (x + this.svg.offset.x) * scale + "px",
+		top   : (y + this.svg.offset.y) * scale + "px",
+		width : (w - this.svg.offset.x * 2) * scale + "px",
+		height: (h - this.svg.offset.y * 2) * scale + "px",
+		fontSize: Math.round(FONT_SIZE * scale) + "px",
+	});
 	if(this.node.isUndevelop()) {
 		var sx = (x + w/2) * scale;
 		var sy = (y + h) * scale;
@@ -269,32 +265,34 @@ View.prototype.animate = function(r) {
 	this.forEachNode(function(e) {
 		e.animate(r);
 	});
-	this.divNodes.style.display = !this.childVisible ? "block" : "none";
+	this.divNodes.css("display", !this.childVisible ? "block" : "none");
 	// line
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
-		var l = lines[i];
 		var e = this.children[i];
-		l.setAttribute("x1", (this.getX() + this.bounds.w/2) * scale);
-		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
-		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
-		l.setAttribute("y2", (e.getY()) * scale);
+		$(lines[i]).attr({
+			x1: (this.getX() + this.bounds.w/2) * scale,
+			y1: (this.getY() + this.bounds.h) * scale,
+			x2: (e.getX() + e.bounds.w/2) * scale,
+			y2: (e.getY()) * scale
+		});
 		if(this.childVisible0 != this.childVisible) {
-			l.setAttribute("display", "block");
-			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
+			lines[i].setAttribute("display", "block");
+			lines[i].setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
 	}
 	var lines = this.contextLines;
 	for(var i=0; i<lines.length; i++) {
-		var l = lines[i];
 		var e = this.contexts[i];
-		l.setAttribute("x1", (this.getX() + this.bounds.w) * scale);
-		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
-		l.setAttribute("x2", (e.getX()) * scale);
-		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
+		$(lines[i]).attr({
+			x1: (this.getX() + this.bounds.w) * scale,
+			y1: (this.getY() + this.bounds.h/2) * scale,
+			x2: e.getX() * scale,
+			y2: (e.getY() + e.bounds.h/2) * scale,
+		});
 		if(this.childVisible0 != this.childVisible) {
-			l.setAttribute("display", "block");
-			l.setAttribute("opacity", this.childVisible ? r : 1.0 - r);
+			lines[i].setAttribute("display", "block");
+			lines[i].setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
 	}
 	//this.argumentBorder.style.left = this.argumentBounds.x;
@@ -315,16 +313,16 @@ View.prototype.move = function() {
 	}
 	this.div.style.display = this.visible ? "block" : "none";
 	if(scale < MIN_DISP_SCALE) {
-		this.divText.style.display = "none";
-		this.divName.style.display = "none";
+		this.divText.css("display", "none");
+		this.divName.css("display", "none");
 		if(this.divNodesVisible) {
-			this.divNodes.innerHTML = "<p></p>";
+			this.divNodes.html("<p></p>");
 		}
 	} else {
-		this.divText.style.display = "block";
-		this.divName.style.display = "block";
+		this.divText.css("display", "block");
+		this.divName.css("display", "block");
 		if(this.divNodesVisible) {
-			this.divNodes.innerHTML = this.divNodesText;
+			this.divNodes.html(this.divNodesText);
 		}
 	}
 	if(this.node.isUndevelop()) {
@@ -333,7 +331,7 @@ View.prototype.move = function() {
 	this.forEachNode(function(e) {
 		e.move();
 	});
-	this.divNodes.style.display = !this.childVisible ? "block" : "none";
+	this.divNodes.css("display", !this.childVisible ? "block" : "none");
 	// line
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
@@ -357,11 +355,13 @@ View.prototype.move = function() {
 	}
 	if(this.node.isArgument()) {
 		var n = 10;
-		this.argumentBorder.style.left = scale * (this.argumentBounds.x-n) + "px";
-		this.argumentBorder.style.top  = scale * (this.argumentBounds.y-n) + "px";
-		this.argumentBorder.style.width  = scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px";
-		this.argumentBorder.style.height = scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px";
-		this.argumentBorder.style.display = this.childVisible ? "block" : "none";
+		$(this.argumentBorder).css({
+			left  : scale * (this.argumentBounds.x-n) + "px",
+			top   : scale * (this.argumentBounds.y-n) + "px",
+			width : scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px",
+			height: scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px",
+			display: this.childVisible ? "block" : "none"
+		});
 	}
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;

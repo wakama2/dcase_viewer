@@ -30,9 +30,10 @@ var DCaseViewer = function(root, model, opts) {
 }
 
 DCaseViewer.prototype.setModel = function(model) {
+	$(this.svgroot).empty();
 	$(this.root)
-			.empty()
-			.append(this.svgroot);
+		.empty()
+		.append(this.svgroot);
 
 	var self = this;
 	function create(node) {
@@ -46,7 +47,6 @@ DCaseViewer.prototype.setModel = function(model) {
 		return view;
 	}
 	this.rootview = create(model);
-
 	this.shiftX = ($(this.root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
 	this.shiftY = 20;
 	this.model = model;
@@ -102,6 +102,18 @@ DCaseViewer.prototype.setSelectedNode = function(node) {
 
 DCaseViewer.prototype.getSelectedNode = function() {
 	return this.selectedNode;
+}
+
+DCaseViewer.prototype.actExpandBranch = function(view, b) {
+	if(b == undefined || b != view.childVisible) {
+		this.rootview.updateLocation(0, 0);
+		var x0 = view.bounds.x;
+		view.setChildVisible(!view.childVisible);
+		this.rootview.updateLocation(0, 0);
+		var x1 = view.bounds.x;
+		this.shiftX -= (x1-x0) * this.scale;
+		this.repaintAll(ANIME_MSEC);
+	}
 }
 
 // duplicated

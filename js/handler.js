@@ -64,17 +64,10 @@ DCaseViewer.prototype.setMouseDragHandler = function(drag) {
 		drag.dragEnd(this.dcaseview);
 	});
 	$(".node-container").dblclick(function(e) {
-		var view = this.dcaseview;
-		self.rootview.updateLocation(0, 0);
-		var x0 = view.bounds.x;
-		view.setChildVisible(!view.childVisible);
-		self.rootview.updateLocation(0, 0);
-		var x1 = view.bounds.x;
-		self.shiftX -= (x1-x0) * self.scale;
-		self.repaintAll(ANIME_MSEC);
+		self.actExpandBranch(this.dcaseview);
 	});
 	$(root).mousewheel(function(e, delta) {
-		if(self.moving) return;// || !self.drag_flag) return;
+		if(self.moving) return;
 		var b = delta < 0 ? 0.95 : 1.05;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
