@@ -58,7 +58,7 @@ function getColorByState(state) {
 
 /* class View */
 var View = function(viewer, node) {
-	// node
+	var self = this;
 	this.viewer = viewer;
 	this.node = node;
 	this.svg = newGSNObject(viewer, node.type);
@@ -66,8 +66,13 @@ var View = function(viewer, node) {
 	this.div.className = "node-container";
 	viewer.appendElem(this.div);
 
-	this.div.dcaseview = this;//FIXME
-
+	$(this.div).mouseup(function(e) {
+		viewer.dragEnd(self);
+	}).dblclick(function(e) {
+		viewer.actExpandBranch(self);
+	}).bind("touchend", function(e) {
+		viewer.dragEnd(self);
+	});
 	if(node.isUndevelop()) {
 		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
 			fill: "none", stroke: "gray"

@@ -27,6 +27,7 @@ var DCaseViewer = function(root, model, opts) {
 	this.rootview = null;
 	this.model = model;
 	this.setModel(model);
+	this.addEventHandler();
 }
 
 DCaseViewer.prototype.setModel = function(model) {
@@ -51,7 +52,6 @@ DCaseViewer.prototype.setModel = function(model) {
 	this.shiftY = 20;
 	this.model = model;
 	this.repaintAll(0);
-	this.addEventHandler();
 }
 
 DCaseViewer.prototype.centerize = function(view) {
