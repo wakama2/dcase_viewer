@@ -29,12 +29,10 @@ body {
 <script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript">
 window.addEventListener("load",function() {
-	var opts = {
-		//node: createNodeFromURL("getjson.cgi")
-		//node: createBinNode(4)
-		node: createSampleNode()
-	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), opts);
+	var node = createSampleNode();
+	//node: createNodeFromURL("getjson.cgi")
+	var opts = {};
+	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
 	var menu = new SideMenu(document.getElementById("sidemenu"), viewer);
 
 	// hide url bar for ipod touch

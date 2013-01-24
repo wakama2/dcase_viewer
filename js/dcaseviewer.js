@@ -10,55 +10,48 @@ var SVG_NS = "http://www.w3.org/2000/svg";
 //-------------------------------------
 // global
 
-var DCaseViewer = function(root, opts) {
+var DCaseViewer = function(root, model, opts) {
 	root.className = "viewer-root";
+	this.svgroot = $(document.createElementNS(SVG_NS, "svg")).css({
+		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
+	});
 	this.root = root;
-
-	this.svgroot = document.createElementNS(SVG_NS, "svg");
-	this.svgroot.id = "svgroot";
-	this.svgroot.style.position = "absolute";
-	this.svgroot.style.left = 0;
-	this.svgroot.style.top  = 0;
-	this.svgroot.style.width  = "100%";
-	this.svgroot.style.height = "100%";
-	root.appendChild(this.svgroot);
-
 	this.moving = false;
+	this.shiftX = 0;
+	this.shiftY = 0;
 	this.dragX = 0;
 	this.dragY = 0;
 	this.scale = 1.0;
 	this.drag_flag = true;
-
 	this.selectedNode = null;
-	this.rootview = this.createView(opts.node);
-	this.shiftX = ($(root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
+	this.rootview = null;
+	this.model = model;
+	this.setModel(model);
+}
+
+DCaseViewer.prototype.setModel = function(model) {
+	$(this.root)
+			.empty()
+			.append(this.svgroot);
+
+	var self = this;
+	function create(node) {
+		var view = new View(self, node);
+		for(var i=0; i<node.children.length; i++) {
+			view.addChild(create(node.children[i]));
+		}
+		for(var i=0; i<node.contexts.length; i++) {
+			view.addChild(create(node.contexts[i]));
+		}
+		return view;
+	}
+	this.rootview = create(model);
+
+	this.shiftX = ($(this.root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
 	this.shiftY = 20;
+	this.model = model;
 	this.repaintAll(0);
 	this.addEventHandler();
-}
-
-DCaseViewer.prototype.createView = function(node) {
-	var v = new View(this, node);
-	for(var i=0; i<node.children.length; i++) {
-		v.addChild(this.createView(node.children[i]));
-	}
-	for(var i=0; i<node.contexts.length; i++) {
-		v.addChild(this.createView(node.contexts[i]));
-	}
-	return v;
-}
-
-DCaseViewer.prototype.createDiv = function(className) {
-	var obj = document.createElement("div");
-	obj.className = className;
-	this.root.appendChild(obj);
-	return obj;
-}
-
-DCaseViewer.prototype.createSvg = function(name) {
-	var obj = document.createElementNS(SVG_NS, name);
-	this.svgroot.appendChild(obj);
-	return obj;
 }
 
 DCaseViewer.prototype.centerize = function(view) {
@@ -109,5 +102,19 @@ DCaseViewer.prototype.setSelectedNode = function(node) {
 
 DCaseViewer.prototype.getSelectedNode = function() {
 	return this.selectedNode;
+}
+
+// duplicated
+DCaseViewer.prototype.createDiv = function(className) {
+	var obj = document.createElement("div");
+	obj.className = className;
+	this.root.appendChild(obj);
+	return obj;
+}
+
+DCaseViewer.prototype.createSvg = function(name) {
+	var obj = document.createElementNS(SVG_NS, name);
+	this.svgroot.append(obj);
+	return obj;
 }
 

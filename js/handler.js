@@ -74,7 +74,7 @@ DCaseViewer.prototype.setMouseDragHandler = function(drag) {
 		self.repaintAll(ANIME_MSEC);
 	});
 	$(root).mousewheel(function(e, delta) {
-		if(self.moving || !self.drag_flag) return;
+		if(self.moving) return;// || !self.drag_flag) return;
 		var b = delta < 0 ? 0.95 : 1.05;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {

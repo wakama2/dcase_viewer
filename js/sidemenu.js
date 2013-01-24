@@ -48,6 +48,37 @@ var SideMenu = function(root, viewer) {
 		}
 	}));
 
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "remove",
+	}).click(function() {
+		var view = viewer.getSelectedNode();
+		if(view != null) {
+			if(confirm("ノードを削除しますか？")) {
+				
+			}
+		}
+	}));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "export json",
+	}).click(function() {
+		//TODO
+		alert("TODO");
+	}));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "export png",
+	}).click(function() {
+		//TODO
+		alert("TODO");
+	}));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "reload",
+	}).click(function() {
+		viewer.setModel(createSampleNode());
+	}));
+
 	$(root).append($("<input></input>").addClass("sidemenu-search-text").attr({
 		type: "text", value: "",
 	}).focus(function(e) {
