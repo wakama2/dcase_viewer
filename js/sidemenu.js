@@ -40,10 +40,15 @@ var SideMenu = function(root, viewer) {
 			var newNode = new DNode(0, "", "Goal", "");
 			new DNodeEditWindow(viewer, newNode, function() {
 				view.node.addChild(newNode);
-				var newView = new View(viewer, newNode);
-				view.addChild(newView);
-				viewer.repaintAll();
-				viewer.centerize(newView);
+				viewer.setModel(viewer.model);
+				callAPI("insert", {
+					type: newNode.type,
+					description: newNode.text,
+					parent: {
+						args_id: "??",
+						node_id: "??"
+					}
+				});
 			});
 		}
 	}));
@@ -76,7 +81,18 @@ var SideMenu = function(root, viewer) {
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "reload",
 	}).click(function() {
-		viewer.setModel(createSampleNode());
+		viewer.setModel(viewer.model);
+	}));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "commit",
+	}).click(function() {
+		var msg = prompt("コミットメッセージを入力して下さい");
+		if(msg != null) {
+			callAPI("commit", {
+				message: msg
+			});
+		}
 	}));
 
 	$(root).append($("<input></input>").addClass("sidemenu-search-text").attr({

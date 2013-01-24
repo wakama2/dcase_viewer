@@ -124,10 +124,28 @@ DCaseViewer.prototype.appendSvg = function(e) {
 	$(this.svgroot).append(e);
 }
 
-// duplicated
 DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.append(obj);
 	return obj;
+}
+
+function callAPI(method, params) {
+	var cmd = {
+		jsonproc: "2.0",
+		method: method,
+		version: "1",
+		params: params
+	};
+	var result = $.ajax({
+		type: "POST",
+		url: "http://192.168.59.251/dcase_cloud/interface.cgi",
+		data: JSON.stringify(cmd),
+		async: false,
+		dataType: "json"
+	});
+
+	console.log(result.responseText);
+	var r = JSON.parse(result.responseText);
 }
 
