@@ -308,6 +308,11 @@ View.prototype.move = function() {
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
 	this.svg.setAttribute("fill", getColorByState(this.node.state));
+	if(this.root.selectedNode == this) {
+		this.svg.setAttribute("stroke", "orange");
+	} else {
+		this.svg.setAttribute("stroke", "none");
+	}
 	this.div.style.display = this.visible ? "block" : "none";
 	if(scale < MIN_DISP_SCALE) {
 		this.divText.style.display = "none";

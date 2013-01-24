@@ -37,10 +37,13 @@ var SideMenu = function(root, viewer) {
 	}).click(function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			var newNode = new DNode(0, "", "", "");
+			var newNode = new DNode(0, "", "Goal", "");
 			new DNodeEditWindow(viewer, newNode, function() {
 				view.node.addChild(newNode);
+				var newView = new View(viewer, newNode);
+				view.addChild(newView);
 				viewer.repaintAll();
+				viewer.centerize(newView);
 			});
 		}
 	}));

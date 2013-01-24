@@ -33,15 +33,7 @@ var Dragger = function(viewer) {
 	this.dragEnd = function(view) {
 		if(flag) {
 			if(self.dragX == 0 && self.dragY == 0) {
-				if(view != null) {
-					viewer.rootview.updateLocation(0, 0);
-					var x0 = view.bounds.x;
-					view.setChildVisible(!view.childVisible);
-					viewer.rootview.updateLocation(0, 0);
-					var x1 = view.bounds.x;
-					self.shiftX -= (x1-x0) * viewer.scale;
-					viewer.repaintAll(ANIME_MSEC);
-				}
+				self.setSelectedNode(view);
 			} else {
 				self.shiftX += self.dragX;
 				self.shiftY += self.dragY;
@@ -70,6 +62,16 @@ DCaseViewer.prototype.setMouseDragHandler = function(drag) {
 	});
 	$(".node-container").mouseup(function(e) {
 		drag.dragEnd(this.dcaseview);
+	});
+	$(".node-container").dblclick(function(e) {
+		var view = this.dcaseview;
+		self.rootview.updateLocation(0, 0);
+		var x0 = view.bounds.x;
+		view.setChildVisible(!view.childVisible);
+		self.rootview.updateLocation(0, 0);
+		var x1 = view.bounds.x;
+		self.shiftX -= (x1-x0) * self.scale;
+		self.repaintAll(ANIME_MSEC);
 	});
 	$(root).mousewheel(function(e, delta) {
 		if(self.moving || !self.drag_flag) return;

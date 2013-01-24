@@ -23,18 +23,13 @@ var DCaseViewer = function(root, opts) {
 	this.svgroot.style.height = "100%";
 	root.appendChild(this.svgroot);
 
-	//var D = document.createElement("div");//for debug
-	//D.style.left = 0;
-	//D.style.top = 0;
-	//D.innerHTML = "";
-	//document.body.appendChild(D);
-
 	this.moving = false;
 	this.dragX = 0;
 	this.dragY = 0;
 	this.scale = 1.0;
 	this.drag_flag = true;
 
+	this.selectedNode = null;
 	this.rootview = this.createView(opts.node);
 	this.shiftX = ($(root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
 	this.shiftY = 20;
@@ -67,10 +62,11 @@ DCaseViewer.prototype.createSvg = function(name) {
 }
 
 DCaseViewer.prototype.centerize = function(view) {
+	this.selectedNode = view;
 	this.rootview.updateLocation(0, 0);
 	var b = view.bounds;
 	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
-	this.shiftY = -b.y * this.scale + 20;
+	this.shiftY = -b.y * this.scale + $(this.root).height() / 5 * this.scale;
 	this.repaintAll(500);
 }
 
@@ -106,7 +102,12 @@ DCaseViewer.prototype.getDragLock = function() {
 	return this.drag_flag;
 }
 
+DCaseViewer.prototype.setSelectedNode = function(node) {
+	this.selectedNode = node;
+	this.repaintAll();
+}
+
 DCaseViewer.prototype.getSelectedNode = function() {
-	return this.rootview;//TODO
+	return this.selectedNode;
 }
 
