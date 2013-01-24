@@ -49,19 +49,20 @@ function createNodeFromJson(json) {
 	var nodes = [];
 	for(var i=0; i<json.nodes.length; i++) {
 		var c = json.nodes[i];
-		nodes[c.name] = c;
+		nodes[c.node_id] = c;
 	}
 	function createChildren(l, node) {
 		for(var i=0; i<l.children.length; i++) {
 			var child = l.children[i];
-			var n = nodes[child.name];
-			var newNode = new DNode(0, n.name, n.DBNodeType, n.description);
+			var n = nodes[child.node_id];
+			n.name = n.type.charAt(0) + n.node_id;
+			var newNode = new DNode(0, n.name, n.type, n.description);
 			node.addChild(newNode);
 			createChildren(child, newNode);
 		}
 	}
-	var n = nodes[json.links.name];
-	var topNode = new DNode(0, n.name, n.DBNodeType, n.description);
+	var n = nodes[json.links.node_id];
+	var topNode = new DNode(0, "TopGoal", n.type, n.description);
 	createChildren(json.links, topNode);
 	return topNode;
 }

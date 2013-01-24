@@ -46,8 +46,8 @@ var SideMenu = function(root, viewer) {
 					type: newNode.type,
 					description: newNode.text,
 					parent: {
-						args_id: "??",
-						node_id: "??"
+						args_id: "0",
+						node_id: view.id
 					}
 				});
 			});

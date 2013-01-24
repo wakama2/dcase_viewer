@@ -29,8 +29,15 @@ body {
 <script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript">
 window.addEventListener("load",function() {
-	var node = createSampleNode();
+	//var node = createSampleNode();
 	//node: createNodeFromURL("getjson.cgi")
+	var s = callAPI("get", { filter: ["Argument"] });
+console.log(s);
+	var id = JSON.parse(s).result[0].argument_id;
+console.log("get id=" + id);
+	var n = callAPI("get", { argument_id: "0" });
+console.log(n);
+	var node = createNodeFromJson(JSON.parse(n).result);
 	var opts = {};
 	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
 	var menu = new SideMenu(document.getElementById("sidemenu"), viewer);
