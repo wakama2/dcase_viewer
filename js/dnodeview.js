@@ -85,6 +85,12 @@ var View = function(viewer, node) {
 				.css({ zIndex: -99 });
 		viewer.appendElem(this.argumentBorder);
 	}
+	if(node.isDScript()) {//FIXME
+		this.svgDScript = $(document.createElementNS(SVG_NS, "polygon")).attr({
+			fill: "none", stroke: "gray"
+		});
+		viewer.appendSvg(this.svgUndevel)
+	}
 	this.argumentBounds = {};
 
 	this.divName = $("<div></div>").addClass("node-name").html(node.name);

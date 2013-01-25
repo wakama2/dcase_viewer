@@ -7,7 +7,7 @@ DCaseAPI.call = function(method, params) {
 		jsonproc: "2.0",
 		method: method,
 		version: "1",
-		param: params
+		params: params
 	};
 	var res = $.ajax({
 		type: "POST",

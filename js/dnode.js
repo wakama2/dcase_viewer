@@ -34,6 +34,26 @@ DNode.getTypes = function() {
 }
 
 //-------------------------------------
+// FIXME?
+var DSCRIPT_PREF = "D-Script:";
+var DSCRIPT_PREF_CONTEXT = "D-ScriptName:";
+DNode.prototype.isDScript = function() {
+	return this.type === "Evidence" && this.text.indexOf(DSCRIPT_PREF) == 0;
+}
+
+DNode.prototype.getDScriptNameInEvidence = function() {
+	return this.text.substr(DSCRIPT_PREF.length);
+}
+
+DNode.prototype.getDScriptNameInContext = function() {
+	if(this.text.indexOf(DSCRIPT_PREF_CONTEXT) == 0) {
+		return this.text.substr(DSCRIPT_PREF_CONTEXT.length);
+	} else {
+		return "";
+	}
+}
+
+//-------------------------------------
 function createNodeFromURL(url) {
 	var a = $.ajax({
 		type: "GET",

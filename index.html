@@ -30,10 +30,10 @@ body {
 <script type="text/javascript" src="js/api.js"></script>
 <script type="text/javascript">
 
-function getNodeFromServer() {
-	var res1 = DCaseAPI.get(["Arugment"]);
+function getNodeFromServer(id) {
+	var res1 = DCaseAPI.get(["Argument"]);
 	//var id = res1[0].argument_id;
-	var id = "0";//FIXME
+	//var id = "0";//FIXME
 	console.log("get id=" + id);
 	var res2 = DCaseAPI.get([], id);
 	console.log(res2);
@@ -42,9 +42,9 @@ function getNodeFromServer() {
 }
 
 window.addEventListener("load",function() {
-	var node = createSampleNode();
-	var id = "0";
-	//var node = getNodeFromServer();
+	//var node = createSampleNode();
+	var id = "1";
+	var node = getNodeFromServer(id);
 	var opts = {
 		argument_id: id,
 	};

@@ -40,11 +40,11 @@ var SideMenu = function(root, viewer) {
 					},
 					argument_id: viewer.opts.argument_id,
 					parent: {
-						args_id: viewer.opts.argument_id,
+						argument_id: viewer.opts.argument_id,
 						node_id: view.node.id,
 					}
 				});
-				newNode.id = JSON.parse(r).result.node_id;
+				newNode.id = r.node_id;
 			});
 		}
 	}
