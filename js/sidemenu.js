@@ -27,14 +27,20 @@ var SideMenu = function(root, viewer) {
 	}).click(function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			new DNodeEditWindow(viewer, view.node, function() {
+			var node = view.node;
+			new DNodeEditWindow(viewer, node, function() {
 				viewer.setModel(viewer.model);
+				var r = callAPI("update", {
+					argument_id: viewer.opts.argument_id,
+					node_id: node.id,
+					description: node.text
+				});
 			});
 		}
 	}));
 
 	$(root).append($("<input></input>").attr({
-		type: "button", value: "new",
+		type: "button", value: "insert",
 	}).click(function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
@@ -42,14 +48,18 @@ var SideMenu = function(root, viewer) {
 			new DNodeEditWindow(viewer, newNode, function() {
 				view.node.addChild(newNode);
 				viewer.setModel(viewer.model);
-				callAPI("insert", {
-					type: newNode.type,
-					description: newNode.text,
+				var r = callAPI("insert", {
+					new: {
+						type: newNode.type,
+						description: newNode.text,
+					},
+					argument_id: viewer.opt.argument_id,
 					parent: {
-						args_id: "0",
-						node_id: view.id
+						args_id: viewer.opt.argument_id,
+						node_id: view.node.id,
 					}
 				});
+				newNode.id = JSON.parse(r).result.node_id;
 			});
 		}
 	}));
@@ -66,6 +76,11 @@ var SideMenu = function(root, viewer) {
 					var n = p.children.indexOf(view.node);
 					p.children.splice(n, 1);
 					viewer.setModel(viewer.model);
+
+					var r = callAPI("delete", {
+						argument_id: viewer.opt.argument_id,
+						node_id: view.node.id,
+					});
 				}
 			}
 		}

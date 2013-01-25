@@ -56,7 +56,7 @@ function createNodeFromJson(json) {
 			var child = l.children[i];
 			var n = nodes[child.node_id];
 			n.name = n.type.charAt(0) + n.node_id;
-			var newNode = new DNode(0, n.name, n.type, n.description);
+			var newNode = new DNode(n.node_id, n.name, n.type, n.description);
 			node.addChild(newNode);
 			createChildren(child, newNode);
 		}
