@@ -3,70 +3,53 @@ var SideMenu = function(root, viewer) {
 	var animeTime = 250;
 	var self = this;
 
-	$(root).addClass("sidemenu").css({
-		left: "0px", top: "0px", display: "none"
-	});
-
-	$(root).append($("<input></input>").attr({
-		type: "button", value: "close"
-	}).click(function() {
-		self.close()
-	}));
-	
-	$(root).append($("<input></input>").attr({
-		type: "button", value: "lock",
-	}).click(function() {
+	//--------------------------------------------------------
+	this.actChangeLock = function() {
 		var flag = !viewer.getDragLock();
 		viewer.setDragLock(flag);
 		this.value = flag ? "lock" : "unlock";
 		viewer.setTextSelectable(!flag);
-	}));
+	}
 
-	$(root).append($("<input></input>").attr({
-		type: "button", value: "edit",
-	}).click(function() {
+	this.actEditSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			var node = view.node;
 			new DNodeEditWindow(viewer, node, function() {
 				viewer.setModel(viewer.model);
-				var r = callAPI("update", {
+				var r = DCaseAPI.update({
 					argument_id: viewer.opts.argument_id,
 					node_id: node.id,
 					description: node.text
 				});
 			});
 		}
-	}));
+	}
 
-	$(root).append($("<input></input>").attr({
-		type: "button", value: "insert",
-	}).click(function() {
+	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			var newNode = new DNode(0, "", "Goal", "");
 			new DNodeEditWindow(viewer, newNode, function() {
 				view.node.addChild(newNode);
 				viewer.setModel(viewer.model);
-				var r = callAPI("insert", {
+				var r = DCaseAPI.insert({
 					new: {
 						type: newNode.type,
 						description: newNode.text,
 					},
-					argument_id: viewer.opt.argument_id,
+					argument_id: viewer.opts.argument_id,
 					parent: {
-						args_id: viewer.opt.argument_id,
+						args_id: viewer.opts.argument_id,
 						node_id: view.node.id,
 					}
 				});
 				newNode.id = JSON.parse(r).result.node_id;
 			});
 		}
-	}));
+	}
 
-	$(root).append($("<input></input>").attr({
-		type: "button", value: "remove",
-	}).click(function() {
+	this.actRemoveSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			if(confirm("ノードを削除しますか？")) {
@@ -76,46 +59,76 @@ var SideMenu = function(root, viewer) {
 					var n = p.children.indexOf(view.node);
 					p.children.splice(n, 1);
 					viewer.setModel(viewer.model);
-
-					var r = callAPI("delete", {
-						argument_id: viewer.opt.argument_id,
+					var r = DCaseAPI.del({
+						argument_id: viewer.opts.argument_id,
 						node_id: view.node.id,
 					});
 				}
 			}
 		}
-	}));
+	}
+
+	this.actExportJson = function() {
+		//TODO
+		alert("TODO");
+	}
+
+	this.actExportPng = function() {
+		//TODO
+		alert("TODO");
+	}
+
+	this.actCommit = function() {
+		var msg = prompt("コミットメッセージを入力して下さい");
+		if(msg != null) {
+			DCaseAPI.commit(msg);
+		}
+	}
+
+	this.refresh = function() {
+		viewer.setModel(viewer.model);
+	}
+
+	//--------------------------------------------------------
+	$(root).addClass("sidemenu").css({
+		left: "0px", top: "0px", display: "none"
+	});
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "close"
+	}).click(self.close));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "lock",
+	}).click(self.actChangeLock));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "edit",
+	}).click(self.actEditSelectedNode));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "insert",
+	}).click(self.actInsertToSelectedNode));
+
+	$(root).append($("<input></input>").attr({
+		type: "button", value: "remove",
+	}).click(self.actRemoveSelectedNode));
 
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "export json",
-	}).click(function() {
-		//TODO
-		alert("TODO");
-	}));
+	}).click(self.actExportJson));
 
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "export png",
-	}).click(function() {
-		//TODO
-		alert("TODO");
-	}));
+	}).click(self.actExportPng));
 
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "reload",
-	}).click(function() {
-		viewer.setModel(viewer.model);
-	}));
+	}).click(self.refresh));
 
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "commit",
-	}).click(function() {
-		var msg = prompt("コミットメッセージを入力して下さい");
-		if(msg != null) {
-			callAPI("commit", {
-				message: msg
-			});
-		}
-	}));
+	}).click(self.actCommit));
 
 	$(root).append($("<input></input>").addClass("sidemenu-search-text").attr({
 		type: "text", value: "",
@@ -142,6 +155,7 @@ var SideMenu = function(root, viewer) {
 	});
 	$(document.body).append(this.divgrip);//FIXME
 
+	//--------------------------------------------------------
 	this.close = function() {
 		self.divgrip.css("display", "block");
 		var begin = new Date();

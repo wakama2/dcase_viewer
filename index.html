@@ -27,20 +27,26 @@ body {
 <script type="text/javascript" src="js/handler.js"></script>
 <script type="text/javascript" src="js/edit.js"></script>
 <script type="text/javascript" src="js/sidemenu.js"></script>
+<script type="text/javascript" src="js/api.js"></script>
 <script type="text/javascript">
-window.addEventListener("load",function() {
-	//var node = createSampleNode();
-	//node: createNodeFromURL("getjson.cgi")
-	var s = callAPI("get", { filter: ["Argument"] });
-	console.log(s);
-	var id = JSON.parse(s).result[0].argument_id;
-	id = "0";//FIXME
+
+function getNodeFromServer() {
+	var res1 = DCaseAPI.get(["Arugment"]);
+	//var id = res1[0].argument_id;
+	var id = "0";//FIXME
 	console.log("get id=" + id);
-	var n = callAPI("get", { argument_id: id });
-console.log(n);
-	var node = createNodeFromJson(JSON.parse(n).result);
+	var res2 = DCaseAPI.get([], id);
+	console.log(res2);
+	var node = createNodeFromJson(res2);
+	return node;
+}
+
+window.addEventListener("load",function() {
+	var node = createSampleNode();
+	var id = "0";
+	//var node = getNodeFromServer();
 	var opts = {
-			argument_id: 	id;
+		argument_id: id,
 	};
 	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
 	var menu = new SideMenu(document.getElementById("sidemenu"), viewer);

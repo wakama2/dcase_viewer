@@ -16,6 +16,7 @@ var DCaseViewer = function(root, model, opts) {
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
 	});
 	this.root = root;
+	this.opts = opts;
 	this.moving = false;
 	this.shiftX = 0;
 	this.shiftY = 0;
@@ -138,23 +139,5 @@ DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.append(obj);
 	return obj;
-}
-
-//-------------------------------------
-function callAPI(method, params) {
-	var cmd = {
-		jsonproc: "2.0",
-		method: method,
-		version: "1",
-		param: params
-	};
-	var res = $.ajax({
-		type: "POST",
-		url: "http://192.168.59.251/dcase_cloud/interface.cgi",
-		async: false,
-		data: JSON.stringify(cmd),
-		dataType: "json",
-	});
-	return res.responseText;
 }
 
