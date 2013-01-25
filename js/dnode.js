@@ -36,7 +36,7 @@ DNode.getTypes = function() {
 //-------------------------------------
 // FIXME?
 var DSCRIPT_PREF = "D-Script:";
-var DSCRIPT_PREF_CONTEXT = "D-ScriptName:";
+var DSCRIPT_PREF_CONTEXT = "D-Script.Name:";
 DNode.prototype.isDScript = function() {
 	return this.type === "Evidence" && this.text.indexOf(DSCRIPT_PREF) == 0;
 }
@@ -46,10 +46,10 @@ DNode.prototype.getDScriptNameInEvidence = function() {
 }
 
 DNode.prototype.getDScriptNameInContext = function() {
-	if(this.text.indexOf(DSCRIPT_PREF_CONTEXT) == 0) {
+	if(this.type == "Context" && this.text.indexOf(DSCRIPT_PREF_CONTEXT) == 0) {
 		return this.text.substr(DSCRIPT_PREF_CONTEXT.length);
 	} else {
-		return "";
+		return null;
 	}
 }
 
@@ -113,11 +113,15 @@ function createSampleNode() {
 	var strategy_children = [
 		{
 			name: "SubGoal 1", type: "Goal", desc: "description",
-			children: [ { name: "test", type: "Context", desc: "description" } ]
+			children: [ 
+				{ name: "test", type: "Context", desc: "D-Script.Name:test" },
+				{ name: "test", type: "Goal", desc: "goal1" },
+				{ name: "test", type: "Goal", desc: "goal2" }
+			]
 		},
 		{
 			name: "SubGoal 2", type: "Goal", desc: "description",
-			children: [ { name: "Evidence 2", type: "Evidence", desc: "description" } ]
+			children: [ { name: "Evidence 2", type: "Evidence", desc: "D-Script:test" } ]
 		},
 		{
 			name: "SubGoal 3", type: "Goal", desc: "description",

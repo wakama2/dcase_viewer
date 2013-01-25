@@ -38,9 +38,16 @@ DCaseViewer.prototype.setModel = function(model) {
 		.empty()
 		.append(this.svgroot);
 
+	this.scripts = {};
+
 	var self = this;
 	function create(node) {
 		var view = new View(self, node);
+		var sc = node.getDScriptNameInContext();
+		if(sc != null) {
+			self.scripts[sc] = node.parents[0];
+			console.log("script " + sc);
+		}
 		for(var i=0; i<node.children.length; i++) {
 			view.addChild(create(node.children[i]));
 		}
