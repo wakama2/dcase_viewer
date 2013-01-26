@@ -4,6 +4,10 @@ var SideMenu = function(root, viewer) {
 	var self = this;
 
 	//--------------------------------------------------------
+	this.actClose = function() {
+		self.close();
+	}
+
 	this.actChangeLock = function() {
 		var flag = !viewer.getDragLock();
 		viewer.setDragLock(flag);
@@ -96,7 +100,7 @@ var SideMenu = function(root, viewer) {
 
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "close"
-	}).click(self.close));
+	}).click(self.actClose));
 
 	$(root).append($("<input></input>").attr({
 		type: "button", value: "lock",
