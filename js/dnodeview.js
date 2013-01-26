@@ -48,42 +48,6 @@ function newGSNObject(root, type) {
 	return o;
 }
 
-function executeDScript(node) {
-	var scriptName = node.getDScriptNameInEvidence();
-	var r = DCaseAPI.call("search", { filter: ["Context"] });
-	var nn = null;
-	for(var i=0; i<r[0].length; i++) {
-		if(r[0][i].value === scriptName) {
-			var n = DCaseAPI.get([], r[0][i].argument_id);
-			nn = createNodeFromJson(n);
-			break;
-		}
-	}
-	var t = $("<div></div>").addClass("node-exeScriptWindow");
-	viewer.appendElem(t);
-
-	var r1x = document.createElement("div");
-	var t1 = $(r1x).css({
-		position: "absolute",
-		left: "20px", top: "20px", right: "20px", bottom: "60px",
-	}).attr("id", "subviewer");
-	t.append(t1);
-	var v = new DCaseViewer(r1x, nn, {
-		argument_id: viewer.opts.id
-	});
-	t.append($("<input></input>").attr({
-		type: "button", value: "実行"
-	}).click(function() {
-		var r = DCaseAPI.call("run", {});
-		alert(r);
-	}));
-	t.append($("<input></input>").attr({
-		type: "button", value: "キャンセル"
-	}).click(function() {
-		t.remove();
-	}));
-}
-
 function getColorByState(state) {
 	if(state == "normal") {
 		return "#E0E0E0";
@@ -106,7 +70,7 @@ var View = function(viewer, node) {
 		viewer.dragEnd(self);
 	}).dblclick(function(e) {
 		if(node.isDScript()) {
-			executeDScript(node);
+			viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
 		} else {
 			viewer.actExpandBranch(self);
 		}

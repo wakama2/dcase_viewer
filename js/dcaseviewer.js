@@ -38,16 +38,9 @@ DCaseViewer.prototype.setModel = function(model) {
 		.empty()
 		.append(this.svgroot);
 
-	this.scripts = {};
-
 	var self = this;
 	function create(node) {
 		var view = new View(self, node);
-		var sc = node.getDScriptNameInContext();
-		if(sc != null) {
-			self.scripts[sc] = node.parents[0];
-			console.log("script " + sc);
-		}
 		for(var i=0; i<node.children.length; i++) {
 			view.addChild(create(node.children[i]));
 		}
@@ -146,5 +139,41 @@ DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.append(obj);
 	return obj;
+}
+
+DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
+	var self = this;
+	var r = DCaseAPI.call("search", { filter: ["Context"] });
+	var nn = null;
+	for(var i=0; i<r[0].length; i++) {
+		if(r[0][i].value === scriptName) {
+			var n = DCaseAPI.get([], r[0][i].argument_id);
+			nn = createNodeFromJson(n);
+			break;
+		}
+	}
+	var t = $("<div></div>").addClass("node-exeScriptWindow");
+	self.appendElem(t);
+
+	var r1x = document.createElement("div");
+	var t1 = $(r1x).css({
+		position: "absolute",
+		left: "20px", top: "20px", right: "20px", bottom: "60px",
+	}).attr("id", "subviewer");
+	t.append(t1);
+	var v = new DCaseViewer(r1x, nn, {
+		argument_id: self.opts.id
+	});
+	t.append($("<input></input>").attr({
+		type: "button", value: "実行"
+	}).click(function() {
+		var r = DCaseAPI.call("run", {});
+		alert(r);
+	}));
+	t.append($("<input></input>").attr({
+		type: "button", value: "キャンセル"
+	}).click(function() {
+		t.remove();
+	}));
 }
 
