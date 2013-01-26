@@ -27,3 +27,16 @@
 	border-style: dotted;
 	border-width: 2px;
 }
+
+.dscript-exe-window {
+	position: absolute;
+	left  : 20px;
+	right : 20px;
+	top   : 20px;
+	bottom: 20px;
+	background: #FFFFFF;
+	opacity: 0.9;
+	border-style: solid;
+	border-color: #808080;
+	z-index: 10;
+}

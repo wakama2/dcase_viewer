@@ -4,6 +4,10 @@ var SideMenu = function(root, viewer) {
 	var self = this;
 
 	//--------------------------------------------------------
+	this.actOpen = function() {
+		self.open();
+	}
+
 	this.actClose = function() {
 		self.close();
 	}
@@ -94,47 +98,48 @@ var SideMenu = function(root, viewer) {
 	}
 
 	//--------------------------------------------------------
-	$(root).addClass("sidemenu").css({
+	var mainWin = $("<div></div>").addClass("sidemenu").css({
 		left: "0px", top: "0px", display: "none"
 	});
+	$(root).append(mainWin);
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "close"
 	}).click(self.actClose));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "lock",
 	}).click(self.actChangeLock));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "edit",
 	}).click(self.actEditSelectedNode));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "insert",
 	}).click(self.actInsertToSelectedNode));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "remove",
 	}).click(self.actRemoveSelectedNode));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "export json",
 	}).click(self.actExportJson));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "export png",
 	}).click(self.actExportPng));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "reload",
 	}).click(self.refresh));
 
-	$(root).append($("<input></input>").attr({
+	mainWin.append($("<input></input>").attr({
 		type: "button", value: "commit",
 	}).click(self.actCommit));
 
-	$(root).append($("<input></input>").addClass("sidemenu-search-text").attr({
+	mainWin.append($("<input></input>").addClass("sidemenu-search-text").attr({
 		type: "text", value: "",
 	}).focus(function(e) {
 		var area = this;
@@ -147,17 +152,14 @@ var SideMenu = function(root, viewer) {
 	}));
 
 	var searchResult = $("<ul></ul>").addClass("sidemenu-search-result");
-	searchResult.height($(root).height() - searchResult.css("top") - 16);
-	$(root).append(searchResult);
+	searchResult.height(mainWin.height() - searchResult.css("top") - 16);
+	mainWin.append(searchResult);
 
 	this.divgrip = $("<div></div>").addClass("sidemenu-grip").css({
 		left: "0px", top: "0px", display: "block", zIndex: 20,
-	}).click(function(e) {
-		self.open();
-	}).bind("touchstart", function(e) {
-		self.open();
-	});
-	$(document.body).append(this.divgrip);//FIXME
+	}).click(self.actOpen)
+		.bind("touchstart", self.actOpen);
+	$(root).append(this.divgrip);
 
 	//--------------------------------------------------------
 	this.close = function() {
@@ -167,9 +169,9 @@ var SideMenu = function(root, viewer) {
 			var time = new Date() - begin;
 			var r = time / animeTime;
 			if(r < 1.0) {
-				$(root).css("left", Math.round(-width * r) + "px");
+				mainWin.css("left", Math.round(-width * r) + "px");
 			} else {
-				$(root).css({ left: "0px", display: "none" });
+				mainWin.css({ left: "0px", display: "none" });
 				clearInterval(id);
 			}
 		}, 1000/60);
@@ -204,16 +206,17 @@ var SideMenu = function(root, viewer) {
 	}
 
 	this.open = function() {
-		$(root).css("display", "block");
+		mainWin.css("display", "block");
+		mainWin.css("left", - width + "px");
 		self.divgrip.css("display", "none");
 		var begin = new Date();
 		var id = setInterval(function() {
 			var time = new Date() - begin;
 			var r = time / animeTime;
 			if(r < 1.0) {
-				$(root).css("left", Math.round(- width * (1.0 - r)) + "px");
+				mainWin.css("left", Math.round(- width * (1.0 - r)) + "px");
 			} else {
-				$(root).css("left", "0px");
+				mainWin.css("left", "0px");
 				clearInterval(id);
 			}
 		}, 1000/60);

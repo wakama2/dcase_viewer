@@ -48,6 +48,42 @@ function newGSNObject(root, type) {
 	return o;
 }
 
+function executeDScript(node) {
+	var scriptName = node.getDScriptNameInEvidence();
+	var r = DCaseAPI.call("search", { filter: ["Context"] });
+	var nn = null;
+	for(var i=0; i<r[0].length; i++) {
+		if(r[0][i].value === scriptName) {
+			var n = DCaseAPI.get([], r[0][i].argument_id);
+			nn = createNodeFromJson(n);
+			break;
+		}
+	}
+	var t = $("<div></div>").addClass("node-exeScriptWindow");
+	viewer.appendElem(t);
+
+	var r1x = document.createElement("div");
+	var t1 = $(r1x).css({
+		position: "absolute",
+		left: "20px", top: "20px", right: "20px", bottom: "60px",
+	}).attr("id", "subviewer");
+	t.append(t1);
+	var v = new DCaseViewer(r1x, nn, {
+		argument_id: viewer.opts.id
+	});
+	t.append($("<input></input>").attr({
+		type: "button", value: "実行"
+	}).click(function() {
+		var r = DCaseAPI.call("run", {});
+		alert(r);
+	}));
+	t.append($("<input></input>").attr({
+		type: "button", value: "キャンセル"
+	}).click(function() {
+		t.remove();
+	}));
+}
+
 function getColorByState(state) {
 	if(state == "normal") {
 		return "#E0E0E0";
@@ -70,55 +106,7 @@ var View = function(viewer, node) {
 		viewer.dragEnd(self);
 	}).dblclick(function(e) {
 		if(node.isDScript()) {
-			var scriptName = node.getDScriptNameInEvidence();
-			var r = DCaseAPI.call("search", { filter: ["Context"] });
-			var nn = null;
-			for(var i=0; i<r[0].length; i++) {
-				if(r[0][i].value === scriptName) {
-					var n = DCaseAPI.get([], r[0][i].argument_id);
-					nn = createNodeFromJson(n);
-					break;
-				}
-			}
-			// the tekito impl
-			var t = $("<div></div>").css({
-				position: "absolute",
-				left: "20px",
-				right: "20px",
-				top: "20px",
-				bottom: "20px",
-				background: "#FFFFFF",
-				opacity: 0.9,
-				borderStyle: "solid",
-				borderColor: "#808080",
-				zIndex: 10
-			});
-			viewer.appendElem(t);
-
-			var r1x = document.createElement("div");
-			var t1 = $(r1x).css({
-				position: "absolute",
-				left: "20px",
-				top: "20px",
-				right: "20px",
-				bottom: "60px",
-			}).attr("id", "subviewer");
-			t.append(t1);
-			var v = new DCaseViewer(r1x, nn, {
-				argument_id: viewer.opts.id
-			});
-			t.append($("<input></input>").attr({
-				type: "button", value: "実行"
-			}).click(function() {
-				//alert("execute " + script_name);
-				var r = DCaseAPI.call("run", {});
-				alert(r);
-			}));
-			t.append($("<input></input>").attr({
-				type: "button", value: "キャンセル"
-			}).click(function() {
-				t.remove();
-			}));
+			executeDScript(node);
 		} else {
 			viewer.actExpandBranch(self);
 		}
@@ -137,12 +125,6 @@ var View = function(viewer, node) {
 				.css({ zIndex: -99 });
 		viewer.appendElem(this.argumentBorder);
 	}
-	//if(node.isDScript()) {//FIXME
-	//	this.svgDScript = $(document.createElementNS(SVG_NS, "polygon")).attr({
-	//		fill: "gray", stroke: "gray"
-	//	});
-	//	viewer.appendSvg(this.svgDScript)
-	//}
 	this.argumentBounds = {};
 
 	this.divName = $("<div></div>").addClass("node-name").html(node.name);
@@ -172,10 +154,6 @@ var View = function(viewer, node) {
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
-
-	//if(node.isDScript()) {
-	//	this.divText.html(this.divText.html(
-	//}
 }
 
 View.prototype.modified = function() {
@@ -250,14 +228,6 @@ View.prototype.setBounds = function(x, y, w, h) {
 		this.svgUndevel.attr("points", 
 			s(sx, sy) + " " + s(sx+n, sy+n) + " " + s(sx, sy+n*2) + " " + s(sx-n, sy+n));
 	}
-	//if(this.node.isDScript()) {
-	//	var sx = (x + w*3/4) * scale;
-	//	var sy = (y) * scale;
-	//	var n = 60 * scale;
-	//	function s(x, y) { return x+","+y }
-	//	this.svgDScript.attr("points",
-	//		s(sx, sy) + " " + s(sx+n, sy+n/2) + " " + s(sx, sy+n));
-	//}
 }
 
 View.prototype.updateLocation = function(x, y) {
@@ -408,9 +378,6 @@ View.prototype.move = function() {
 	if(this.node.isUndevelop()) {
 		this.svgUndevel.attr("display", this.visible ? "block" : "none");
 	}
-	//if(this.node.isDScript()) {
-	//	this.svgDScript.attr("display", this.visible ? "block" : "none");
-	//}
 	this.forEachNode(function(e) {
 		e.move();
 	});
