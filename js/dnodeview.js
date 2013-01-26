@@ -70,9 +70,16 @@ var View = function(viewer, node) {
 		viewer.dragEnd(self);
 	}).dblclick(function(e) {
 		if(node.isDScript()) {
-			var script_name = node.getDScriptNameInEvidence();
-			var nn = viewer.scripts[node.getDScriptNameInEvidence()];
-			console.log(nn);
+			var scriptName = node.getDScriptNameInEvidence();
+			var r = DCaseAPI.call("search", { filter: ["Context"] });
+			var nn = null;
+			for(var i=0; i<r[0].length; i++) {
+				if(r[0][i].value === scriptName) {
+					var n = DCaseAPI.get([], r[0][i].argument_id);
+					nn = createNodeFromJson(n);
+					break;
+				}
+			}
 			// the tekito impl
 			var t = $("<div></div>").css({
 				position: "absolute",
@@ -80,7 +87,7 @@ var View = function(viewer, node) {
 				right: "20px",
 				top: "20px",
 				bottom: "20px",
-				background: "#EEEEEE",
+				background: "#FFFFFF",
 				opacity: 0.9,
 				borderStyle: "solid",
 				borderColor: "#808080",
@@ -96,10 +103,10 @@ var View = function(viewer, node) {
 				right: "20px",
 				bottom: "60px",
 			}).attr("id", "subviewer");
+			t.append(t1);
 			var v = new DCaseViewer(r1x, nn, {
 				argument_id: viewer.opts.id
 			});
-			t.append(t1);
 			t.append($("<input></input>").attr({
 				type: "button", value: "実行"
 			}).click(function() {

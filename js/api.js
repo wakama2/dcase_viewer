@@ -1,6 +1,6 @@
 var DCaseAPI = new Object();
 
-DCaseAPI.cgi = "http://192.168.59.251/dcase_cloud/interface.cgi";
+DCaseAPI.cgi = "cgi/interface.cgi";
 
 DCaseAPI.call = function(method, params) {
 	var cmd = {
