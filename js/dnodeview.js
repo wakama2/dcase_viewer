@@ -1,9 +1,10 @@
-var FONT_SIZE = 12;
+var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
 function newGSNObject(root, type) {
 	var o = null;
 	if(type == "Goal") {
+		var n = 10;
 		o = root.createSvg("rect");
 		o.setBounds = function(x, y, w, h) {
 			this.setAttribute("x", x);
@@ -11,7 +12,7 @@ function newGSNObject(root, type) {
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
 		}
-		o.offset = { x: 0, y: 0 };
+		o.offset = { x: n, y: n };
 	} else if(type == "Context") {
 		o = root.createSvg("rect");
 		var n = 20;
@@ -23,7 +24,7 @@ function newGSNObject(root, type) {
 			this.setAttribute("width", w);
 			this.setAttribute("height", h);
 		}
-		o.offset = { x: n/3, y: n/3 };
+		o.offset = { x: n/2, y: n/2 };
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
@@ -31,7 +32,7 @@ function newGSNObject(root, type) {
 			this.setAttribute("points", 
 					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
 		}
-		o.offset = { x: 20, y: 0 };
+		o.offset = { x: 25, y: 10 };
 	} else if(type == "Evidence" || type == "Monitor") {
 		o = root.createSvg("ellipse");
 		o.setBounds = function(x, y, w, h) {
@@ -39,7 +40,7 @@ function newGSNObject(root, type) {
 			this.setAttribute("cy", y + h/2);
 			this.setAttribute("rx", w/2);
 			this.setAttribute("ry", h/2);
-			o.offset = { x: w/8/root.scale, y: h/8/root.scale };
+			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
 		}
 		o.offset = { x: 0, y: 0 };
 	} else {
@@ -112,7 +113,8 @@ var View = function(viewer, node) {
 	this.lines = [];
 	this.contextLines = [];
 	// for animation
-	this.bounds = { x: 0, y: 0, w: 200, h: this.div.getBoundingClientRect().height + 60 };
+	var r = this.div.getBoundingClientRect();
+	this.bounds = { x: 0, y: 0, w: 200, h: r.height + 60 };
 	this.visible = true;
 	this.childVisible = true;
 	this.bounds0 = this.bounds;
