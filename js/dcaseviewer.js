@@ -70,6 +70,7 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	var rootview = self.rootview;
 	rootview.updateLocation(
 			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
+	rootview.animeBegin();
 	if(ms == 0) {
 		rootview.move();
 		return;

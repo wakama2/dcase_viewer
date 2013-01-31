@@ -258,6 +258,27 @@ View.prototype.updateLocation = function(x, y) {
 	return { x: x, y: y };
 }
 
+View.prototype.animeBegin = function() {
+	if(this.visible != this.visible0 && this.visible) {
+		this.svg.setAttribute("display", "block");
+		this.div.css("display", "block");
+	}
+	this.divNodes.css("display", !this.childVisible ? "block" : "none");
+	this.forEachNode(function(e) {
+		e.animeBegin();
+	});
+	if(this.childVisible0 != this.childVisible) {
+		var lines = this.lines;
+		for(var i=0; i<lines.length; i++) {
+			lines[i].setAttribute("display", "block");
+		}
+		lines = this.contextLines;
+		for(var i=0; i<lines.length; i++) {
+			lines[i].setAttribute("display", "block");
+		}
+	}
+}
+
 View.prototype.animate = function(r) {
 	var scale = this.viewer.scale;
 	if(this.visible == this.visible0 && !this.visible0) return;
@@ -266,17 +287,12 @@ View.prototype.animate = function(r) {
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
 			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
 	if(this.visible != this.visible0) {
-		if(this.visible) {
-			this.svg.setAttribute("display", "block");
-			this.div.css("display", "block");
-		}
 		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
 		this.div.css("opacity", this.visible ? r : 1.0 - r);
 	}
 	this.forEachNode(function(e) {
 		e.animate(r);
 	});
-	this.divNodes.css("display", !this.childVisible ? "block" : "none");
 	// line
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
@@ -288,7 +304,6 @@ View.prototype.animate = function(r) {
 			y2: (e.getY()) * scale
 		});
 		if(this.childVisible0 != this.childVisible) {
-			lines[i].setAttribute("display", "block");
 			lines[i].setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
 	}
@@ -302,7 +317,6 @@ View.prototype.animate = function(r) {
 			y2: (e.getY() + e.bounds.h/2) * scale,
 		});
 		if(this.childVisible0 != this.childVisible) {
-			lines[i].setAttribute("display", "block");
 			lines[i].setAttribute("opacity", this.childVisible ? r : 1.0 - r);
 		}
 	}
