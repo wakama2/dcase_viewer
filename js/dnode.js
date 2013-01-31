@@ -4,7 +4,6 @@ var DNode = function(id, name, type, text) {
 	this.name = name;
 	this.text = text;
 	this.type = type;
-	this.state = "normal";
 	this.children = [];
 	this.contexts = [];
 	this.parents = [];
@@ -78,6 +77,7 @@ function createNodeFromJson(json) {
 			n.name = n.type.charAt(0) + n.node_id;
 			var newNode = new DNode(n.node_id, n.name, n.type,
 					n.type != "Context" ? n.description : JSON.stringify(n.properties));
+			newNode.isEvidence = n.isEvidence;
 			node.addChild(newNode);
 			createChildren(child, newNode);
 		}

@@ -49,12 +49,8 @@ function newGSNObject(root, type) {
 	return o;
 }
 
-function getColorByState(state) {
-	if(state == "normal") {
-		return "#E0E0E0";
-	} else if(state == "error") {
-		return "#FF8080";
-	}
+function getColorByState(node) {
+	return node.isEvidence ? "#80FF80" : "#E0E0E0";
 }
 
 /* class View */
@@ -320,7 +316,7 @@ View.prototype.move = function() {
 	var scale = this.viewer.scale;
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
 	this.svg.setAttribute("display", this.visible ? "block" : "none");
-	this.svg.setAttribute("fill", getColorByState(this.node.state));
+	this.svg.setAttribute("fill", getColorByState(this.node));
 	if(this.viewer.selectedNode == this) {
 		this.svg.setAttribute("stroke", "orange");
 	} else {
