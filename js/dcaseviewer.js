@@ -152,7 +152,7 @@ DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
 			break;
 		}
 	}
-	var t = $("<div></div>").addClass("node-exeScriptWindow");
+	var t = $("<div></div>").addClass("dscript-exe-window");
 	self.appendElem(t);
 
 	var r1x = document.createElement("div");
