@@ -29,6 +29,13 @@ var Animation = function() {
 		return this;
 	}
 
+	this.moves = function(dom, json) {
+		for(var key in json) {
+			this.move(dom, key, json[key]);
+		}
+		return this;
+	}
+
 	this.show = function(dom, visible) {
 		var mtd = getAttrSetter(dom);
 		var disp = mtd.get("display");

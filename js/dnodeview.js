@@ -258,11 +258,14 @@ View.prototype.animeBegin = function() {
 	a.show(this.svg, this.visible);
 	a.show(this.div, this.visible);
 	a.show(this.divNodes, !this.childVisible);
-	a.move(this.div, "left"  , (this.bounds.x + this.svg.offset.x)*scale);
-	a.move(this.div, "top"   , (this.bounds.y + this.svg.offset.y)*scale);
-	a.move(this.div, "width" , (this.bounds.w - this.svg.offset.x*2)*scale);
-	a.move(this.div, "height", (this.bounds.h - this.svg.offset.y*2)*scale);
-	a.move(this.div, "fontSize", FONT_SIZE*scale);
+
+	a.moves(this.div, {
+		left  : (this.bounds.x + this.svg.offset.x) * scale,
+		top   : (this.bounds.y + this.svg.offset.y) * scale,
+		width : (this.bounds.w - this.svg.offset.x*2) * scale,
+		height: (this.bounds.h - this.svg.offset.y*2) * scale,
+		fontSize: FONT_SIZE*scale,
+	});
 
 	this.svg.setAttribute("fill", getColorByState(this.node));
 	if(this.viewer.selectedNode == this) {
@@ -286,19 +289,21 @@ View.prototype.animeBegin = function() {
 	
 	$.each(this.lines, function(i, l) {
 		var e = self.children[i];
-		a.move(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
-		a.move(l, "y1", (self.bounds.y + self.bounds.h  ) * scale);
-		a.move(l, "x2", (e.bounds.x + e.bounds.w/2) * scale);
-		a.move(l, "y2", (e.bounds.y) * scale);
-		a.show(l, self.childVisible);
+		a.moves(l, {
+			x1: (self.bounds.x + self.bounds.w/2) * scale,
+			y1: (self.bounds.y + self.bounds.h  ) * scale,
+			x2: (e.bounds.x + e.bounds.w/2) * scale,
+			y2: (e.bounds.y) * scale,
+		}).show(l, self.childVisible);
 	});
 	$.each(this.contextLines, function(i, l) {
 		var e = self.contexts[i];
-		a.move(l, "x1", (self.bounds.x + self.bounds.w  ) * scale);
-		a.move(l, "y1", (self.bounds.y + self.bounds.h/2) * scale);
-		a.move(l, "x2", (e.bounds.x) * scale);
-		a.move(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
-		a.show(l, self.childVisible);
+		a.moves(l, {
+			x1: (self.bounds.x + self.bounds.w  ) * scale,
+			y1: (self.bounds.y + self.bounds.h/2) * scale,
+			x2: (e.bounds.x) * scale,
+			y2: (e.bounds.y + e.bounds.h/2) * scale,
+		}).show(l, self.childVisible);
 	});
 	if(this.svgUndevel != null) {
 		a.show(this.svgUndevel.context, this.visible);
