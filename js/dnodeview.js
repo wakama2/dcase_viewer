@@ -265,55 +265,55 @@ View.prototype.updateLocation = function(x, y) {
 }
 
 View.prototype.animeBegin = function() {
-	var animCss = [];
 	var animSvg = [];
 	var fadeInSvg = [];
 	var fadeOutSvg = [];
-	var fadeInCss = [];
-	var fadeOutCss = [];
 
-	function anime(dom, key, fromValue, toValue) {
+	function getAttrSetter(dom) {
+		if(dom.setAttribute != null) {//FIXME?
+			return {
+				set: function(key, value) { dom.setAttribute(key, value); },
+				get: function(key) { return dom.getAttribute(key); }
+			};
+		} else {
+			return {
+				set: function(key, value) { dom.css(key, value); },
+				get: function(key) { return dom.css(key); }
+			};
+		}
+	}
+
+	function animeTo(dom, key, toValue) {
+		var mtd = getAttrSetter(dom);
+		var fromValue = parseInt(mtd.get(key));
 		animSvg.push({
-			dom: dom,
-			prop: key,
+			key: key,
 			from: fromValue,
-			to: parseInt(toValue)
+			to: parseInt(toValue),
+			set: mtd.set
 		});
 	}
-	function animeTo(dom, key, toValue) {
-		anime(dom, key, parseInt(dom.getAttribute(key)), toValue);
-	}
 	function setShow(dom, visible) {
-		var disp = dom.getAttribute("display");
+		var mtd = getAttrSetter(dom);
+		var disp = mtd.get("display");
 		if(disp == null) {
-			dom.setAttribute("display", visible ? "block" : "none");
+			mtd.set("display", visible ? "block" : "none");
 		} else if(disp == "none" && visible) {
 			// fade in
-			fadeInSvg.push(dom);
-			dom.setAttribute("opacity", 0.0);
-			dom.setAttribute("display", "block");
-			console.log("fadein " + dom);
+			fadeInSvg.push(mtd.set);
+			mtd.set("opacity", 0.0);
+			mtd.set("display", "block");
 		} else if(disp == "block" && !visible) {
 			// fade out
-			fadeOutSvg.push(dom);
-			dom.setAttribute("opacity", 1.0);
-			dom.setAttribute("display", "block");
+			fadeOutSvg.push(mtd.set);
+			mtd.set("opacity", 1.0);
+			mtd.set("display", "block");
 		}
 	}
-
 	setShow(this.svg, this.visible);
-	if(this.visible != this.visible0) {
-		if(this.visible) {
-			this.div.css("display", "block");
-			animCss.push({ dom: this.div, prop: "opacity", from: 0, to: 1 });
-		} else {
-			animCss.push({ dom: this.div, prop: "opacity", from: 1, to: 0 });
-		}
-	}
-	this.divNodes.css("display", !this.childVisible ? "block" : "none");
-	this.forEachNode(function(e) {
-		e.animeBegin();
-	});
+	setShow(this.div, this.visible);
+	setShow(this.divNodes, !this.childVisible);
+	
 	var self = this;
 	var scale = this.viewer.scale;
 	$.each(this.lines, function(i, l) {
@@ -332,6 +332,9 @@ View.prototype.animeBegin = function() {
 		animeTo(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
 		setShow(l, self.childVisible);
 	});
+	if(this.svgUndevel != null) {
+		setShow(this.svgUndevel, this.visible);
+	}
 	if(this.argumentBorder != null) {
 		var n = 10;
 		var b = this.argumentBorder.context;
@@ -341,7 +344,9 @@ View.prototype.animeBegin = function() {
 		animeTo(b, "height", (this.argumentBounds.y1 + n*2) * scale);
 		setShow(b, this.childVisible);
 	}
-	this.animCss = animCss;
+	this.forEachNode(function(e) {
+		e.animeBegin();
+	});
 	this.animSvg = animSvg;
 	this.fadeInSvg = fadeInSvg;
 	this.fadeOutSvg = fadeOutSvg;
@@ -354,17 +359,14 @@ View.prototype.animate = function(r) {
 	this.setBounds(
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
 			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
-	$.each(this.animCss, function(i, e) {
-		e.dom.css(e.prop, e.from + (e.to - e.from) * r);
-	});
 	$.each(this.animSvg, function(i, e) {
-		e.dom.setAttribute(e.prop, e.from + (e.to - e.from) * r);
+		e.set(e.key, e.from + (e.to - e.from) * r);
 	});
 	$.each(this.fadeInSvg, function(i, e) {
-		e.setAttribute("opacity", r);
+		e("opacity", r);
 	});
 	$.each(this.fadeOutSvg, function(i, e) {
-		e.setAttribute("opacity", 1.0 - r);
+		e("opacity", 1.0 - r);
 	});
 	this.forEachNode(function(e) {
 		e.animate(r);
@@ -381,7 +383,6 @@ View.prototype.move = function() {
 	} else {
 		this.svg.setAttribute("stroke", "none");
 	}
-	this.div.css("display", this.visible ? "block" : "none");
 	if(scale < MIN_DISP_SCALE) {
 		this.divText.css("display", "none");
 		this.divName.css("display", "none");
@@ -396,27 +397,19 @@ View.prototype.move = function() {
 		}
 	}
 
-	$.each(this.animCss, function(i, e) {
-		e.dom.css(e.prop, e.to);
-	});
 	$.each(this.animSvg, function(i, e) {
-		e.dom.setAttribute(e.prop, e.to);
+		e.set(e.key, e.to);
 	});
 	$.each(this.fadeInSvg, function(i, e) {
-		e.setAttribute("opacity", 1.0);
+		e("opacity", 1.0);
 	});
 	$.each(this.fadeOutSvg, function(i, e) {
-		e.setAttribute("opacity", 0.0);
-		e.setAttribute("display", "none");
+		e("opacity", 0.0);
+		e("display", "none");
 	});
-
-	if(this.node.isUndevelop()) {
-		this.svgUndevel.attr("display", this.visible ? "block" : "none");
-	}
 	this.forEachNode(function(e) {
 		e.move();
 	});
-	this.divNodes.css("display", !this.childVisible ? "block" : "none");
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
 	this.childVisible0 = this.childVisible;
