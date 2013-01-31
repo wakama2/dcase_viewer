@@ -259,24 +259,69 @@ View.prototype.updateLocation = function(x, y) {
 }
 
 View.prototype.animeBegin = function() {
-	if(this.visible != this.visible0 && this.visible) {
-		this.svg.setAttribute("display", "block");
-		this.div.css("display", "block");
+	var animCss = [];
+	var animSvg = [];
+
+	function animeTo(dom, key, toValue) {
+		anime(dom, key, parseInt(dom.getAttribute(key)), toValue);
+	}
+
+	function anime(dom, key, fromValue, toValue) {
+		animSvg.push({
+			dom: dom,
+			prop: key,
+			from: fromValue,
+			to: toValue
+		});
+	}
+
+	if(this.visible != this.visible0) {
+		if(this.visible) {
+			this.svg.setAttribute("display", "block");
+			this.div.css("display", "block");
+			animCss.push({ dom: this.div, prop: "opacity", from: 0, to: 1 });
+			anime(this.svg, "opacity", 0, 1);
+		} else {
+			animCss.push({ dom: this.div, prop: "opacity", from: 1, to: 0 });
+			anime(this.svg, "opacity", 1, 0);
+		}
 	}
 	this.divNodes.css("display", !this.childVisible ? "block" : "none");
 	this.forEachNode(function(e) {
 		e.animeBegin();
 	});
+	var self = this;
+	var scale = this.viewer.scale;
 	if(this.childVisible0 != this.childVisible) {
-		var lines = this.lines;
-		for(var i=0; i<lines.length; i++) {
-			lines[i].setAttribute("display", "block");
-		}
-		lines = this.contextLines;
-		for(var i=0; i<lines.length; i++) {
-			lines[i].setAttribute("display", "block");
-		}
+		$.each(this.lines, function(i, l) {
+			var e = self.children[i];
+			animeTo(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
+			animeTo(l, "y1", (self.bounds.y + self.bounds.h  ) * scale);
+			animeTo(l, "x2", (e.bounds.x + e.bounds.w/2) * scale);
+			animeTo(l, "y2", (e.bounds.y + e.bounds.h  ) * scale);
+			l.setAttribute("display", "block");
+			if(self.childVisible) {
+				anime(l, "opacity", 0, 1);
+			} else {
+				anime(l, "opacity", 1, 0);
+			}
+		});
+		$.each(this.contextLines, function(i, l) {
+			l.setAttribute("display", "block");
+			var e = self.contexts[i];
+			animeTo(l, "x1", (self.bounds.x + self.bounds.w  ) * scale);
+			animeTo(l, "y1", (self.bounds.y + self.bounds.h/2) * scale);
+			animeTo(l, "x2", (e.bounds.x + e.bounds.w  ) * scale);
+			animeTo(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
+			if(self.childVisible) {
+				anime(l, "opacity", 0, 1);
+			} else {
+				anime(l, "opacity", 1, 0);
+			}
+		});
 	}
+	this.animCss = animCss;
+	this.animSvg = animSvg;
 }
 
 View.prototype.animate = function(r) {
@@ -286,40 +331,15 @@ View.prototype.animate = function(r) {
 	this.setBounds(
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
 			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
-	if(this.visible != this.visible0) {
-		this.svg.setAttribute("opacity", this.visible ? r : 1.0-r);
-		this.div.css("opacity", this.visible ? r : 1.0 - r);
-	}
+	$.each(this.animCss, function(i, e) {
+		e.dom.css(e.prop, e.from + (e.to - e.from) * r);
+	});
+	$.each(this.animSvg, function(i, e) {
+		e.dom.setAttribute(e.prop, e.from + (e.to - e.from) * r);
+	});
 	this.forEachNode(function(e) {
 		e.animate(r);
 	});
-	// line
-	var lines = this.lines;
-	for(var i=0; i<lines.length; i++) {
-		var e = this.children[i];
-		$(lines[i]).attr({
-			x1: (this.getX() + this.bounds.w/2) * scale,
-			y1: (this.getY() + this.bounds.h) * scale,
-			x2: (e.getX() + e.bounds.w/2) * scale,
-			y2: (e.getY()) * scale
-		});
-		if(this.childVisible0 != this.childVisible) {
-			lines[i].setAttribute("opacity", this.childVisible ? r : 1.0 - r);
-		}
-	}
-	var lines = this.contextLines;
-	for(var i=0; i<lines.length; i++) {
-		var e = this.contexts[i];
-		$(lines[i]).attr({
-			x1: (this.getX() + this.bounds.w) * scale,
-			y1: (this.getY() + this.bounds.h/2) * scale,
-			x2: e.getX() * scale,
-			y2: (e.getY() + e.bounds.h/2) * scale,
-		});
-		if(this.childVisible0 != this.childVisible) {
-			lines[i].setAttribute("opacity", this.childVisible ? r : 1.0 - r);
-		}
-	}
 	//this.argumentBorder.style.left = this.argumentBounds.x;
 	//this.argumentBorder.style.top  = this.argumentBounds.y;
 	//this.argumentBorder.style.right  = this.argumentBounds.x1;
