@@ -26,6 +26,7 @@ var Animation = function() {
 			to: parseInt(toValue),
 			set: mtd.set
 		});
+		return this;
 	}
 
 	this.show = function(dom, visible) {
@@ -44,6 +45,7 @@ var Animation = function() {
 			mtd.set("opacity", 1.0);
 			mtd.set("display", "block");
 		}
+		return this;
 	}
 
 	this.anime = function(r) {
@@ -66,7 +68,7 @@ var Animation = function() {
 			e("opacity", 1.0);
 		});
 		$.each(fadeOutList, function(i, e) {
-			e("opacity", 0.0);
+			e("opacity", 1.0);
 			e("display", "none");
 		});
 	}

@@ -84,7 +84,7 @@ var View = function(viewer, node) {
 		this.argumentBorder = $(document.createElementNS(SVG_NS, "rect")).attr({
 			stroke: "#8080D0",
 			fill: "none",
-			//width: 2px, dashed
+			"stroke-dasharray": 3,
 		});
 		viewer.appendSvg(this.argumentBorder);
 	}
@@ -115,8 +115,6 @@ var View = function(viewer, node) {
 	this.visible = true;
 	this.childVisible = true;
 	this.bounds0 = this.bounds;
-	this.visible0 = this.visible;
-	this.childVisible0 = this.childVisible;
 }
 
 View.prototype.modified = function() {
@@ -265,6 +263,26 @@ View.prototype.animeBegin = function() {
 	a.move(this.div, "width" , (this.bounds.w - this.svg.offset.x*2)*scale);
 	a.move(this.div, "height", (this.bounds.h - this.svg.offset.y*2)*scale);
 	a.move(this.div, "fontSize", FONT_SIZE*scale);
+
+	this.svg.setAttribute("fill", getColorByState(this.node));
+	if(this.viewer.selectedNode == this) {
+		this.svg.setAttribute("stroke", "orange");
+	} else {
+		this.svg.setAttribute("stroke", "none");
+	}
+	if(scale < MIN_DISP_SCALE) {
+		a.show(this.divText, false);
+		a.show(this.divName, false);
+		if(this.divNodesVisible) {
+			this.divNodes.html("<p></p>");
+		}
+	} else {
+		a.show(this.divText, true);
+		a.show(this.divName, true);
+		if(this.divNodesVisible) {
+			this.divNodes.html(this.divNodesText);
+		}
+	}
 	
 	$.each(this.lines, function(i, l) {
 		var e = self.children[i];
@@ -300,8 +318,6 @@ View.prototype.animeBegin = function() {
 }
 
 View.prototype.animate = function(r) {
-	var scale = this.viewer.scale;
-	if(this.visible == this.visible0 && !this.visible0) return;
 	function mid(x0, x1) { return (x1-x0) * r + x0; }
 	this.setBounds(
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
@@ -313,34 +329,11 @@ View.prototype.animate = function(r) {
 }
 
 View.prototype.move = function() {
-	var scale = this.viewer.scale;
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
-
-	this.svg.setAttribute("fill", getColorByState(this.node));
-	if(this.viewer.selectedNode == this) {
-		this.svg.setAttribute("stroke", "orange");
-	} else {
-		this.svg.setAttribute("stroke", "none");
-	}
-	if(scale < MIN_DISP_SCALE) {
-		this.divText.css("display", "none");
-		this.divName.css("display", "none");
-		if(this.divNodesVisible) {
-			this.divNodes.html("<p></p>");
-		}
-	} else {
-		this.divText.css("display", "block");
-		this.divName.css("display", "block");
-		if(this.divNodesVisible) {
-			this.divNodes.html(this.divNodesText);
-		}
-	}
 	this.animation.animeFinish();
 	this.forEachNode(function(e) {
 		e.move();
 	});
 	this.bounds0 = this.bounds;
-	this.visible0 = this.visible;
-	this.childVisible0 = this.childVisible;
 }
 
