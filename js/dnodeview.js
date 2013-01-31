@@ -102,7 +102,6 @@ var View = function(viewer, node) {
 	this.divNodesText = "";
 	this.divNodesVisible = false;
 	
-	this.location = { x: 0, y: 0 };
 	this.childOpen = true;
 	// child node
 	this.contexts = [];
@@ -125,9 +124,6 @@ View.prototype.modified = function() {
 	this.divText.html(this.node.text);
 	this.viewer.repaintAll();
 }
-
-View.prototype.getX = function() { return this.location.x; }
-View.prototype.getY = function() { return this.location.y; }
 
 View.prototype.forEachNode = function(f) {
 	var contexts = this.contexts;
@@ -177,16 +173,8 @@ View.prototype.addChild = function(view) {
 }
 
 View.prototype.setBounds = function(x, y, w, h) {
-	this.location = { x: x, y: y };
 	var scale = this.viewer.scale;
 	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	this.div.css({
-		left  : (x + this.svg.offset.x) * scale + "px",
-		top   : (y + this.svg.offset.y) * scale + "px",
-		width : (w - this.svg.offset.x * 2) * scale + "px",
-		height: (h - this.svg.offset.y * 2) * scale + "px",
-		fontSize: Math.round(FONT_SIZE * scale) + "px",
-	});
 	if(this.node.isUndevelop()) {
 		var sx = (x + w/2) * scale;
 		var sy = (y + h) * scale;
@@ -310,12 +298,17 @@ View.prototype.animeBegin = function() {
 			mtd.set("display", "block");
 		}
 	}
+	var self = this;
+	var scale = this.viewer.scale;
 	setShow(this.svg, this.visible);
 	setShow(this.div, this.visible);
 	setShow(this.divNodes, !this.childVisible);
+	animeTo(this.div, "left"  , (this.bounds.x + this.svg.offset.x)*scale);
+	animeTo(this.div, "top"   , (this.bounds.y + this.svg.offset.y)*scale);
+	animeTo(this.div, "width" , (this.bounds.w - this.svg.offset.x*2)*scale);
+	animeTo(this.div, "height", (this.bounds.h - this.svg.offset.y*2)*scale);
+	animeTo(this.div, "fontSize", FONT_SIZE*scale);
 	
-	var self = this;
-	var scale = this.viewer.scale;
 	$.each(this.lines, function(i, l) {
 		var e = self.children[i];
 		animeTo(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
@@ -333,7 +326,7 @@ View.prototype.animeBegin = function() {
 		setShow(l, self.childVisible);
 	});
 	if(this.svgUndevel != null) {
-		setShow(this.svgUndevel, this.visible);
+		setShow(this.svgUndevel.context, this.visible);
 	}
 	if(this.argumentBorder != null) {
 		var n = 10;
