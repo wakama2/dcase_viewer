@@ -1,6 +1,7 @@
 .node-container {
 	position: absolute;
 	font-size: 12px;
+	word-wrap: break-word;
 }
 .node-name {
 	font-weight: bold;
