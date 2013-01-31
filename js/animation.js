@@ -79,6 +79,5 @@ var Animation = function() {
 			e("display", "none");
 		});
 	}
-
 }
 

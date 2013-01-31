@@ -41,11 +41,11 @@ DCaseViewer.prototype.setModel = function(model) {
 	var self = this;
 	function create(node) {
 		var view = new View(self, node);
+		if(node.context != null) {
+			view.addChild(create(node.context));
+		}
 		for(var i=0; i<node.children.length; i++) {
 			view.addChild(create(node.children[i]));
-		}
-		for(var i=0; i<node.contexts.length; i++) {
-			view.addChild(create(node.contexts[i]));
 		}
 		return view;
 	}

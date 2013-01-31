@@ -5,7 +5,7 @@ var DNode = function(id, name, type, text) {
 	this.text = text;
 	this.type = type;
 	this.children = [];
-	this.contexts = [];
+	this.context = null;
 	this.parents = [];
 }
 
@@ -13,13 +13,13 @@ DNode.prototype.addChild = function(node) {
 	if(node.type != "Context") {
 		this.children.push(node);
 	} else {
-		this.contexts.push(node);
+		this.context = node;
 	}
 	node.parents.push(this);
 }
 
 DNode.prototype.isArgument = function() {
-	return this.contexts.length != 0 && this.type == "Goal";
+	return this.context != null && this.type == "Goal";
 }
 
 DNode.prototype.isUndevelop = function() {
@@ -150,8 +150,6 @@ function createSampleNode() {
 							"・応答時間は1件あたり3秒以内<br>" +
 							"・一回の障害あたりの復旧時間は5分以内"
 			},
-			{ name: "Context2", type: "Context", desc: "現在のシステムの運用状態" },
-			{ name: "Context2", type: "Context", desc: "Risk分析の結果<br>・アクセス数の増大<br>応答遅延" },
 			{
 				name: "Strategy", type: "Strategy", desc: "DEOSプロセスによって議論する",
 				children: strategy_children

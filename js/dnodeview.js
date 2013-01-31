@@ -104,11 +104,11 @@ var View = function(viewer, node) {
 	
 	this.childOpen = true;
 	// child node
-	this.contexts = [];
+	this.context = null;
 	this.children = [];
 	// line
 	this.lines = [];
-	this.contextLines = [];
+	this.contextLine = null;
 	// for animation
 	this.div.width(200);
 	this.bounds = { x: 0, y: 0, w: 200, h: this.div.height() + 60 };
@@ -124,9 +124,8 @@ View.prototype.modified = function() {
 }
 
 View.prototype.forEachNode = function(f) {
-	var contexts = this.contexts;
-	for(var i=0; i<contexts.length; i++) {
-		f(contexts[i]);
+	if(this.context != null) {
+		f(this.context);
 	}
 	var children = this.children;
 	for(var i=0; i<children.length; i++) {
@@ -163,14 +162,19 @@ View.prototype.addChild = function(view) {
 		this.lines.push(l);
 		this.children.push(view);
 	} else {
-		this.contextLines.push(l);
-		this.contexts.push(view);
+		this.contextLine = l;
+		this.context = view;
 	}
-	this.divNodesText = (this.lines.length + this.contextLines.length) + " nodes...";
+	this.divNodesText = (this.lines.length + (this.contextLine!=null?1:0))
+			 + " nodes...";
 	this.divNodesVisible = true;
 }
 
 View.prototype.updateLocation = function(x, y) {
+	console.log(x+","+y);
+	var ARG_MARGIN = this.node.isArgument() ? 5 : 0;
+	x += ARG_MARGIN;
+	y += ARG_MARGIN;
 	var x0 = x;
 	var y0 = y;
 	var w = this.bounds.w;
@@ -180,61 +184,63 @@ View.prototype.updateLocation = function(x, y) {
 			e.updateLocation(x, y);
 		});
 		this.bounds = { x: x, y: y, w: w, h: h };
+		if(this.node.isArgument()) {
+			this.argumentBounds = {
+				x: x0 - ARG_MARGIN,
+				y: y0 - ARG_MARGIN,
+				w: w + ARG_MARGIN * 2,
+				h: h + ARG_MARGIN * 2
+			};
+			w += ARG_MARGIN;
+			h += ARG_MARGIN;
+		}
 		if(this.visible) {
-			this.argumentBounds = { x:x0, y:y0, x1:w, y1:h };
 			return { x: x+w, y: y+h };
 		} else {
-			this.argumentBounds = { x:x0, y:y0, x1:x-x0, y1:y-y0 };
 			return { x: x, y: y };
 		}
 	}
-	// contents
-	if(this.node.contexts.length != 0) {
-		var contexts = this.contexts;
-		for(var i=0; i<contexts.length; i++) {
-			var e = contexts[i];
-			y = e.updateLocation(x, y).y + X_MARGIN;
-		}
-		y -= X_MARGIN;
+	// calc context height
+	var contextHeight = h;
+	var childrenY = y0 + h + Y_MARGIN;
+	if(this.context != null) {
+		var cy = this.context.updateLocation(x, y).y;
+		contextHeight = Math.max(contextHeight, cy-y0);
+		childrenY = Math.max(childrenY, cy + X_MARGIN);
 	}
-	y = Math.max(y0 + h + Y_MARGIN, y + X_MARGIN);
-	var y1 = y;
+	var maxHeight = contextHeight;
 
-	// children
-	if(this.node.children.length != 0) {
-		var children = this.children;
-		for(var i=0; i<children.length; i++) {
-			var e = children[i];
-			var size = e.updateLocation(x, y);
-			x = size.x + X_MARGIN;
-			y1 = Math.max(y1, size.y);
-		}
-		x -= X_MARGIN;
-	} else {
-		y -= Y_MARGIN;
-		y1 -= Y_MARGIN;
+	// update children location
+	$.each(this.children, function(i, e) {
+		if(i != 0) x += X_MARGIN;
+		var size = e.updateLocation(x, childrenY);
+		x = size.x;
+		maxHeight = Math.max(maxHeight, size.y - y0);
+	});
+	var maxWidth = Math.max(w, x - x0);
+
+	// update this location
+	this.bounds = {
+		x: x0 + (maxWidth-w)/2,
+		y: y0 + (contextHeight-h)/2,
+		w: w,
+		h: h
+	};
+
+	// update context location
+	if(this.context != null) {
+		x = this.bounds.x + w + Y_MARGIN;
+		y = y0;
+		var p = this.context.updateLocation(x, y);
+		maxWidth = Math.max(maxWidth, p.x - x0);
 	}
-	x = Math.max(x0 + w, x);
-	var x1 = x;
-
-	// set this bounds
-	this.bounds = { x: x0 + (x-x0-w)/2, y: y0, w: w, h: h };
-
-	// contents (second)
-	x = this.bounds.x + w + Y_MARGIN;
-	y = y0;
-	var contexts = this.contexts;
-	for(var i=0; i<contexts.length; i++) {
-		var e = contexts[i];
-		var p = e.updateLocation(x, y);
-		x1 = Math.max(x1, p.x);
-		y = p.y + X_MARGIN;
-	}
-	
-	x = Math.max(x1, this.bounds.x + w);
-	y = Math.max(y1, this.bounds.y + h);
-	this.argumentBounds = { x:x0, y:y0, x1:x-x0, y1:y-y0 };
-	return { x: x, y: y };
+	this.argumentBounds = {
+		x: x0 - ARG_MARGIN,
+		y: y0 - ARG_MARGIN,
+		w: maxWidth + ARG_MARGIN * 2,
+		h: maxHeight + ARG_MARGIN * 2
+	};
+	return { x: x0 + maxWidth + ARG_MARGIN, y: y0 + maxHeight + ARG_MARGIN };
 }
 
 View.prototype.animeBegin = function(a) {
@@ -281,15 +287,16 @@ View.prototype.animeBegin = function(a) {
 			y2: (e.bounds.y) * scale,
 		}).show(l, self.childVisible);
 	});
-	$.each(this.contextLines, function(i, l) {
-		var e = self.contexts[i];
+	if(this.contextLine != null) {
+		var e = self.context;
+		var l = self.contextLine;
 		a.moves(l, {
 			x1: (self.bounds.x + self.bounds.w  ) * scale,
 			y1: (self.bounds.y + self.bounds.h/2) * scale,
 			x2: (e.bounds.x) * scale,
 			y2: (e.bounds.y + e.bounds.h/2) * scale,
 		}).show(l, self.childVisible);
-	});
+	};
 	if(this.svgUndevel != null) {
 		a.show(this.svgUndevel.context, this.visible);
 	}
@@ -297,11 +304,11 @@ View.prototype.animeBegin = function(a) {
 		var n = 10;
 		var b = this.argumentBorder.context;
 		a.moves(b, {
-			x     : (this.argumentBounds.x - n) * scale,
-			y     : (this.argumentBounds.y - n) * scale,
-			width : (this.argumentBounds.x1 + n*2) * scale,
-			height: (this.argumentBounds.y1 + n*2) * scale,
-		}).show(b, this.childVisible);
+			x     : this.argumentBounds.x * scale,
+			y     : this.argumentBounds.y * scale,
+			width : this.argumentBounds.w * scale,
+			height: this.argumentBounds.h * scale,
+		}).show(b, this.visible);
 	}
 	this.forEachNode(function(e) {
 		e.animeBegin(a);
