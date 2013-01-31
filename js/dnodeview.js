@@ -171,7 +171,6 @@ View.prototype.addChild = function(view) {
 }
 
 View.prototype.updateLocation = function(x, y) {
-	console.log(x+","+y);
 	var ARG_MARGIN = this.node.isArgument() ? 5 : 0;
 	x += ARG_MARGIN;
 	y += ARG_MARGIN;

@@ -122,7 +122,9 @@ function createSampleNode() {
 		},
 		{
 			name: "SubGoal 2", type: "Goal", desc: "description",
-			children: [ { name: "Evidence 2", type: "Evidence", desc: "D-Script:test" } ]
+			children: [
+				{ name: "Context 2", type: "Context", desc: "test" }
+			]
 		},
 		{
 			name: "SubGoal 3", type: "Goal", desc: "description",

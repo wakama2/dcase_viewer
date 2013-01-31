@@ -114,11 +114,12 @@ DCaseViewer.prototype.getSelectedNode = function() {
 DCaseViewer.prototype.actExpandBranch = function(view, b) {
 	if(b == undefined || b != view.childVisible) {
 		this.rootview.updateLocation(0, 0);
-		var x0 = view.bounds.x;
+		var b0 = view.bounds;
 		view.setChildVisible(!view.childVisible);
 		this.rootview.updateLocation(0, 0);
-		var x1 = view.bounds.x;
-		this.shiftX -= (x1-x0) * this.scale;
+		var b1 = view.bounds;
+		this.shiftX -= (b1.x-b0.x) * this.scale;
+		this.shiftY -= (b1.y-b0.y) * this.scale;
 		this.repaintAll(ANIME_MSEC);
 	}
 }
