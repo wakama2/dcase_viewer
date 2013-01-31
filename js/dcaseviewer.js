@@ -70,9 +70,11 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	var rootview = self.rootview;
 	rootview.updateLocation(
 			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
-	rootview.animeBegin();
+	var a = new Animation();
+	rootview.animeBegin(a);
 	if(ms == 0) {
 		rootview.move();
+		a.animeFinish();
 		return;
 	}
 	self.moving = true;
@@ -82,9 +84,11 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 		var r = time / ms;
 		if(r < 1.0) {
 			rootview.animate(r);
+			a.anime(r);
 		} else {
 			clearInterval(id);
 			rootview.move();
+			a.animeFinish();
 			self.moving = false;
 		}
 	}, 1000/60);

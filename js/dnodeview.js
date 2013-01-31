@@ -170,19 +170,6 @@ View.prototype.addChild = function(view) {
 	this.divNodesVisible = true;
 }
 
-View.prototype.setBounds = function(x, y, w, h) {
-	var scale = this.viewer.scale;
-	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	if(this.node.isUndevelop()) {
-		var sx = (x + w/2) * scale;
-		var sy = (y + h) * scale;
-		var n = 20 * scale;
-		function s(x, y) { return x+","+y }
-		this.svgUndevel.attr("points", 
-			s(sx, sy) + " " + s(sx+n, sy+n) + " " + s(sx, sy+n*2) + " " + s(sx-n, sy+n));
-	}
-}
-
 View.prototype.updateLocation = function(x, y) {
 	var x0 = x;
 	var y0 = y;
@@ -250,11 +237,9 @@ View.prototype.updateLocation = function(x, y) {
 	return { x: x, y: y };
 }
 
-View.prototype.animeBegin = function() {
+View.prototype.animeBegin = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
-	var a = new Animation();
-	this.animation = a;
 	a.show(this.svg, this.visible);
 	a.show(this.div, this.visible);
 	a.show(this.divNodes, !this.childVisible);
@@ -311,15 +296,29 @@ View.prototype.animeBegin = function() {
 	if(this.argumentBorder != null) {
 		var n = 10;
 		var b = this.argumentBorder.context;
-		a.move(b, "x"     , (this.argumentBounds.x - n) * scale);
-		a.move(b, "y"     , (this.argumentBounds.y - n) * scale);
-		a.move(b, "width" , (this.argumentBounds.x1 + n*2) * scale);
-		a.move(b, "height", (this.argumentBounds.y1 + n*2) * scale);
-		a.show(b, this.childVisible);
+		a.moves(b, {
+			x     : (this.argumentBounds.x - n) * scale,
+			y     : (this.argumentBounds.y - n) * scale,
+			width : (this.argumentBounds.x1 + n*2) * scale,
+			height: (this.argumentBounds.y1 + n*2) * scale,
+		}).show(b, this.childVisible);
 	}
 	this.forEachNode(function(e) {
-		e.animeBegin();
+		e.animeBegin(a);
 	});
+}
+
+View.prototype.setBounds = function(x, y, w, h) {
+	var scale = this.viewer.scale;
+	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
+	if(this.node.isUndevelop()) {
+		var sx = (x + w/2) * scale;
+		var sy = (y + h) * scale;
+		var n = 20 * scale;
+		function s(x, y) { return x+","+y }
+		this.svgUndevel.attr("points", 
+			s(sx, sy) + " " + s(sx+n, sy+n) + " " + s(sx, sy+n*2) + " " + s(sx-n, sy+n));
+	}
 }
 
 View.prototype.animate = function(r) {
@@ -327,7 +326,6 @@ View.prototype.animate = function(r) {
 	this.setBounds(
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
 			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
-	this.animation.anime(r);
 	this.forEachNode(function(e) {
 		e.animate(r);
 	});
@@ -335,7 +333,6 @@ View.prototype.animate = function(r) {
 
 View.prototype.move = function() {
 	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
-	this.animation.animeFinish();
 	this.forEachNode(function(e) {
 		e.move();
 	});
