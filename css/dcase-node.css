@@ -22,12 +22,6 @@
 	display: hidden;
 	border-radius: 4px;
 }
-.argument-border {
-	position: absolute;
-	border-color: #8080D0;
-	border-style: dotted;
-	border-width: 2px;
-}
 
 .dscript-exe-window {
 	position: absolute;

@@ -79,11 +79,14 @@ var View = function(viewer, node) {
 		});
 		viewer.appendSvg(this.svgUndevel)
 	}
+	this.argumentBorder = null;
 	if(node.isArgument()) {
-		this.argumentBorder = $("<div></div>")
-				.addClass("argument-border")
-				.css({ zIndex: -99 });
-		viewer.appendElem(this.argumentBorder);
+		this.argumentBorder = $(document.createElementNS(SVG_NS, "rect")).attr({
+			stroke: "#8080D0",
+			fill: "none",
+			//width: 2px, dashed
+		});
+		viewer.appendSvg(this.argumentBorder);
 	}
 	this.argumentBounds = {};
 
@@ -158,7 +161,10 @@ View.prototype.setVisible = function(b) {
 
 View.prototype.addChild = function(view) {
 	var l = this.viewer.createSvg("line");
-	l.setAttribute("stroke", "#404040");
+	$(l).attr({
+		stroke: "#404040",
+		x1: 0, y1: 0, x2: 0, y2: 0
+	});
 	if(view.node.type != "Context") {
 		this.lines.push(l);
 		this.children.push(view);
@@ -202,10 +208,10 @@ View.prototype.updateLocation = function(x, y) {
 		});
 		this.bounds = { x: x, y: y, w: w, h: h };
 		if(this.visible) {
-			this.argumentBounds = { x:x0, y:y0, x1:x+w, y1:y+h };
+			this.argumentBounds = { x:x0, y:y0, x1:w, y1:h };
 			return { x: x+w, y: y+h };
 		} else {
-			this.argumentBounds = { x:x0, y:y0, x1:x, y1:y };
+			this.argumentBounds = { x:x0, y:y0, x1:x-x0, y1:y-y0 };
 			return { x: x, y: y };
 		}
 	}
@@ -254,7 +260,7 @@ View.prototype.updateLocation = function(x, y) {
 	
 	x = Math.max(x1, this.bounds.x + w);
 	y = Math.max(y1, this.bounds.y + h);
-	this.argumentBounds = { x:x0, y:y0, x1:x, y1:y };
+	this.argumentBounds = { x:x0, y:y0, x1:x-x0, y1:y-y0 };
 	return { x: x, y: y };
 }
 
@@ -262,17 +268,16 @@ View.prototype.animeBegin = function() {
 	var animCss = [];
 	var animSvg = [];
 
-	function animeTo(dom, key, toValue) {
-		anime(dom, key, parseInt(dom.getAttribute(key)), toValue);
-	}
-
 	function anime(dom, key, fromValue, toValue) {
 		animSvg.push({
 			dom: dom,
 			prop: key,
 			from: fromValue,
-			to: toValue
+			to: parseInt(toValue)
 		});
+	}
+	function animeTo(dom, key, toValue) {
+		anime(dom, key, parseInt(dom.getAttribute(key)), toValue);
 	}
 
 	if(this.visible != this.visible0) {
@@ -292,33 +297,44 @@ View.prototype.animeBegin = function() {
 	});
 	var self = this;
 	var scale = this.viewer.scale;
-	if(this.childVisible0 != this.childVisible) {
-		$.each(this.lines, function(i, l) {
-			var e = self.children[i];
-			animeTo(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
-			animeTo(l, "y1", (self.bounds.y + self.bounds.h  ) * scale);
-			animeTo(l, "x2", (e.bounds.x + e.bounds.w/2) * scale);
-			animeTo(l, "y2", (e.bounds.y + e.bounds.h  ) * scale);
-			l.setAttribute("display", "block");
+	$.each(this.lines, function(i, l) {
+		var e = self.children[i];
+		animeTo(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
+		animeTo(l, "y1", (self.bounds.y + self.bounds.h  ) * scale);
+		animeTo(l, "x2", (e.bounds.x + e.bounds.w/2) * scale);
+		animeTo(l, "y2", (e.bounds.y) * scale);
+		l.setAttribute("display", "block");
+		if(this.childVisible0 != this.childVisible) {
 			if(self.childVisible) {
 				anime(l, "opacity", 0, 1);
 			} else {
 				anime(l, "opacity", 1, 0);
 			}
-		});
-		$.each(this.contextLines, function(i, l) {
-			l.setAttribute("display", "block");
-			var e = self.contexts[i];
-			animeTo(l, "x1", (self.bounds.x + self.bounds.w  ) * scale);
-			animeTo(l, "y1", (self.bounds.y + self.bounds.h/2) * scale);
-			animeTo(l, "x2", (e.bounds.x + e.bounds.w  ) * scale);
-			animeTo(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
+		}
+	});
+	$.each(this.contextLines, function(i, l) {
+		l.setAttribute("display", "block");
+		var e = self.contexts[i];
+		animeTo(l, "x1", (self.bounds.x + self.bounds.w  ) * scale);
+		animeTo(l, "y1", (self.bounds.y + self.bounds.h/2) * scale);
+		animeTo(l, "x2", (e.bounds.x) * scale);
+		animeTo(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
+		if(this.childVisible0 != this.childVisible) {
 			if(self.childVisible) {
 				anime(l, "opacity", 0, 1);
 			} else {
 				anime(l, "opacity", 1, 0);
 			}
-		});
+		}
+	});
+	if(this.argumentBorder != null) {
+		var n = 10;
+		var b = this.argumentBorder.context;
+		animeTo(b, "x"     , (this.argumentBounds.x - n) * scale);
+		animeTo(b, "y"     , (this.argumentBounds.y - n) * scale);
+		animeTo(b, "width" , (this.argumentBounds.x1 + n*2) * scale);
+		animeTo(b, "height", (this.argumentBounds.y1 + n*2) * scale);
+		this.argumentBorder.attr("display", this.childVisible ? "block" : "none");
 	}
 	this.animCss = animCss;
 	this.animSvg = animSvg;
@@ -340,10 +356,6 @@ View.prototype.animate = function(r) {
 	this.forEachNode(function(e) {
 		e.animate(r);
 	});
-	//this.argumentBorder.style.left = this.argumentBounds.x;
-	//this.argumentBorder.style.top  = this.argumentBounds.y;
-	//this.argumentBorder.style.right  = this.argumentBounds.x1;
-	//this.argumentBorder.style.bottom = this.argumentBounds.y1;
 }
 
 View.prototype.move = function() {
@@ -370,6 +382,14 @@ View.prototype.move = function() {
 			this.divNodes.html(this.divNodesText);
 		}
 	}
+
+	$.each(this.animCss, function(i, e) {
+		e.dom.css(e.prop, e.to);
+	});
+	$.each(this.animSvg, function(i, e) {
+		e.dom.setAttribute(e.prop, e.to);
+	});
+
 	if(this.node.isUndevelop()) {
 		this.svgUndevel.attr("display", this.visible ? "block" : "none");
 	}
@@ -381,32 +401,15 @@ View.prototype.move = function() {
 	var lines = this.lines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
-		var e = this.children[i];
-		l.setAttribute("x1", (this.getX() + this.bounds.w/2) * scale);
-		l.setAttribute("y1", (this.getY() + this.bounds.h) * scale);
-		l.setAttribute("x2", (e.getX() + e.bounds.w/2) * scale);
-		l.setAttribute("y2", (e.getY()) * scale);
 		l.setAttribute("display", this.childVisible ? "block" : "none");
 	}
 	var lines = this.contextLines;
 	for(var i=0; i<lines.length; i++) {
 		var l = lines[i];
-		var e = this.contexts[i];
-		l.setAttribute("x1", (this.getX() + this.bounds.w) * scale);
-		l.setAttribute("y1", (this.getY() + this.bounds.h/2) * scale);
-		l.setAttribute("x2", (e.getX()) * scale);
-		l.setAttribute("y2", (e.getY() + e.bounds.h/2) * scale);
 		l.setAttribute("display", this.childVisible ? "block" : "none");
 	}
-	if(this.node.isArgument()) {
-		var n = 10;
-		this.argumentBorder.css({
-			left  : scale * (this.argumentBounds.x-n) + "px",
-			top   : scale * (this.argumentBounds.y-n) + "px",
-			width : scale * (this.argumentBounds.x1-this.argumentBounds.x+n*2) + "px",
-			height: scale * (this.argumentBounds.y1-this.argumentBounds.y+n*2) + "px",
-			display: this.childVisible ? "block" : "none"
-		});
+	if(this.argumentBorder != null) {
+		this.argumentBorder.attr("display", this.childVisible ? "block" : "none");
 	}
 	this.bounds0 = this.bounds;
 	this.visible0 = this.visible;
