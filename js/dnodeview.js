@@ -253,96 +253,50 @@ View.prototype.updateLocation = function(x, y) {
 }
 
 View.prototype.animeBegin = function() {
-	var animSvg = [];
-	var fadeInSvg = [];
-	var fadeOutSvg = [];
-
-	function getAttrSetter(dom) {
-		if(dom.setAttribute != null) {//FIXME?
-			return {
-				set: function(key, value) { dom.setAttribute(key, value); },
-				get: function(key) { return dom.getAttribute(key); }
-			};
-		} else {
-			return {
-				set: function(key, value) { dom.css(key, value); },
-				get: function(key) { return dom.css(key); }
-			};
-		}
-	}
-
-	function animeTo(dom, key, toValue) {
-		var mtd = getAttrSetter(dom);
-		var fromValue = parseInt(mtd.get(key));
-		animSvg.push({
-			key: key,
-			from: fromValue,
-			to: parseInt(toValue),
-			set: mtd.set
-		});
-	}
-	function setShow(dom, visible) {
-		var mtd = getAttrSetter(dom);
-		var disp = mtd.get("display");
-		if(disp == null) {
-			mtd.set("display", visible ? "block" : "none");
-		} else if(disp == "none" && visible) {
-			// fade in
-			fadeInSvg.push(mtd.set);
-			mtd.set("opacity", 0.0);
-			mtd.set("display", "block");
-		} else if(disp == "block" && !visible) {
-			// fade out
-			fadeOutSvg.push(mtd.set);
-			mtd.set("opacity", 1.0);
-			mtd.set("display", "block");
-		}
-	}
 	var self = this;
 	var scale = this.viewer.scale;
-	setShow(this.svg, this.visible);
-	setShow(this.div, this.visible);
-	setShow(this.divNodes, !this.childVisible);
-	animeTo(this.div, "left"  , (this.bounds.x + this.svg.offset.x)*scale);
-	animeTo(this.div, "top"   , (this.bounds.y + this.svg.offset.y)*scale);
-	animeTo(this.div, "width" , (this.bounds.w - this.svg.offset.x*2)*scale);
-	animeTo(this.div, "height", (this.bounds.h - this.svg.offset.y*2)*scale);
-	animeTo(this.div, "fontSize", FONT_SIZE*scale);
+	var a = new Animation();
+	this.animation = a;
+	a.show(this.svg, this.visible);
+	a.show(this.div, this.visible);
+	a.show(this.divNodes, !this.childVisible);
+	a.move(this.div, "left"  , (this.bounds.x + this.svg.offset.x)*scale);
+	a.move(this.div, "top"   , (this.bounds.y + this.svg.offset.y)*scale);
+	a.move(this.div, "width" , (this.bounds.w - this.svg.offset.x*2)*scale);
+	a.move(this.div, "height", (this.bounds.h - this.svg.offset.y*2)*scale);
+	a.move(this.div, "fontSize", FONT_SIZE*scale);
 	
 	$.each(this.lines, function(i, l) {
 		var e = self.children[i];
-		animeTo(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
-		animeTo(l, "y1", (self.bounds.y + self.bounds.h  ) * scale);
-		animeTo(l, "x2", (e.bounds.x + e.bounds.w/2) * scale);
-		animeTo(l, "y2", (e.bounds.y) * scale);
-		setShow(l, self.childVisible);
+		a.move(l, "x1", (self.bounds.x + self.bounds.w/2) * scale);
+		a.move(l, "y1", (self.bounds.y + self.bounds.h  ) * scale);
+		a.move(l, "x2", (e.bounds.x + e.bounds.w/2) * scale);
+		a.move(l, "y2", (e.bounds.y) * scale);
+		a.show(l, self.childVisible);
 	});
 	$.each(this.contextLines, function(i, l) {
 		var e = self.contexts[i];
-		animeTo(l, "x1", (self.bounds.x + self.bounds.w  ) * scale);
-		animeTo(l, "y1", (self.bounds.y + self.bounds.h/2) * scale);
-		animeTo(l, "x2", (e.bounds.x) * scale);
-		animeTo(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
-		setShow(l, self.childVisible);
+		a.move(l, "x1", (self.bounds.x + self.bounds.w  ) * scale);
+		a.move(l, "y1", (self.bounds.y + self.bounds.h/2) * scale);
+		a.move(l, "x2", (e.bounds.x) * scale);
+		a.move(l, "y2", (e.bounds.y + e.bounds.h/2) * scale);
+		a.show(l, self.childVisible);
 	});
 	if(this.svgUndevel != null) {
-		setShow(this.svgUndevel.context, this.visible);
+		a.show(this.svgUndevel.context, this.visible);
 	}
 	if(this.argumentBorder != null) {
 		var n = 10;
 		var b = this.argumentBorder.context;
-		animeTo(b, "x"     , (this.argumentBounds.x - n) * scale);
-		animeTo(b, "y"     , (this.argumentBounds.y - n) * scale);
-		animeTo(b, "width" , (this.argumentBounds.x1 + n*2) * scale);
-		animeTo(b, "height", (this.argumentBounds.y1 + n*2) * scale);
-		setShow(b, this.childVisible);
+		a.move(b, "x"     , (this.argumentBounds.x - n) * scale);
+		a.move(b, "y"     , (this.argumentBounds.y - n) * scale);
+		a.move(b, "width" , (this.argumentBounds.x1 + n*2) * scale);
+		a.move(b, "height", (this.argumentBounds.y1 + n*2) * scale);
+		a.show(b, this.childVisible);
 	}
 	this.forEachNode(function(e) {
 		e.animeBegin();
 	});
-	this.animSvg = animSvg;
-	this.fadeInSvg = fadeInSvg;
-	this.fadeOutSvg = fadeOutSvg;
 }
 
 View.prototype.animate = function(r) {
@@ -352,15 +306,7 @@ View.prototype.animate = function(r) {
 	this.setBounds(
 			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
 			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
-	$.each(this.animSvg, function(i, e) {
-		e.set(e.key, e.from + (e.to - e.from) * r);
-	});
-	$.each(this.fadeInSvg, function(i, e) {
-		e("opacity", r);
-	});
-	$.each(this.fadeOutSvg, function(i, e) {
-		e("opacity", 1.0 - r);
-	});
+	this.animation.anime(r);
 	this.forEachNode(function(e) {
 		e.animate(r);
 	});
@@ -389,17 +335,7 @@ View.prototype.move = function() {
 			this.divNodes.html(this.divNodesText);
 		}
 	}
-
-	$.each(this.animSvg, function(i, e) {
-		e.set(e.key, e.to);
-	});
-	$.each(this.fadeInSvg, function(i, e) {
-		e("opacity", 1.0);
-	});
-	$.each(this.fadeOutSvg, function(i, e) {
-		e("opacity", 0.0);
-		e("display", "none");
-	});
+	this.animation.animeFinish();
 	this.forEachNode(function(e) {
 		e.move();
 	});
