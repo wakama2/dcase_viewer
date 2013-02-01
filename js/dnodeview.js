@@ -228,14 +228,14 @@ View.prototype.updateLocation = function(x, y) {
 		}
 	}
 	// calc context height
-	var contextHeight = h;
+	var contextHeight = 0;
 	var childrenY = y0 + h + Y_MARGIN;
 	if(this.context != null) {
 		var cy = this.context.updateLocation(x, y).y;
-		contextHeight = Math.max(contextHeight, cy-y0);
+		contextHeight = cy-y0;
 		childrenY = Math.max(childrenY, cy + X_MARGIN);
 	}
-	var maxHeight = contextHeight;
+	var maxHeight = Math.max(contextHeight, h);
 
 	// update children location
 	$.each(this.children, function(i, e) {
@@ -249,7 +249,7 @@ View.prototype.updateLocation = function(x, y) {
 	// update this location
 	this.bounds = {
 		x: x0 + (maxWidth-w)/2,
-		y: y0 + (contextHeight-h)/2,
+		y: y0 + Math.max((contextHeight-h)/2, 0),
 		w: w,
 		h: h
 	};
@@ -257,7 +257,7 @@ View.prototype.updateLocation = function(x, y) {
 	// update context location
 	if(this.context != null) {
 		x = this.bounds.x + w + Y_MARGIN;
-		y = y0;
+		y = y0 + Math.max((h - contextHeight) / 2, 0);
 		var p = this.context.updateLocation(x, y);
 		maxWidth = Math.max(maxWidth, p.x - x0);
 	}
