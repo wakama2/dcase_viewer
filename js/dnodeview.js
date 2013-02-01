@@ -1,6 +1,15 @@
 var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
+function makePoints(points) {
+	var s = "";
+	for(var i=0; i<points.length; i++) {
+		if(i != 0) s += " ";
+		s += points[i].x + "," + points[i].y
+	}
+	return s;
+}
+
 function newGSNObject(root, type) {
 	var o = null;
 	if(type == "Goal") {
@@ -29,8 +38,12 @@ function newGSNObject(root, type) {
 		o = root.createSvg("polygon");
 		o.setBounds = function(x, y, w, h) {
 			var n = 20 * root.scale;
-			this.setAttribute("points", 
-					(x+n)+","+y+" "+(x+w)+","+y+" "+(x+w-n)+","+(y+h)+" "+x+","+(y+h));
+			this.setAttribute("points", makePoints([
+				{ x: x+n, y: y },
+				{ x: x+w, y: y },
+				{ x: x+w-n, y: y+h },
+				{ x: x, y: y+h }
+			]));
 		}
 		o.offset = { x: 25, y: 10 };
 	} else if(type == "Evidence" || type == "Monitor") {
@@ -43,6 +56,26 @@ function newGSNObject(root, type) {
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
 		}
 		o.offset = { x: 0, y: 0 };
+	} else if(type == "DScript") {
+		var o1 = root.createSvg("ellipse");
+		var o2 = root.createSvg("polygon");
+		$(o2).attr({ stroke: "gray", fill:"gray" });
+		var o = root.createSvg("g");
+		o.appendChild(o1);
+		o.appendChild(o2);
+		o.setBounds = function(x, y, w, h) {
+			o1.setAttribute("cx", x + w/2);
+			o1.setAttribute("cy", y + h/2);
+			o1.setAttribute("rx", w/2);
+			o1.setAttribute("ry", h/2);
+			o2.setAttribute("points", makePoints([
+				{ x: x+w*5/8, y:y-h/4 },
+				{ x: x+w*5/8, y:y+h/4 },
+				{ x: x+w*7/8, y:y },
+			]));
+			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
+		}
+		o.offset = { x: 200/6, y: 200/6 };
 	} else {
 		throw type + " is not GSN type";
 	}
@@ -104,8 +137,8 @@ var View = function(viewer, node) {
 	
 	this.childOpen = true;
 	// child node
-	this.context = null;
 	this.children = [];
+	this.context = null;
 	// line
 	this.lines = [];
 	this.contextLine = null;
@@ -115,12 +148,6 @@ var View = function(viewer, node) {
 	this.visible = true;
 	this.childVisible = true;
 	this.bounds0 = this.bounds;
-}
-
-View.prototype.modified = function() {
-	this.divName.html(this.node.name);
-	this.divText.html(this.node.text);
-	this.viewer.repaintAll();
 }
 
 View.prototype.forEachNode = function(f) {
@@ -317,13 +344,16 @@ View.prototype.animeBegin = function(a) {
 View.prototype.setBounds = function(x, y, w, h) {
 	var scale = this.viewer.scale;
 	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	if(this.node.isUndevelop()) {
+	if(this.svgUndevel != null) {
 		var sx = (x + w/2) * scale;
 		var sy = (y + h) * scale;
 		var n = 20 * scale;
-		function s(x, y) { return x+","+y }
-		this.svgUndevel.attr("points", 
-			s(sx, sy) + " " + s(sx+n, sy+n) + " " + s(sx, sy+n*2) + " " + s(sx-n, sy+n));
+		this.svgUndevel.attr("points", makePoints([
+			{ x: sx, y: sy },
+			{ x: sx-n, y: sy+n },
+			{ x: sx, y: sy+n*2 },
+			{ x: sx+n, y: sy+n },
+		]));
 	}
 }
 

@@ -132,7 +132,7 @@ function createSampleNode() {
 				{ name: "Context 3.1", type: "Context", desc: "description" },
 				{ name: "SubGoal 3.1", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.2", type: "Goal", desc: "description", 
-					children: [ { name: "Evidence 3.2", type: "Evidence", desc: "" } ] },
+					children: [ { name: "D-Script", type: "DScript", desc: "p(\"hello\");" } ] },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 			]
