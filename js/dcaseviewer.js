@@ -73,7 +73,6 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	var a = new Animation();
 	rootview.animeBegin(a);
 	if(ms == 0) {
-		rootview.move();
 		a.animeFinish();
 		return;
 	}
@@ -83,11 +82,9 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 		var time = new Date() - begin;
 		var r = time / ms;
 		if(r < 1.0) {
-			rootview.animate(r);
 			a.anime(r);
 		} else {
 			clearInterval(id);
-			rootview.move();
 			a.animeFinish();
 			self.moving = false;
 		}

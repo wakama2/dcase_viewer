@@ -1,58 +1,55 @@
 var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
-function makePoints(points) {
-	var s = "";
-	for(var i=0; i<points.length; i++) {
-		if(i != 0) s += " ";
-		s += points[i].x + "," + points[i].y
-	}
-	return s;
-}
-
 function newGSNObject(root, type) {
 	var o = null;
 	if(type == "Goal") {
 		var n = 10;
 		o = root.createSvg("rect");
-		o.setBounds = function(x, y, w, h) {
-			this.setAttribute("x", x);
-			this.setAttribute("y", y);
-			this.setAttribute("width", w);
-			this.setAttribute("height", h);
+		o.setBounds = function(a, x, y, w, h) {
+			a.moves(this, {
+				x: x,
+				y: y,
+				width : w,
+				height: h,
+			});
 		}
 		o.offset = { x: n, y: n };
 	} else if(type == "Context") {
 		o = root.createSvg("rect");
 		var n = 20;
-		o.setBounds = function(x, y, w, h) {
-			this.setAttribute("rx", n * root.scale);
-			this.setAttribute("ry", n * root.scale);
-			this.setAttribute("x", x);
-			this.setAttribute("y", y);
-			this.setAttribute("width", w);
-			this.setAttribute("height", h);
+		o.setBounds = function(a, x, y, w, h) {
+			a.moves(this, {
+				rx: n * root.scale,
+				ry: n * root.scale,
+				x : x,
+				y : y,
+				width : w,
+				height: h
+			});
 		}
 		o.offset = { x: n/2, y: n/2 };
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
-		o.setBounds = function(x, y, w, h) {
+		o.setBounds = function(a, x, y, w, h) {
 			var n = 20 * root.scale;
-			this.setAttribute("points", makePoints([
+			a.movePolygon(this, [
 				{ x: x+n, y: y },
 				{ x: x+w, y: y },
 				{ x: x+w-n, y: y+h },
 				{ x: x, y: y+h }
-			]));
+			]);
 		}
 		o.offset = { x: 25, y: 10 };
 	} else if(type == "Evidence" || type == "Monitor") {
 		o = root.createSvg("ellipse");
-		o.setBounds = function(x, y, w, h) {
-			this.setAttribute("cx", x + w/2);
-			this.setAttribute("cy", y + h/2);
-			this.setAttribute("rx", w/2);
-			this.setAttribute("ry", h/2);
+		o.setBounds = function(a, x, y, w, h) {
+			a.moves(this, {
+				cx: x + w/2,
+				cy: y + h/2,
+				rx: w/2,
+				ry: h/2,
+			});
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
 		}
 		o.offset = { x: 0, y: 0 };
@@ -63,16 +60,18 @@ function newGSNObject(root, type) {
 		var o = root.createSvg("g");
 		o.appendChild(o1);
 		o.appendChild(o2);
-		o.setBounds = function(x, y, w, h) {
-			o1.setAttribute("cx", x + w/2);
-			o1.setAttribute("cy", y + h/2);
-			o1.setAttribute("rx", w/2);
-			o1.setAttribute("ry", h/2);
-			o2.setAttribute("points", makePoints([
+		o.setBounds = function(a, x, y, w, h) {
+			a.moves(o1, {
+				cx: x + w/2,
+				cy: y + h/2,
+				rx: w/2,
+				ry: h/2,
+			});
+			a.movePolygon(o2, [
 				{ x: x+w*5/8, y:y-h/4 },
 				{ x: x+w*5/8, y:y+h/4 },
 				{ x: x+w*7/8, y:y },
-			]));
+			]);
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
 		}
 		o.offset = { x: 200/6, y: 200/6 };
@@ -147,7 +146,6 @@ var View = function(viewer, node) {
 	this.bounds = { x: 0, y: 0, w: 200, h: this.div.height() + 60 };
 	this.visible = true;
 	this.childVisible = true;
-	this.bounds0 = this.bounds;
 }
 
 View.prototype.forEachNode = function(f) {
@@ -272,15 +270,18 @@ View.prototype.updateLocation = function(x, y) {
 View.prototype.animeBegin = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
+	var b = this.bounds;
 	a.show(this.svg, this.visible);
 	a.show(this.div, this.visible);
 	a.show(this.divNodes, !this.childVisible);
 
+	this.svg.setBounds(a, b.x * scale, b.y * scale,
+			b.w * scale, b.h * scale);
 	a.moves(this.div, {
-		left  : (this.bounds.x + this.svg.offset.x) * scale,
-		top   : (this.bounds.y + this.svg.offset.y) * scale,
-		width : (this.bounds.w - this.svg.offset.x*2) * scale,
-		height: (this.bounds.h - this.svg.offset.y*2) * scale,
+		left  : (b.x + this.svg.offset.x) * scale,
+		top   : (b.y + this.svg.offset.y) * scale,
+		width : (b.w - this.svg.offset.x*2) * scale,
+		height: (b.h - this.svg.offset.y*2) * scale,
 		fontSize: FONT_SIZE*scale,
 	});
 
@@ -307,8 +308,8 @@ View.prototype.animeBegin = function(a) {
 	$.each(this.lines, function(i, l) {
 		var e = self.children[i];
 		a.moves(l, {
-			x1: (self.bounds.x + self.bounds.w/2) * scale,
-			y1: (self.bounds.y + self.bounds.h  ) * scale,
+			x1: (b.x + b.w/2) * scale,
+			y1: (b.y + b.h  ) * scale,
 			x2: (e.bounds.x + e.bounds.w/2) * scale,
 			y2: (e.bounds.y) * scale,
 		}).show(l, self.childVisible);
@@ -317,14 +318,23 @@ View.prototype.animeBegin = function(a) {
 		var e = self.context;
 		var l = self.contextLine;
 		a.moves(l, {
-			x1: (self.bounds.x + self.bounds.w  ) * scale,
-			y1: (self.bounds.y + self.bounds.h/2) * scale,
+			x1: (b.x + b.w  ) * scale,
+			y1: (b.y + b.h/2) * scale,
 			x2: (e.bounds.x) * scale,
 			y2: (e.bounds.y + e.bounds.h/2) * scale,
 		}).show(l, self.childVisible);
 	};
 	if(this.svgUndevel != null) {
+		var sx = (b.x + b.w/2) * scale;
+		var sy = (b.y + b.h) * scale;
+		var n = 20 * scale;
 		a.show(this.svgUndevel.context, this.visible);
+		a.movePolygon(this.svgUndevel.context, [
+			{ x: sx, y: sy },
+			{ x: sx-n, y: sy+n },
+			{ x: sx, y: sy+n*2 },
+			{ x: sx+n, y: sy+n },
+		]);
 	}
 	if(this.argumentBorder != null) {
 		var n = 10;
@@ -339,39 +349,5 @@ View.prototype.animeBegin = function(a) {
 	this.forEachNode(function(e) {
 		e.animeBegin(a);
 	});
-}
-
-View.prototype.setBounds = function(x, y, w, h) {
-	var scale = this.viewer.scale;
-	this.svg.setBounds(x * scale, y * scale, w * scale, h * scale);
-	if(this.svgUndevel != null) {
-		var sx = (x + w/2) * scale;
-		var sy = (y + h) * scale;
-		var n = 20 * scale;
-		this.svgUndevel.attr("points", makePoints([
-			{ x: sx, y: sy },
-			{ x: sx-n, y: sy+n },
-			{ x: sx, y: sy+n*2 },
-			{ x: sx+n, y: sy+n },
-		]));
-	}
-}
-
-View.prototype.animate = function(r) {
-	function mid(x0, x1) { return (x1-x0) * r + x0; }
-	this.setBounds(
-			mid(this.bounds0.x, this.bounds.x), mid(this.bounds0.y, this.bounds.y),
-			mid(this.bounds0.w, this.bounds.w), mid(this.bounds0.h, this.bounds.h));
-	this.forEachNode(function(e) {
-		e.animate(r);
-	});
-}
-
-View.prototype.move = function() {
-	this.setBounds(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h);
-	this.forEachNode(function(e) {
-		e.move();
-	});
-	this.bounds0 = this.bounds;
 }
 
