@@ -21,12 +21,15 @@ var Animation = function() {
 	this.move = function(dom, key, toValue) {
 		var mtd = getAttrSetter(dom);
 		var fromValue = parseInt(mtd.get(key));
-		moveList.push({
-			key: key,
-			from: fromValue,
-			to: parseInt(toValue),
-			set: mtd.set
-		});
+		toValue = Math.floor(toValue);
+		if(fromValue != toValue) {
+			moveList.push({
+				key: key,
+				from: fromValue,
+				to: toValue,
+				set: mtd.set
+			});
+		}
 		return this;
 	}
 
@@ -41,7 +44,7 @@ var Animation = function() {
 		var s = "";
 		for(var i=0; i<points.length; i++) {
 			if(i != 0) s += " ";
-			s += parseInt(points[i].x) + "," + parseInt(points[i].y);
+			s += Math.floor(points[i].x) + "," + Math.floor(points[i].y);
 		}
 		return s;
 	}

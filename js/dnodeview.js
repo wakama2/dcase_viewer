@@ -208,6 +208,9 @@ View.prototype.updateLocation = function(x, y) {
 			e.updateLocation(x, y);
 		});
 		this.bounds = { x: x, y: y, w: w, h: h };
+		if(this.visible && this.node.isUndevelop()) {
+			h += 40;
+		}
 		if(this.node.isArgument()) {
 			this.argumentBounds = {
 				x: x0 - ARG_MARGIN,
@@ -257,6 +260,9 @@ View.prototype.updateLocation = function(x, y) {
 		y = y0;
 		var p = this.context.updateLocation(x, y);
 		maxWidth = Math.max(maxWidth, p.x - x0);
+	}
+	if(this.node.isUndevelop()) {
+		maxHeight += 40;
 	}
 	this.argumentBounds = {
 		x: x0 - ARG_MARGIN,
