@@ -15,6 +15,13 @@ var DCaseViewer = function(root, model, opts) {
 	this.svgroot = $(document.createElementNS(SVG_NS, "svg")).css({
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
 	});
+	this.editInPlaceOpts = {
+		callback: function(_, txt) { return txt; },
+		field_type: "textarea",
+		textarea_rows: 3,
+		textarea_cols: 20,
+		show_buttons: true
+	};
 	this.root = root;
 	this.opts = opts;
 	this.moving = false;

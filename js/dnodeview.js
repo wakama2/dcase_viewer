@@ -7,25 +7,25 @@ var DNodeView = function(viewer, node) {
 	this.viewer = viewer;
 	this.node = node;
 	this.svg = this.initSvg(node.type);
-	this.div = $("<div></div>").addClass("node-container");
+	this.div = $("<div></div>")
+		.addClass("node-container")
+		.mouseup(function(e) {
+			viewer.dragEnd(self);
+		}).dblclick(function(e) {
+			if(node.isDScript()) {
+				viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
+			} else {
+				viewer.actExpandBranch(self);
+			}
+		}).bind("touchend", function(e) {
+			viewer.dragEnd(self);
+		});
 	viewer.appendElem(this.div);
-
-	this.div.mouseup(function(e) {
-		viewer.dragEnd(self);
-	}).dblclick(function(e) {
-		if(node.isDScript()) {
-			viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
-		} else {
-			viewer.actExpandBranch(self);
-		}
-	}).bind("touchend", function(e) {
-		viewer.dragEnd(self);
-	});
 	if(node.isUndevelop()) {
 		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
 			fill: "none", stroke: "gray"
 		});
-		viewer.appendSvg(this.svgUndevel)
+		viewer.appendSvg(this.svgUndevel);
 	}
 	this.argumentBorder = null;
 	if(node.isArgument()) {
@@ -41,7 +41,10 @@ var DNodeView = function(viewer, node) {
 	this.divName = $("<div></div>").addClass("node-name").html(node.name);
 	this.div.append(this.divName);
 
-	this.divText = $("<div></div>").addClass("node-text").html(node.text);
+	this.divText = $("<div></div>")
+		.addClass("node-text")
+		.html(node.text)
+		.editInPlace(viewer.editInPlaceOpts);
 	this.div.append(this.divText);
 
 	this.divNodes = $("<div></div>").addClass("node-closednodes");
