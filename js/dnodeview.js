@@ -1,8 +1,72 @@
 var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
-function newGSNObject(root, type) {
+/* class DNodeView */
+var DNodeView = function(viewer, node) {
+	var self = this;
+	this.viewer = viewer;
+	this.node = node;
+	this.svg = this.initSvg(node.type);
+	this.div = $("<div></div>").addClass("node-container");
+	viewer.appendElem(this.div);
+
+	this.div.mouseup(function(e) {
+		viewer.dragEnd(self);
+	}).dblclick(function(e) {
+		if(node.isDScript()) {
+			viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
+		} else {
+			viewer.actExpandBranch(self);
+		}
+	}).bind("touchend", function(e) {
+		viewer.dragEnd(self);
+	});
+	if(node.isUndevelop()) {
+		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
+			fill: "none", stroke: "gray"
+		});
+		viewer.appendSvg(this.svgUndevel)
+	}
+	this.argumentBorder = null;
+	if(node.isArgument()) {
+		this.argumentBorder = $(document.createElementNS(SVG_NS, "rect")).attr({
+			stroke: "#8080D0",
+			fill: "none",
+			"stroke-dasharray": 3,
+		});
+		viewer.appendSvg(this.argumentBorder);
+	}
+	this.argumentBounds = {};
+
+	this.divName = $("<div></div>").addClass("node-name").html(node.name);
+	this.div.append(this.divName);
+
+	this.divText = $("<div></div>").addClass("node-text").html(node.text);
+	this.div.append(this.divText);
+
+	this.divNodes = $("<div></div>").addClass("node-closednodes");
+	this.div.append(this.divNodes);
+
+	this.divNodesText = "";
+	this.divNodesVisible = false;
+	
+	this.childOpen = true;
+	// child node
+	this.children = [];
+	this.context = null;
+	// line
+	this.lines = [];
+	this.contextLine = null;
+	// for animation
+	this.div.width(200);
+	this.bounds = { x: 0, y: 0, w: 200, h: this.div.height() + 60 };
+	this.visible = true;
+	this.childVisible = true;
+}
+
+DNodeView.prototype.initSvg = function(type) {
 	var o = null;
+	var root = this.viewer;
 	if(type == "Goal") {
 		var n = 10;
 		o = root.createSvg("rect");
@@ -85,70 +149,7 @@ function getColorByState(node) {
 	return node.isEvidence ? "#80FF80" : "#E0E0E0";
 }
 
-/* class View */
-var View = function(viewer, node) {
-	var self = this;
-	this.viewer = viewer;
-	this.node = node;
-	this.svg = newGSNObject(viewer, node.type);
-	this.div = $("<div></div>").addClass("node-container");
-	viewer.appendElem(this.div);
-
-	this.div.mouseup(function(e) {
-		viewer.dragEnd(self);
-	}).dblclick(function(e) {
-		if(node.isDScript()) {
-			viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
-		} else {
-			viewer.actExpandBranch(self);
-		}
-	}).bind("touchend", function(e) {
-		viewer.dragEnd(self);
-	});
-	if(node.isUndevelop()) {
-		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
-			fill: "none", stroke: "gray"
-		});
-		viewer.appendSvg(this.svgUndevel)
-	}
-	this.argumentBorder = null;
-	if(node.isArgument()) {
-		this.argumentBorder = $(document.createElementNS(SVG_NS, "rect")).attr({
-			stroke: "#8080D0",
-			fill: "none",
-			"stroke-dasharray": 3,
-		});
-		viewer.appendSvg(this.argumentBorder);
-	}
-	this.argumentBounds = {};
-
-	this.divName = $("<div></div>").addClass("node-name").html(node.name);
-	this.div.append(this.divName);
-
-	this.divText = $("<div></div>").addClass("node-text").html(node.text);
-	this.div.append(this.divText);
-
-	this.divNodes = $("<div></div>").addClass("node-closednodes");
-	this.div.append(this.divNodes);
-
-	this.divNodesText = "";
-	this.divNodesVisible = false;
-	
-	this.childOpen = true;
-	// child node
-	this.children = [];
-	this.context = null;
-	// line
-	this.lines = [];
-	this.contextLine = null;
-	// for animation
-	this.div.width(200);
-	this.bounds = { x: 0, y: 0, w: 200, h: this.div.height() + 60 };
-	this.visible = true;
-	this.childVisible = true;
-}
-
-View.prototype.forEachNode = function(f) {
+DNodeView.prototype.forEachNode = function(f) {
 	if(this.context != null) {
 		f(this.context);
 	}
@@ -158,7 +159,7 @@ View.prototype.forEachNode = function(f) {
 	}
 }
 
-View.prototype.setChildVisible = function(b) {
+DNodeView.prototype.setChildVisible = function(b) {
 	this.childVisible = b;
 	this.childOpen = b;
 	this.forEachNode(function(e) {
@@ -166,7 +167,7 @@ View.prototype.setChildVisible = function(b) {
 	});
 }
 
-View.prototype.setVisible = function(b) {
+DNodeView.prototype.setVisible = function(b) {
 	this.visible = b;
 	if(b) {
 		b = this.childOpen;
@@ -177,7 +178,7 @@ View.prototype.setVisible = function(b) {
 	});
 }
 
-View.prototype.addChild = function(view) {
+DNodeView.prototype.addChild = function(view) {
 	var l = this.viewer.createSvg("line");
 	$(l).attr({
 		stroke: "#404040",
@@ -195,7 +196,7 @@ View.prototype.addChild = function(view) {
 	this.divNodesVisible = true;
 }
 
-View.prototype.updateLocation = function(x, y) {
+DNodeView.prototype.updateLocation = function(x, y) {
 	var ARG_MARGIN = this.node.isArgument() ? 5 : 0;
 	x += ARG_MARGIN;
 	y += ARG_MARGIN;
@@ -273,7 +274,7 @@ View.prototype.updateLocation = function(x, y) {
 	return { x: x0 + maxWidth + ARG_MARGIN, y: y0 + maxHeight + ARG_MARGIN };
 }
 
-View.prototype.animeBegin = function(a) {
+DNodeView.prototype.animeBegin = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
 	var b = this.bounds;
