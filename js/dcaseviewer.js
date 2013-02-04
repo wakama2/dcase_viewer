@@ -56,13 +56,13 @@ DCaseViewer.prototype.setModel = function(model) {
 	this.repaintAll(0);
 }
 
-DCaseViewer.prototype.centerize = function(view) {
+DCaseViewer.prototype.centerize = function(view, ms) {
 	this.selectedNode = view;
 	this.rootview.updateLocation(0, 0);
 	var b = view.bounds;
 	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
 	this.shiftY = -b.y * this.scale + $(this.root).height() / 5 * this.scale;
-	this.repaintAll(500);
+	this.repaintAll(ms);
 }
 
 DCaseViewer.prototype.repaintAll = function(ms) {
@@ -128,6 +128,17 @@ DCaseViewer.prototype.setTextSelectable = function(b) {
 		"-moz-user-select": p,
 		"-webkit-user-select": p
 	});
+}
+
+DCaseViewer.prototype.fit = function(ms) {
+	var size = this.rootview.updateLocation(0, 0);
+	this.scale = Math.min(
+		$(this.root).width()  * 0.98 / size.x,
+		$(this.root).height() * 0.98 / size.y);
+	var b = this.rootview.bounds;
+	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
+	this.shiftY = -b.y * this.scale + ($(this.root).height() - size.y * this.scale) / 2;
+	this.repaintAll(ms);
 }
 
 DCaseViewer.prototype.appendElem = function(e) {
