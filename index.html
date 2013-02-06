@@ -4,10 +4,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>D-CASE VIEWER</title>
+<link rel="stylesheet" type="text/css" href="lib/codemirror.css"/>
+<link rel="stylesheet" type="text/css" href="lib/jquery.toolbars.css"/>
+<link rel="stylesheet" type="text/css" href="lib/bootstrap.icons.css"/>
 <link rel="stylesheet" type="text/css" href="css/dcase-node.css"/>
 <link rel="stylesheet" type="text/css" href="css/viewer.css"/>
 <link rel="stylesheet" type="text/css" href="css/sidemenu.css"/>
-<link rel="stylesheet" type="text/css" href="lib/codemirror.css"/>
 <style>
 body {
 	min-height: 480px;
@@ -22,9 +24,9 @@ body {
 </style>
 <script type="text/javascript" src="lib/jquery.min.js"></script>
 <script type="text/javascript" src="lib/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" src="lib/jquery.toolbar.min.js"></script>
 <script type="text/javascript" src="lib/codemirror.js"></script>
-<script type="text/javascript" src="lib/jquery.editinplace.js"></script>
-<script type="text/javascript" src="js/dcaseviewer.js" charset="utf-8"></script>
+<script type="text/javascript" src="js/dcaseviewer.js"></script>
 <script type="text/javascript" src="js/dnode.js"></script>
 <script type="text/javascript" src="js/dnodeview.js"></script>
 <script type="text/javascript" src="js/handler.js"></script>
@@ -55,6 +57,22 @@ window.addEventListener("load",function() {
 	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
 	var menu = new SideMenu(document.body, viewer);
 
+	$(".tool-new").click(function() {
+		menu.actInsertToSelectedNode();
+	});
+	$(".tool-edit").click(function() {
+		menu.actEditSelectedNode();
+	});
+	$(".tool-remove").click(function() {
+		menu.actRemoveSelectedNode();
+	});
+	$(".tool-left").click(function() {
+		menu.actPrevVersion();
+	});
+	$(".tool-right").click(function() {
+		menu.actNextVersion();
+	});
+
 	// hide url bar for ipod touch
 	setTimeout(function(){
 		window.scrollTo(0, 0);
@@ -64,5 +82,12 @@ window.addEventListener("load",function() {
 </head>
 <body>
 <div id="viewer"></div>
+<div id="toolbar-node-edit" style="display: none;">
+	<a class="tool-new"><i class="icon-plus"></i></a>
+	<a class="tool-edit"><i class="icon-edit"></i></a>
+	<a class="tool-remove"><i class="icon-remove"></i></a>
+	<a class="tool-left"><i class="icon-arrow-left"></i></a>
+	<a class="tool-right"><i class="icon-arrow-right"></i></a>
+</div>
 </body>
 </html>

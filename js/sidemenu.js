@@ -93,6 +93,21 @@ var SideMenu = function(root, viewer) {
 		}
 	}
 
+	this.showTimeline = function(v) {
+
+	}
+
+	this.actPrevVersion = function() {
+		var v = viewer.getSelectedNode();
+		if(v != null) {
+			
+		}
+	}
+
+	this.actPrevVersion = function() {
+
+	}
+
 	this.refresh = function() {
 		viewer.setModel(viewer.model);
 	}
@@ -138,6 +153,14 @@ var SideMenu = function(root, viewer) {
 	mainWin.append($("<input></input>").attr({
 		type: "button", value: "commit",
 	}).click(self.actCommit));
+
+	mainWin.append($("<input></input>").attr({
+		type: "button", value: "prev version",
+	}).click(self.actNextVersion));
+
+	mainWin.append($("<input></input>").attr({
+		type: "button", value: "next version",
+	}).click(self.actNextVersion));
 
 	mainWin.append($("<input></input>").addClass("sidemenu-search-text").attr({
 		type: "text", value: "",

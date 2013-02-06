@@ -10,6 +10,12 @@ var DNodeView = function(viewer, node) {
 	this.div = $("<div></div>").addClass("node-container");
 	viewer.appendElem(this.div);
 
+	$(this.div).toolbar({
+		content: "#toolbar-node-edit",
+		position: "top",
+		hideOnClick: true,
+	});
+
 	this.div.mouseup(function(e) {
 		viewer.dragEnd(self);
 	}).dblclick(function(e) {
