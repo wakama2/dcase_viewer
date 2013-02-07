@@ -2,19 +2,57 @@
 	position: absolute;
 	width: 200px;
 	height: 100%;
-	background: #D0F0D0;
+	background: #AAA;
 	opacity: 0.90;
 	margin: 0px;
 	padding: 0px;
 	overflow: hidden;
 }
 
-.sidemenu-grip {
+.menu-i {
 	position: absolute;
+	left: 24px;
+	top : 0px;
 	width : 40px;
 	height: 40px;
-	background: #D0F0D0;
-	opacity: 0.6;
+	background: #888;
+	opacity: 0.8;
+	border-radius: 4px;
+	text-align: center;
+}
+
+.menu-i:hover {
+	background: #999;
+}
+
+.menu-box {
+	position: absolute;
+	display: none;
+	left: 0px;
+	top: 40px;
+	width: 180px;
+	bottom: 0px;
+	background: #EEE;
+	padding: 4px;
+	overflow: auto;
+}
+
+.sidemenu-grip {
+	position: absolute;
+	left: 0px;
+	top : 0px;
+	width : 24px;
+	height: 40px;
+	background: #888;
+	opacity: 0.8;
+	z-index: 20;
+	border-radius: 4px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.sidemenu-grip:hover {
+	background: #999;
 }
 
 .sidemenu-search-text {

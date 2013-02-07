@@ -89,5 +89,30 @@ window.addEventListener("load",function() {
 	<a class="tool-left"><i class="icon-arrow-left"></i></a>
 	<a class="tool-right"><i class="icon-arrow-right"></i></a>
 </div>
+<div id="menu">
+	<div id="menu-search-i" class="menu-i" style="left: 0px;">
+		<i class="icon-search"></i>
+	</div>
+	<div id="menu-export-i" class="menu-i" style="left: 40px;">
+		<i class="icon-download"></i>
+	</div>
+	<div id="menu-info-i" class="menu-i" style="left: 80px;">
+		<i class="icon-info-sign"></i>
+	</div>
+	<div id="menu-tool-i" class="menu-i" style="left: 120px;">
+		<i class="icon-list"></i>
+	</div>
+	<div id="menu-search" class="menu-box">
+		<input type="text"></input>
+		<ul style="list-style-type: none; overflow: auto;"></ul>
+	</div>
+	<div id="menu-export" class="menu-box">
+		<input id="menu-export-json" type="button" value="export json"></input>
+		<input id="menu-export-png"  type="button" value="export png"></input>
+	</div>
+	<div id="menu-tool" class="menu-box">
+		<input id="menu-tool-commit" type="button" value="commit"></input>
+	</div>
+</div>
 </body>
 </html>
