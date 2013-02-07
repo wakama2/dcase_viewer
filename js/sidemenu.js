@@ -14,8 +14,7 @@ var SideMenu = function(root, viewer) {
 	this.actEditSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			var node = view.node;
-			new DNodeEditWindow(viewer, node, function() {
+			DNodeEditWindow.open(view.node, function(node) {
 				viewer.setModel(viewer.model);
 				var r = DCaseAPI.update({
 					argument_id: viewer.opts.argument_id,
@@ -29,8 +28,7 @@ var SideMenu = function(root, viewer) {
 	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			var newNode = new DNode(0, "", "Goal", "");
-			new DNodeEditWindow(viewer, newNode, function() {
+			DNodeEditWindow.open(null, function(newNode) {
 				view.node.addChild(newNode);
 				viewer.setModel(viewer.model);
 				var r = DCaseAPI.insert({
@@ -53,11 +51,9 @@ var SideMenu = function(root, viewer) {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			if(confirm("ノードを削除しますか？")) {
-				var ps = view.node.parents;
-				if(ps.length > 0) {
-					var p = ps[0];
-					var n = p.children.indexOf(view.node);
-					p.children.splice(n, 1);
+				var parent = view.node.parents;
+				if(parent.length > 0) {
+					parent[0].removeChild(view.node);
 					viewer.setModel(viewer.model);
 					var r = DCaseAPI.del({
 						argument_id: viewer.opts.argument_id,
@@ -189,7 +185,6 @@ var SideMenu = function(root, viewer) {
 				.append($("<td></td>").html(name))
 				.append($("<td></td>").html(count[name]))
 				.appendTo($table);
-			console.log(name);
 		}
 	})();
 

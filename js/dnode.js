@@ -20,6 +20,15 @@ DNode.prototype.addChild = function(node) {
 	node.parents.push(this);
 }
 
+DNode.prototype.removeChild = function(node) {
+	if(this.context == node) {
+		this.context = null;
+	} else {
+		var n = this.children.indexOf(node);
+		this.children.splice(n, 1);
+	}
+}
+
 DNode.prototype.isArgument = function() {
 	return this.context != null && this.type == "Goal";
 }

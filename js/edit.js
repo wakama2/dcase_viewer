@@ -1,61 +1,72 @@
-$(function() {
-	var $s = $("#edit select")
-	$.each(DNode.getTypes(), function(type) {
-		$("<option></option>")
-			.html(type)
-			.appendTo($s);
-	});
-});
-
-var DNodeEditWindow = function(viewer, node, do_ok) {
+var DNodeEditWindow = (function() {
 	var self = this;
+	var $select;
+	var $desc;
+	var selectedType = null;
+	var success = null;
+	var node = null;
 
-	var dom = $("<div></div>").css({
-		position: "absolute",
-		left  : "10%",
-		top   : "10%",
-		right : "10%",
-		bottom: "10%",
-		background: "#EEEEEE",
-		opacity: 0.9,
-		borderStyle: "solid",
-		borderColor: "#808080",
-		zIndex: 10,
-	})
-
-	if(node.name != null) {
-		
+	function init() {
+		$select = $("#edit select");
+		$desc = $("#edit textarea");
+		$.each(DNode.getTypes(), function(i, type) {
+			$("<option></option>")
+				.attr("id", "edit-option-" + type)
+				.html(type)
+				.appendTo($select);
+		});
+		$("#edit").css({
+			left: ($(document).width() - $("#edit").width()) / 2,
+			top : ($(document).height() - $("#edit").height()) / 2,
+		});
+		$("#edit-ok").click(function() {
+			DNodeEditWindow.applyAndClose();
+		});
+		$("#edit-cancel").click(function() {
+			DNodeEditWindow.close();
+		});
+		$select.change(function() {
+			$("select option:selected").each(function() {
+				selectedType = this.text;
+			});
+		});
 	}
 
-	var typeSelected = node.type;
-	var inputType = $("<select></select>").change(function() {
-		$("select option:selected").each(function() {
-			typeSelected = this.text;
-		});
-	});
-	var inputDesc = $("<textarea></textarea>").attr({
-		type: "text", value: node.text
-	}).css({
-		width: "80%"
-	});
-
-	$("#edit-ok").click(function() {
-		self.applyAndClose();
-	});
-
-	$("#edit-cancel").click(function() {
-		self.close();
-	});
-
 	this.applyAndClose = function() {
-		node.type = typeSelected;
-		node.text = $(inputDesc).attr("value");
-		do_ok();
+		var node = self.node;
+		if(node != null) {
+			node.text = $desc.attr("value");
+		} else {
+			node = new DNode(-1, "NewNode", selectedType, $desc.attr("value"));
+		}
 		self.close();
+		self.success(node);
 	}
 
 	this.close = function() {
-		dom.remove();
+		$("#edit").hide();
 	}
-}
+
+	this.open = function(node, success) {
+		self.success = success;
+		self.node = node;
+		if(node != null) {
+			selectedType = node.type;
+			$select.attr("disabled", true);
+			$desc.attr("value", node.text);
+		} else {
+			selectedType = DNode.getTypes()[0];
+			$select.attr("disabled", false);
+			$desc.attr("value", "");
+		}
+		$("edit-option-" + selectedType).attr("selected", true);
+		$("#edit").show();
+	}
+
+	$(function() {
+		init();
+	});
+
+	return this;
+}());
 
