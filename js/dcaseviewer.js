@@ -91,6 +91,44 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	}, 1000/60);
 }
 
+DCaseViewer.prototype.prevVersion = function(v) {
+	var node = v.node;
+	var prev = node.prevVersion;
+	if(prev != null) {
+		var parent = node.parents[0];
+		for(var i=0; i<parent.children.length; i++) {
+			if(parent.children[i] == node) {
+				parent.children[i] = prev;
+				if(prev.parents.length == 0) {
+					prev.parents.push(parent);
+				}
+				console.log("node " + i);
+				this.setModel(this.model);
+				break;
+			}
+		}
+	}
+}
+
+DCaseViewer.prototype.nextVersion = function(v) {
+	var node = v.node;
+	var next = node.nextVersion;
+	if(next != null) {
+		var parent = node.parents[0];
+		for(var i=0; i<parent.children.length; i++) {
+			if(parent.children[i] == node) {
+				parent.children[i] = next;
+				if(next.parents.length == 0) {
+					next.parents.push(parent);
+				}
+				console.log("node " + i);
+				this.setModel(this.model);
+				break;
+			}
+		}
+	}
+}
+
 DCaseViewer.prototype.setDragLock = function(b) {
 	this.drag_flag = b;
 }

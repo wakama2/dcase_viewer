@@ -100,12 +100,15 @@ var SideMenu = function(root, viewer) {
 	this.actPrevVersion = function() {
 		var v = viewer.getSelectedNode();
 		if(v != null) {
-			
+			viewer.prevVersion(v);
 		}
 	}
 
-	this.actPrevVersion = function() {
-
+	this.actNextVersion = function() {
+		var v = viewer.getSelectedNode();
+		if(v != null) {
+			viewer.nextVersion(v);
+		}
 	}
 
 	this.refresh = function() {
