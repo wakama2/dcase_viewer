@@ -179,6 +179,17 @@ DCaseViewer.prototype.fit = function(ms) {
 	this.repaintAll(ms);
 }
 
+DCaseViewer.prototype.traverseAll = function(f) {
+	function traverse(node) {
+		f(node);
+		if(node.context != null) f(node.context);
+		for(var i=0; i<node.children.length; i++) {
+			traverse(node.children[i]);
+		}
+	}
+	traverse(this.model);
+}
+
 DCaseViewer.prototype.appendElem = function(e) {
 	$(this.root).append(e);
 }

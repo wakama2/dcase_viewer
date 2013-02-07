@@ -1,28 +1,17 @@
-.sidemenu {
-	position: absolute;
-	width: 200px;
-	height: 100%;
-	background: #AAA;
-	opacity: 0.90;
-	margin: 0px;
-	padding: 0px;
-	overflow: hidden;
-}
-
 .menu-i {
 	position: absolute;
 	left: 24px;
 	top : 0px;
 	width : 40px;
 	height: 40px;
-	background: #888;
+	background: #CCC;
 	opacity: 0.8;
 	border-radius: 4px;
 	text-align: center;
 }
 
 .menu-i:hover {
-	background: #999;
+	background: #EEE;
 }
 
 .menu-box {
@@ -35,28 +24,6 @@
 	background: #EEE;
 	padding: 4px;
 	overflow: auto;
-}
-
-.sidemenu-grip {
-	position: absolute;
-	left: 0px;
-	top : 0px;
-	width : 24px;
-	height: 40px;
-	background: #888;
-	opacity: 0.8;
-	z-index: 20;
-	border-radius: 4px;
-	text-align: center;
-	vertical-align: middle;
-}
-
-.sidemenu-grip:hover {
-	background: #999;
-}
-
-.sidemenu-search-text {
-
 }
 
 .sidemenu-search-result {

@@ -1,3 +1,12 @@
+$(function() {
+	var $s = $("#edit select")
+	$.each(DNode.getTypes(), function(type) {
+		$("<option></option>")
+			.html(type)
+			.appendTo($s);
+	});
+});
+
 var DNodeEditWindow = function(viewer, node, do_ok) {
 	var self = this;
 
@@ -14,7 +23,9 @@ var DNodeEditWindow = function(viewer, node, do_ok) {
 		zIndex: 10,
 	})
 
-	var inputName = $("<input></input>").attr({type: "text", value: node.name});
+	if(node.name != null) {
+		
+	}
 
 	var typeSelected = node.type;
 	var inputType = $("<select></select>").change(function() {
@@ -22,38 +33,21 @@ var DNodeEditWindow = function(viewer, node, do_ok) {
 			typeSelected = this.text;
 		});
 	});
-	var types = DNode.getTypes();
-	for(var i=0; i<types.length; i++) {
-		var type = types[i];
-		inputType.append($("<option></option>").attr({
-			value: "type" + i, selected: type == typeSelected
-		}).html(type));
-	}
-
 	var inputDesc = $("<textarea></textarea>").attr({
 		type: "text", value: node.text
 	}).css({
 		width: "80%"
 	});
 
-	dom.append($("<p>Name<br></p>").append(inputName))
-			.append($("<p>Type<br></p>").append(inputType))
-			.append($("<p>Description<br></p>").append(inputDesc))
-			.append($("<input></input>").attr({
-					type: "button", value: "OK"
-				}).click(function() {
-					self.applyAndClose();
-				}))
-			.append($("<input></input>").attr({
-					type: "button", value: "Cancel"
-				}).click(function() {
-					self.close();
-				}))
-			;
-	$(document.body).append(dom);
+	$("#edit-ok").click(function() {
+		self.applyAndClose();
+	});
+
+	$("#edit-cancel").click(function() {
+		self.close();
+	});
 
 	this.applyAndClose = function() {
-		node.name = $(inputName).attr("value");
 		node.type = typeSelected;
 		node.text = $(inputDesc).attr("value");
 		do_ok();
