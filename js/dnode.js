@@ -150,7 +150,7 @@ function createSampleNode() {
 				{ name: "Context 3.1", type: "Context", desc: "description" },
 				{ name: "SubGoal 3.1", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.2", type: "Goal", desc: "description", 
-					children: [ { name: "D-Script", type: "DScript", desc: "p(\"hello\");" } ] },
+					children: [ { name: "D-Script", type: "DScript", desc: "shutdown -r now" } ] },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 			]
@@ -160,15 +160,15 @@ function createSampleNode() {
 	return createNodeFromJson2({
 		name: "TopGoal", type: "Goal",
 		desc: "ウェブショッピングデモ<br>" +
-					"システムはDEOSプロセスにより運用され，ODSを満たしている",
+					"システムはDEOSプロセスにより運用され，OSDを満たしている",
 		children: [
 			{
 				name: "Context",
 				type: "Context",
-				desc: "サービス用件:<br>" +
-							"・アクセス数の定格は2500件/分<br>" +
-							"・応答時間は1件あたり3秒以内<br>" +
-							"・一回の障害あたりの復旧時間は5分以内"
+				desc: "サービス用件:<br><ul>" +
+							"<li>アクセス数の定格は2500件/分</li>" +
+							"<li>応答時間は1件あたり3秒以内</li>" +
+							"<li>一回の障害あたりの復旧時間は5分以内</li></ul>"
 			},
 			{
 				name: "Strategy", type: "Strategy", desc: "DEOSプロセスによって議論する",
