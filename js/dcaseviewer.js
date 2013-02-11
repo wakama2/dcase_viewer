@@ -190,14 +190,6 @@ DCaseViewer.prototype.traverseAll = function(f) {
 	traverse(this.model);
 }
 
-DCaseViewer.prototype.appendElem = function(e) {
-	$(this.root).append(e);
-}
-
-DCaseViewer.prototype.appendSvg = function(e) {
-	$(this.svgroot).append(e);
-}
-
 DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.append(obj);

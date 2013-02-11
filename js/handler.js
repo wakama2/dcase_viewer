@@ -61,18 +61,15 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 	var self = this;
 	var root = this.root;
 	$(root).mousedown(function(e) {
-		if(e.originalEvent.detail == 2) return false;
-		if(self.moving || !self.drag_flag) return false;
+		if(e.originalEvent.detail == 2) return ;
+		if(self.moving || !self.drag_flag) return ;
 		self.dragStart(e.pageX, e.pageY);
-		return false;
 	});
 	$(root).mousemove(function(e) {
 		self.drag(e.pageX, e.pageY);
-		return false;
 	});
 	$(root).mouseup(function(e) {
 		self.dragEnd();
-		return false;
 	});
 	$(root).mousewheel(function(e, delta) {
 		if(self.moving) return;
@@ -86,7 +83,6 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 			self.shiftY = y1 - (y1 - self.shiftY) * b;
 		}
 		self.repaintAll(0);
-		return false;
 	});
 }
 

@@ -159,16 +159,16 @@ function createSampleNode() {
 	];
 	return createNodeFromJson2({
 		name: "TopGoal", type: "Goal",
-		desc: "ウェブショッピングデモ<br>" +
+		desc: "ウェブショッピングデモ\n" +
 					"システムはDEOSプロセスにより運用され，OSDを満たしている",
 		children: [
 			{
 				name: "Context",
 				type: "Context",
-				desc: "サービス用件:<br><ul>" +
-							"<li>アクセス数の定格は2500件/分</li>" +
-							"<li>応答時間は1件あたり3秒以内</li>" +
-							"<li>一回の障害あたりの復旧時間は5分以内</li></ul>"
+				desc: "サービス用件:\n" +
+							"・アクセス数の定格は2500件/分\n" +
+							"・応答時間は1件あたり3秒以内\n" +
+							"・一回の障害あたりの復旧時間は5分以内\n"
 			},
 			{
 				name: "Strategy", type: "Strategy", desc: "DEOSプロセスによって議論する",
