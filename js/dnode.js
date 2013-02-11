@@ -39,7 +39,7 @@ DNode.prototype.isUndevelop = function() {
 
 DNode.getTypes = function() {
 	return [
-			"Goal", "Context", "Strategy", "Evidence", "Monitor", "DScript"
+			"Goal", "Context", "Strategy", "Evidence", "Monitor", "DScript", "Rebuttal",
 	];
 }
 
@@ -160,7 +160,10 @@ function createSampleNode() {
 				{ name: "Context 3.1", type: "Context", desc: "description" },
 				{ name: "SubGoal 3.1", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.2", type: "Goal", desc: "description", 
-					children: [ { name: "D-Script", type: "DScript", desc: "shutdown -r now" } ] },
+					children: [ {
+						name: "D-Script", type: "DScript", desc: "shutdown -r now",
+						children: [ { name: "R", type: "Rebuttal", desc: "error" } ],
+					} ] },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 			]

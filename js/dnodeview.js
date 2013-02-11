@@ -156,7 +156,7 @@ DNodeView.prototype.initSvg = function(type) {
 			]);
 		}
 		o.offset = { x: 25, y: 10 };
-	} else if(type == "Evidence" || type == "Monitor") {
+	} else if(type == "Evidence" || type == "Monitor" || type == "Rebuttal") {
 		o = root.createSvg("ellipse");
 		o.setBounds = function(a, x, y, w, h) {
 			a.moves(this, {
@@ -197,6 +197,7 @@ DNodeView.prototype.initSvg = function(type) {
 }
 
 function getColorByState(node) {
+	if(node.type == "Rebuttal") return "#FF8080";
 	return node.isEvidence ? "#80FF80" : "#E0E0E0";
 }
 
@@ -235,12 +236,12 @@ DNodeView.prototype.addChild = function(view) {
 		stroke: "#404040",
 		x1: 0, y1: 0, x2: 0, y2: 0
 	});
-	if(view.node.type != "Context") {
-		this.lines.push(l);
-		this.children.push(view);
-	} else {
+	if(view.node.type == "Context" || view.node.type == "Rebuttal") {
 		this.contextLine = l;
 		this.context = view;
+	} else {
+		this.lines.push(l);
+		this.children.push(view);
 	}
 	this.divNodesText = (this.lines.length + (this.contextLine!=null?1:0))
 			 + " nodes...";
