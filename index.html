@@ -69,10 +69,16 @@ window.addEventListener("load",function() {
 		menu.actRemoveSelectedNode();
 	});
 	$(".tool-left").click(function() {
-		menu.actPrevVersion();
+		viewer.prevVersion(viewer.getSelectedNode());
 	});
 	$(".tool-right").click(function() {
-		menu.actNextVersion();
+		viewer.nextVersion(viewer.getSelectedNode());
+	});
+	$(".tool-play").click(function() {
+		var v = viewer.getSelectedNode();
+		if(v.node.isDScript()) {
+			viewer.showDScriptExecuteWindow(v.node.getDScriptNameInEvidence());
+		}
 	});
 
 	// hide url bar for ipod touch
@@ -92,6 +98,7 @@ window.addEventListener("load",function() {
 	<a href="#" class="tool-remove"><i class="icon-remove"></i></a>
 	<a href="#" class="tool-left"><i class="icon-arrow-left"></i></a>
 	<a href="#" class="tool-right"><i class="icon-arrow-right"></i></a>
+	<a href="#" class="tool-play"><i class="icon-play"></i></a>
 </div>
 
 <div id="menu">

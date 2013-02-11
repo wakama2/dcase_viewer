@@ -71,7 +71,7 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	rootview.updateLocation(
 			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
 	var a = new Animation();
-	rootview.animeBegin(a);
+	rootview.animeStart(a);
 	if(ms == 0) {
 		a.animeFinish();
 		return;
@@ -134,11 +134,13 @@ DCaseViewer.prototype.showToolbox = function(node) {
 	if(this.toolboxNode != node) {
 		if(node != null) {
 			var b = node.div.offset();
+			var w = node.div.width();
+			var x = 120;
 			$("#toolbar").css({
 				display: "block",
-				left: b.left + 80 * self.scale,
-				top: b.top,
-				width: 100,
+				left: b.left + (w - x)/2,//b.left + 80 * self.scale,
+				top: b.top - 40,
+				width: x,
 				height: 30,
 			});
 			console.log("in");
@@ -161,6 +163,7 @@ DCaseViewer.prototype.getDragLock = function() {
 DCaseViewer.prototype.setSelectedNode = function(node) {
 	this.selectedNode = node;
 	this.repaintAll();
+	this.showToolbox(node);
 }
 
 DCaseViewer.prototype.getSelectedNode = function() {

@@ -326,7 +326,7 @@ DNodeView.prototype.updateLocation = function(x, y) {
 	return { x: x0 + maxWidth + ARG_MARGIN, y: y0 + maxHeight + ARG_MARGIN };
 }
 
-DNodeView.prototype.animeBegin = function(a) {
+DNodeView.prototype.animeStart = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
 	var b = this.bounds;
@@ -406,7 +406,7 @@ DNodeView.prototype.animeBegin = function(a) {
 		}).show(b, this.visible);
 	}
 	this.forEachNode(function(e) {
-		e.animeBegin(a);
+		e.animeStart(a);
 	});
 }
 
