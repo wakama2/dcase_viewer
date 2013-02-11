@@ -1,0 +1,16 @@
+#edit {
+	position: absolute;
+	display: none;
+	width: 400px;
+	height: 300px;
+	background: #EEE;
+	opacity: 0.9;
+	zIndex: 10;
+	margin: 8 auto;
+	border-style: solid;
+}
+
+#edit h1 {
+	font-size: 120%;
+}
+

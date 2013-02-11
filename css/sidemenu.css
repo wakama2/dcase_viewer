@@ -1,24 +1,29 @@
-.sidemenu {
+.menu-i {
 	position: absolute;
-	width: 200px;
-	height: 100%;
-	background: #D0F0D0;
-	opacity: 0.90;
-	margin: 0px;
-	padding: 0px;
-	overflow: hidden;
-}
-
-.sidemenu-grip {
-	position: absolute;
+	left: 24px;
+	top : 0px;
 	width : 40px;
 	height: 40px;
-	background: #D0F0D0;
-	opacity: 0.6;
+	background: #CCC;
+	opacity: 0.8;
+	border-radius: 4px;
+	text-align: center;
 }
 
-.sidemenu-search-text {
+.menu-i:hover {
+	background: #EEE;
+}
 
+.menu-box {
+	position: absolute;
+	display: none;
+	left: 0px;
+	top: 40px;
+	width: 192px;
+	bottom: 0px;
+	background: #EEE;
+	padding: 4px;
+	overflow: auto;
 }
 
 .sidemenu-search-result {

@@ -1,67 +1,72 @@
-var DNodeEditWindow = function(viewer, node, do_ok) {
+var DNodeEditWindow = (function() {
 	var self = this;
+	var $select;
+	var $desc;
+	var selectedType = null;
+	var success = null;
+	var node = null;
 
-	var dom = $("<div></div>").css({
-		position: "absolute",
-		left  : "10%",
-		top   : "10%",
-		right : "10%",
-		bottom: "10%",
-		background: "#EEEEEE",
-		opacity: 0.9,
-		borderStyle: "solid",
-		borderColor: "#808080",
-		zIndex: 10,
-	})
-
-	var inputName = $("<input></input>").attr({type: "text", value: node.name});
-
-	var typeSelected = node.type;
-	var inputType = $("<select></select>").change(function() {
-		$("select option:selected").each(function() {
-			typeSelected = this.text;
+	function init() {
+		$select = $("#edit select");
+		$desc = $("#edit textarea");
+		$.each(DNode.getTypes(), function(i, type) {
+			$("<option></option>")
+				.attr("id", "edit-option-" + type)
+				.html(type)
+				.appendTo($select);
 		});
-	});
-	var types = DNode.getTypes();
-	for(var i=0; i<types.length; i++) {
-		var type = types[i];
-		inputType.append($("<option></option>").attr({
-			value: "type" + i, selected: type == typeSelected
-		}).html(type));
+		$("#edit").css({
+			left: ($(document).width() - $("#edit").width()) / 2,
+			top : ($(document).height() - $("#edit").height()) / 2,
+		});
+		$("#edit-ok").click(function() {
+			DNodeEditWindow.applyAndClose();
+		});
+		$("#edit-cancel").click(function() {
+			DNodeEditWindow.close();
+		});
+		$select.change(function() {
+			$("select option:selected").each(function() {
+				selectedType = this.text;
+			});
+		});
 	}
 
-	var inputDesc = $("<textarea></textarea>").attr({
-		type: "text", value: node.text
-	}).css({
-		width: "80%"
-	});
-
-	dom.append($("<p>Name<br></p>").append(inputName))
-			.append($("<p>Type<br></p>").append(inputType))
-			.append($("<p>Description<br></p>").append(inputDesc))
-			.append($("<input></input>").attr({
-					type: "button", value: "OK"
-				}).click(function() {
-					self.applyAndClose();
-				}))
-			.append($("<input></input>").attr({
-					type: "button", value: "Cancel"
-				}).click(function() {
-					self.close();
-				}))
-			;
-	$(document.body).append(dom);
-
 	this.applyAndClose = function() {
-		node.name = $(inputName).attr("value");
-		node.type = typeSelected;
-		node.text = $(inputDesc).attr("value");
-		do_ok();
+		var node = self.node;
+		if(node != null) {
+			node.text = $desc.attr("value");
+		} else {
+			node = new DNode(-1, "NewNode", selectedType, $desc.attr("value"));
+		}
 		self.close();
+		self.success(node);
 	}
 
 	this.close = function() {
-		dom.remove();
+		$("#edit").hide();
 	}
-}
+
+	this.open = function(node, success) {
+		self.success = success;
+		self.node = node;
+		if(node != null) {
+			selectedType = node.type;
+			$select.attr("disabled", true);
+			$desc.attr("value", node.text);
+		} else {
+			selectedType = DNode.getTypes()[0];
+			$select.attr("disabled", false);
+			$desc.attr("value", "");
+		}
+		$("edit-option-" + selectedType).attr("selected", true);
+		$("#edit").show();
+	}
+
+	$(function() {
+		init();
+	});
+
+	return this;
+}());
 

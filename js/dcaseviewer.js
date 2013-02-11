@@ -98,6 +98,44 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	}, 1000/60);
 }
 
+DCaseViewer.prototype.prevVersion = function(v) {
+	var node = v.node;
+	var prev = node.prevVersion;
+	if(prev != null) {
+		var parent = node.parents[0];
+		for(var i=0; i<parent.children.length; i++) {
+			if(parent.children[i] == node) {
+				parent.children[i] = prev;
+				if(prev.parents.length == 0) {
+					prev.parents.push(parent);
+				}
+				console.log("node " + i);
+				this.setModel(this.model);
+				break;
+			}
+		}
+	}
+}
+
+DCaseViewer.prototype.nextVersion = function(v) {
+	var node = v.node;
+	var next = node.nextVersion;
+	if(next != null) {
+		var parent = node.parents[0];
+		for(var i=0; i<parent.children.length; i++) {
+			if(parent.children[i] == node) {
+				parent.children[i] = next;
+				if(next.parents.length == 0) {
+					next.parents.push(parent);
+				}
+				console.log("node " + i);
+				this.setModel(this.model);
+				break;
+			}
+		}
+	}
+}
+
 DCaseViewer.prototype.setDragLock = function(b) {
 	this.drag_flag = b;
 }
@@ -146,6 +184,17 @@ DCaseViewer.prototype.fit = function(ms) {
 	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
 	this.shiftY = -b.y * this.scale + ($(this.root).height() - size.y * this.scale) / 2;
 	this.repaintAll(ms);
+}
+
+DCaseViewer.prototype.traverseAll = function(f) {
+	function traverse(node) {
+		f(node);
+		if(node.context != null) f(node.context);
+		for(var i=0; i<node.children.length; i++) {
+			traverse(node.children[i]);
+		}
+	}
+	traverse(this.model);
 }
 
 DCaseViewer.prototype.appendElem = function(e) {

@@ -21,6 +21,38 @@ var DNodeView = function(viewer, node) {
 			viewer.dragEnd(self);
 		});
 	viewer.appendElem(this.div);
+
+	$(this.div).toolbar({
+		content: "#toolbar-node-edit",
+		position: "top",
+		hideOnClick: true,
+	});
+
+	var touchinfo = {};
+	this.div.mouseup(function(e) {
+		viewer.dragEnd(self);
+	}).dblclick(function(e) {
+		if(node.isDScript()) {
+			viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
+		} else {
+			viewer.actExpandBranch(self);
+		}
+	}).bind("touchstart", function(e) {
+		var touches = e.originalEvent.touches;
+		touchinfo.count = touches.length;
+	}).bind("touchend", function(e) {
+		viewer.dragEnd(self);
+		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
+			console.log(new Date() - touchinfo.time);
+			viewer.actExpandBranch(self);
+			touchinfo.time = null;
+		}
+		if(touchinfo.count == 1) {
+			touchinfo.time = new Date();
+		} else {
+			touchinfo.time = null;
+		}
+	});
 	if(node.isUndevelop()) {
 		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
 			fill: "none", stroke: "gray"

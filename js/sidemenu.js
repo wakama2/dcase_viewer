@@ -1,17 +1,9 @@
 var SideMenu = function(root, viewer) {
-	var width = 250;
+	var width = 200;
 	var animeTime = 250;
 	var self = this;
 
 	//--------------------------------------------------------
-	this.actOpen = function() {
-		self.open();
-	}
-
-	this.actClose = function() {
-		self.close();
-	}
-
 	this.actChangeLock = function() {
 		var flag = !viewer.getDragLock();
 		viewer.setDragLock(flag);
@@ -22,8 +14,7 @@ var SideMenu = function(root, viewer) {
 	this.actEditSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			var node = view.node;
-			new DNodeEditWindow(viewer, node, function() {
+			DNodeEditWindow.open(view.node, function(node) {
 				viewer.setModel(viewer.model);
 				var r = DCaseAPI.update({
 					argument_id: viewer.opts.argument_id,
@@ -37,8 +28,7 @@ var SideMenu = function(root, viewer) {
 	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			var newNode = new DNode(0, "", "Goal", "");
-			new DNodeEditWindow(viewer, newNode, function() {
+			DNodeEditWindow.open(null, function(newNode) {
 				view.node.addChild(newNode);
 				viewer.setModel(viewer.model);
 				var r = DCaseAPI.insert({
@@ -61,11 +51,9 @@ var SideMenu = function(root, viewer) {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			if(confirm("ノードを削除しますか？")) {
-				var ps = view.node.parents;
-				if(ps.length > 0) {
-					var p = ps[0];
-					var n = p.children.indexOf(view.node);
-					p.children.splice(n, 1);
+				var parent = view.node.parents;
+				if(parent.length > 0) {
+					parent[0].removeChild(view.node);
 					viewer.setModel(viewer.model);
 					var r = DCaseAPI.del({
 						argument_id: viewer.opts.argument_id,
@@ -93,104 +81,55 @@ var SideMenu = function(root, viewer) {
 		}
 	}
 
-	this.refresh = function() {
-		viewer.setModel(viewer.model);
+	this.show = function(m) {
+		var ids = [
+			"#menu-search",
+			"#menu-export",
+			"#menu-info",
+			"#menu-tool"
+		];
+		$.each(ids, function(i, id) {
+			if(m == id) $(id).toggle();
+			else $(id).hide();
+		});
 	}
 
 	//--------------------------------------------------------
-	var mainWin = $("<div></div>").addClass("sidemenu").css({
-		left: "0px", top: "0px", display: "none"
-	});
-	$(root).append(mainWin);
+	var $search = $("#menu-search-i")
+			.click(function(e) {
+				self.show("#menu-search");
+				$("#menu-search input").focus();
+			})
+			.appendTo(root);
 
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "close"
-	}).click(self.actClose));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "lock",
-	}).click(self.actChangeLock));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "edit",
-	}).click(self.actEditSelectedNode));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "insert",
-	}).click(self.actInsertToSelectedNode));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "remove",
-	}).click(self.actRemoveSelectedNode));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "export json",
-	}).click(self.actExportJson));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "export png",
-	}).click(self.actExportPng));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "reload",
-	}).click(self.refresh));
-
-	mainWin.append($("<input></input>").attr({
-		type: "button", value: "commit",
-	}).click(self.actCommit));
-
-	mainWin.append($("<input></input>").addClass("sidemenu-search-text").attr({
-		type: "text", value: "",
-	}).focus(function(e) {
-		var area = this;
+	$("#menu-search input").focus(function(e) {
+		var i = this;
 		this.interval_id = setInterval(function() {
-			self.search_inc(area.value);
+			self.search_inc(i.value);
 		}, 1000/5);
 	}).blur(function(e) {
 		clearInterval(this.interval_id);
 		delete this.interval_id;
-	}));
-
-	var searchResult = $("<ul></ul>").addClass("sidemenu-search-result");
-	searchResult.height(mainWin.height() - searchResult.css("top") - 16);
-	mainWin.append(searchResult);
-
-	this.divgrip = $("<div></div>").addClass("sidemenu-grip").css({
-		left: "0px", top: "0px", display: "block", zIndex: 20,
-	}).click(self.actOpen)
-		.bind("touchstart", self.actOpen);
-	$(root).append(this.divgrip);
-
-	//--------------------------------------------------------
-	this.close = function() {
-		self.divgrip.css("display", "block");
-		var begin = new Date();
-		var id = setInterval(function() {
-			var time = new Date() - begin;
-			var r = time / animeTime;
-			if(r < 1.0) {
-				mainWin.css("left", Math.round(-width * r) + "px");
-			} else {
-				mainWin.css({ left: "0px", display: "none" });
-				clearInterval(id);
-			}
-		}, 1000/60);
-	}
+	});
 
 	this.search = function(text) {
-		searchResult.empty();
+		var $res = $("#menu-search ul");
+		$res.empty();
 		text = text.toLowerCase();
 		function cmp(v) {
 			var name = v.node.name;
 			var index = name.toLowerCase().indexOf(text);
 			if(index != -1) {
-				searchResult.append($("<li>").addClass("sidemenu-result").html(
-						name.substr(0, index) +
+				var s = name.substr(0, index) +
 						"<b>" + name.substr(index, text.length) +
 						"</b>" + name.substr(index + text.length)
-				).click(function() {
-					viewer.centerize(v);
-				}));
+				$("<li>")
+					.addClass("sidemenu-result")
+					.html(s)
+					.click(function() {
+						viewer.centerize(v, 500);
+					})
+					.appendTo($res);
 			}
 			v.forEachNode(cmp);
 		}
@@ -205,24 +144,60 @@ var SideMenu = function(root, viewer) {
 		prev_isesarch = text;
 	}
 
-	this.open = function() {
-		mainWin.css("display", "block");
-		mainWin.css("left", - width + "px");
-		self.divgrip.css("display", "none");
-		var begin = new Date();
-		var id = setInterval(function() {
-			var time = new Date() - begin;
-			var r = time / animeTime;
-			if(r < 1.0) {
-				mainWin.css("left", Math.round(- width * (1.0 - r)) + "px");
-			} else {
-				mainWin.css("left", "0px");
-				clearInterval(id);
-			}
-		}, 1000/60);
-	}
-
 	// init search list
 	this.search("");
+
+	//--------------------------------------------------------
+	var $export = $("#menu-export-i")
+			.click(function(e) {
+				self.show("#menu-export");
+			})
+			.appendTo(root);
+
+	$("#menu-export-json").click(function() {
+		self.actExportJson();
+	});
+
+	$("#menu-export-png").click(function() {
+		self.actExportPng();
+	});
+
+	//--------------------------------------------------------
+	var $info = $("#menu-info-i")
+			.click(function(e) {
+				self.show("#menu-info");
+			})
+			.appendTo(root);
+	
+	(function() {
+		var types = DNode.getTypes();
+		var count = {};
+		for(var i=0; i<types.length; i++) {
+			count[types[i]] = 0;
+		}
+		viewer.traverseAll(function(node) {
+			count[node.type] += 1;
+		});
+		var $table = $("#menu-info-table");
+		for(var i=0; i<types.length; i++) {
+			var name = types[i];
+			$("<tr></tr>")
+				.append($("<td></td>").html(name))
+				.append($("<td></td>").html(count[name]))
+				.appendTo($table);
+		}
+	})();
+
+	//--------------------------------------------------------
+	var $tool = $("#menu-tool-i")
+			.click(function(e) {
+				self.show("#menu-tool");
+			})
+			.appendTo(root);
+
+	$("#menu-tool-commit").click(function() {
+		self.actCommit();
+	});
+
 }
 

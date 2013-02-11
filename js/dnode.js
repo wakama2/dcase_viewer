@@ -7,6 +7,8 @@ var DNode = function(id, name, type, text) {
 	this.children = [];
 	this.context = null;
 	this.parents = [];
+	this.prevVersion = null;
+	this.nextVersion = null;
 }
 
 DNode.prototype.addChild = function(node) {
@@ -16,6 +18,15 @@ DNode.prototype.addChild = function(node) {
 		this.context = node;
 	}
 	node.parents.push(this);
+}
+
+DNode.prototype.removeChild = function(node) {
+	if(this.context == node) {
+		this.context = null;
+	} else {
+		var n = this.children.indexOf(node);
+		this.children.splice(n, 1);
+	}
 }
 
 DNode.prototype.isArgument = function() {
@@ -99,8 +110,14 @@ function createBinNode(n) {
 	}
 }
 
+var id_count = 1;
 function createNodeFromJson2(json) {
+	var id = json.id != null ? parseInt(json.id) : id_count++;
 	var node = new DNode(0, json.name, json.type, json.desc);
+	if(json.prev != null) {
+		node.prevVersion = createNodeFromJson2(json.prev);
+		node.prevVersion.nextVersion = node;
+	}
 	if(json.children != null) {
 		for(var i=0; i<json.children.length; i++) {
 			var child = createNodeFromJson2(json.children[i]);
@@ -124,7 +141,8 @@ function createSampleNode() {
 			name: "SubGoal 2", type: "Goal", desc: "description",
 			children: [
 				{ name: "Context 2", type: "Context", desc: "" }
-			]
+			],
+			prev: { name: "SubGoal 2 old", type: "Goal", desc: "old version" }
 		},
 		{
 			name: "SubGoal 3", type: "Goal", desc: "description",
@@ -132,7 +150,7 @@ function createSampleNode() {
 				{ name: "Context 3.1", type: "Context", desc: "description" },
 				{ name: "SubGoal 3.1", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.2", type: "Goal", desc: "description", 
-					children: [ { name: "D-Script", type: "DScript", desc: "p(\"hello\");" } ] },
+					children: [ { name: "D-Script", type: "DScript", desc: "shutdown -r now" } ] },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
 			]
@@ -142,15 +160,15 @@ function createSampleNode() {
 	return createNodeFromJson2({
 		name: "TopGoal", type: "Goal",
 		desc: "ウェブショッピングデモ<br>" +
-					"システムはDEOSプロセスにより運用され，ODSを満たしている",
+					"システムはDEOSプロセスにより運用され，OSDを満たしている",
 		children: [
 			{
 				name: "Context",
 				type: "Context",
-				desc: "サービス用件:<br>" +
-							"・アクセス数の定格は2500件/分<br>" +
-							"・応答時間は1件あたり3秒以内<br>" +
-							"・一回の障害あたりの復旧時間は5分以内"
+				desc: "サービス用件:<br><ul>" +
+							"<li>アクセス数の定格は2500件/分</li>" +
+							"<li>応答時間は1件あたり3秒以内</li>" +
+							"<li>一回の障害あたりの復旧時間は5分以内</li></ul>"
 			},
 			{
 				name: "Strategy", type: "Strategy", desc: "DEOSプロセスによって議論する",
