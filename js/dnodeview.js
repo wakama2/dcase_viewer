@@ -5,7 +5,6 @@ function toHTML(txt) {
 	var x = txt
 	.replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/\n/g, "<br>");
-	console.log(x);
 	return x;
 }
 
@@ -98,7 +97,7 @@ var DNodeView = function(viewer, node) {
 	}).bind("touchend", function(e) {
 		viewer.dragEnd(self);
 		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
-			console.log(new Date() - touchinfo.time);
+			//console.log(new Date() - touchinfo.time);
 			viewer.actExpandBranch(self);
 			touchinfo.time = null;
 		}

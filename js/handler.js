@@ -72,6 +72,7 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 		self.dragEnd();
 	});
 	$(root).mousewheel(function(e, delta) {
+		e.preventDefault();
 		if(self.moving) return;
 		var b = delta < 0 ? 0.95 : 1.05;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);

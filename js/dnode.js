@@ -74,6 +74,14 @@ function createNodeFromURL(url) {
 	return createNodeFromJson(JSON.parse(a.responseText));
 }
 
+function contextParams(params) {
+	var s = "";
+	for(key in params) {
+		s += "@" + key + " = " + params[key] + "\n";
+	}
+	return s;
+}
+
 function createNodeFromJson(json) {
 	console.log(json);
 	var nodes = [];
@@ -81,13 +89,14 @@ function createNodeFromJson(json) {
 		var c = json.nodes[i];
 		nodes[c.node_id] = c;
 	}
+		
 	function createChildren(l, node) {
 		for(var i=0; i<l.children.length; i++) {
 			var child = l.children[i];
 			var n = nodes[child.node_id];
 			n.name = n.type.charAt(0) + n.node_id;
-			var newNode = new DNode(n.node_id, n.name, n.type,
-					n.type != "Context" ? n.description : JSON.stringify(n.properties));
+			var desc = n.description ? n.description : contextParams(n.properties);
+			var newNode = new DNode(n.node_id, n.name, n.type, desc);
 			newNode.isEvidence = n.isEvidence;
 			node.addChild(newNode);
 			createChildren(child, newNode);
@@ -113,7 +122,8 @@ function createBinNode(n) {
 var id_count = 1;
 function createNodeFromJson2(json) {
 	var id = json.id != null ? parseInt(json.id) : id_count++;
-	var node = new DNode(0, json.name, json.type, json.desc);
+	var desc = json.desc ? json.desc : contextParams(json.prop);
+	var node = new DNode(0, json.name, json.type, desc);
 	if(json.prev != null) {
 		node.prevVersion = createNodeFromJson2(json.prev);
 		node.prevVersion.nextVersion = node;
@@ -132,7 +142,7 @@ function createSampleNode() {
 		{
 			name: "SubGoal 1", type: "Goal", desc: "description",
 			children: [ 
-				{ name: "test", type: "Context", desc: "D-Script.Name:test" },
+				{ name: "C", type: "Context", prop: { "D-Script.Name": "test" } },
 				{ name: "test", type: "Goal", desc: "goal1" },
 				{ name: "test", type: "Goal", desc: "goal2" }
 			]
