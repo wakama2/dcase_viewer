@@ -129,6 +129,27 @@ DCaseViewer.prototype.nextVersion = function(v) {
 	}
 }
 
+DCaseViewer.prototype.showToolbox = function(node) {
+	var self = this;
+	if(this.toolboxNode != node) {
+		if(node != null) {
+			var b = node.div.offset();
+			$("#toolbar").css({
+				display: "block",
+				left: b.left + 80 * self.scale,
+				top: b.top,
+				width: 100,
+				height: 30,
+			});
+			console.log("in");
+		} else {
+			$("#toolbar").css("display", "none");
+			console.log("out");
+		}
+		this.toolboxNode = node;
+	}
+}
+
 DCaseViewer.prototype.setDragLock = function(b) {
 	this.drag_flag = b;
 }

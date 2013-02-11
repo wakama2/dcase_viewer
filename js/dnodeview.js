@@ -107,6 +107,12 @@ var DNodeView = function(viewer, node) {
 			touchinfo.time = null;
 		}
 	});
+
+	//this.div.hover(function() {
+	//	viewer.showToolbox(self);
+	//}, function() {
+	//	viewer.showToolbox(null);
+	//});
 }
 
 DNodeView.prototype.initSvg = function(type) {
