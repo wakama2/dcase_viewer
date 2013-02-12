@@ -50,8 +50,6 @@ DCaseViewer.prototype.setModel = function(model) {
 		return view;
 	}
 	this.rootview = create(model);
-	this.shiftX = ($(this.root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
-	this.shiftY = 20;
 	this.model = model;
 
 	setTimeout(function() {
@@ -64,7 +62,9 @@ DCaseViewer.prototype.setModel = function(model) {
 			});
 		}
 		f(self.rootview);
-		self.repaintAll(0);
+		self.shiftX = ($(self.root).width() - self.rootview.updateLocation(0, 0).x * self.scale)/2;
+		self.shiftY = 20;
+		self.repaintAll();
 	}, 100);
 }
 
