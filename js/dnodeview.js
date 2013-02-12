@@ -363,7 +363,7 @@ DNodeView.prototype.updateLocation = function(x, y) {
 
 	// update this location
 	this.bounds = {
-		x: x0 + (maxWidth-w)/2,
+		x: x0 + (maxCWidth-w)/2,
 		y: y0 + Math.max((contextHeight-h)/2, 0),
 		w: w,
 		h: h
@@ -386,6 +386,7 @@ DNodeView.prototype.updateLocation = function(x, y) {
 		h: maxHeight + ARG_MARGIN * 2
 	};
 	return {
+		cx: x0 + maxCWidth + ARG_MARGIN,
 		x: x0 + maxWidth + ARG_MARGIN,
 		y: y0 + maxHeight + ARG_MARGIN,
 	};
