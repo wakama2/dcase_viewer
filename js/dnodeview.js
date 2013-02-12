@@ -284,20 +284,30 @@ DNodeView.prototype.setVisible = function(b) {
 }
 
 DNodeView.prototype.addChild = function(view) {
-	var l = this.viewer.createSvg("line");
-	$(l).attr({
-		stroke: "#444",
-		x1: 0, y1: 0, x2: 0, y2: 0,
-		"marker-end": "url(#Triangle-black)",
-	});
 	switch(view.node.type) {
 	case "Context":
 	case "Rebuttal":
 	case "DScriptContext":
+		var l = this.viewer.createSvg("line");
+		$(l).attr({
+			fill: "none",
+			stroke: "#404040",
+			x1: 0, y1: 0, x2: 0, y2: 0,
+			"marker-end": "url(#Triangle-black)",
+		});
+
 		this.contextLine = l;
 		this.context = view;
 		break;
 	default:
+		var l = this.viewer.createSvg("path");
+		$(l).attr({
+			d: "M0,0 C0,0 0,0 0,0",
+			fill: "none",
+			stroke: "#404040",
+			"marker-end": "url(#Triangle-black)",
+		});
+
 		this.lines.push(l);
 		this.children.push(view);
 		break;
@@ -432,12 +442,28 @@ DNodeView.prototype.animeStart = function(a) {
 	
 	$.each(this.lines, function(i, l) {
 		var e = self.children[i];
-		a.moves(l, {
-			x1: (b.x + b.w/2) * scale,
-			y1: (b.y + b.h  ) * scale,
-			x2: (e.bounds.x + e.bounds.w/2) * scale,
-			y2: (e.bounds.y) * scale,
-		}).show(l, self.childVisible);
+		var start = l.pathSegList.getItem(0); // SVG_PATHSEG_MOVETO_ABS(M)
+		var curve = l.pathSegList.getItem(1); // SVG_PATHSEG_CURVETO_CUBIC_ABS(C)
+		
+		var x1 = (b.x + b.w/2) * scale;
+		var y1 = (b.y + b.h  ) * scale;
+		var x2 = (e.bounds.x + e.bounds.w/2) * scale;
+		var y2 = (e.bounds.y) * scale;
+
+		a.show(l, self.childVisible);
+	
+		a.moves(start, {
+			x: x1,
+			y: y1,
+		});
+		a.moves(curve, {
+			x1: (9 * x1 + x2) / 10,
+			y1: y2,
+			x2: (9 * x2 + x1) / 10,
+			y2: y1,
+			x: x2,
+			y: y2,
+		});
 	});
 	if(this.contextLine != null) {
 		var e = self.context;
