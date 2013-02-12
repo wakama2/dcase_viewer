@@ -240,8 +240,9 @@ DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
 	if(nn.context != null) {
 		nn.context.type = "DScriptContext";
 	}
-	var t = $("<div></div>").addClass("dscript-exe-window");
-	self.appendElem(t);
+	var t = $("<div></div>")
+			.addClass("dscript-exe-window")
+			.appendTo(self.root);
 
 	var r1x = document.createElement("div");
 	var t1 = $(r1x).css({
