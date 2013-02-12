@@ -163,7 +163,7 @@ DCaseViewer.prototype.getDragLock = function() {
 DCaseViewer.prototype.setSelectedNode = function(node) {
 	this.selectedNode = node;
 	this.repaintAll();
-	this.showToolbox(node);
+	//this.showToolbox(node);
 }
 
 DCaseViewer.prototype.getSelectedNode = function() {
@@ -230,6 +230,9 @@ DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
 			nn = createNodeFromJson(n);
 			break;
 		}
+	}
+	if(nn.context != null) {
+		nn.context.type = "DScriptContext";
 	}
 	var t = $("<div></div>").addClass("dscript-exe-window");
 	self.appendElem(t);

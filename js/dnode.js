@@ -77,7 +77,7 @@ function createNodeFromURL(url) {
 function contextParams(params) {
 	var s = "";
 	for(key in params) {
-		s += "@" + key + " = " + params[key] + "\n";
+		s += "@" + key + " : " + params[key] + "\n";
 	}
 	return s;
 }
@@ -142,7 +142,7 @@ function createSampleNode() {
 		{
 			name: "SubGoal 1", type: "Goal", desc: "description",
 			children: [ 
-				{ name: "C", type: "Context", prop: { "D-Script.Name": "test" } },
+				{ name: "C", type: "DScriptContext", prop: { "D-Script.Name": "test" } },
 				{ name: "test", type: "Goal", desc: "goal1" },
 				{ name: "test", type: "Goal", desc: "goal2" }
 			]
