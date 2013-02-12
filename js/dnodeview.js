@@ -106,7 +106,6 @@ var DNodeView = function(viewer, node) {
 	}).bind("touchend", function(e) {
 		viewer.dragEnd(self);
 		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
-			//console.log(new Date() - touchinfo.time);
 			viewer.actExpandBranch(self);
 			touchinfo.time = null;
 		}
@@ -458,9 +457,9 @@ DNodeView.prototype.animeStart = function(a) {
 		});
 		a.moves(curve, {
 			x1: (9 * x1 + x2) / 10,
-			y1: y2,
+			y1: (y1 + y2) / 2,
 			x2: (9 * x2 + x1) / 10,
-			y2: y1,
+			y2: (y1 + y2) / 2,
 			x: x2,
 			y: y2,
 		});
