@@ -406,7 +406,7 @@ DNodeView.prototype.animeStart = function(a) {
 		top   : (b.y + this.svg.offset.y) * scale,
 		width : (b.w - this.svg.offset.x*2) * scale,
 		height: (b.h - this.svg.offset.y*2) * scale,
-		fontSize: FONT_SIZE*scale,
+		fontSize: Math.floor(FONT_SIZE*scale),
 	});
 
 	this.svg.setAttribute("fill", getColorByState(this.node));

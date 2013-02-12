@@ -56,7 +56,7 @@ DCaseViewer.prototype.setModel = function(model) {
 
 	setTimeout(function() {
 		function f(v) {
-			var b = v.getOuterSize(200, v.divText.height() + 60);
+			var b = v.getOuterSize(200, v.divText.height() / self.scale + 60);
 			v.bounds.w = b.w;
 			v.bounds.h = b.h;
 			v.forEachNode(function(e) {
