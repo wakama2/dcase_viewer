@@ -2,6 +2,9 @@ var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 
 function toHTML(txt) {
+	if(txt == "") {
+		return "<font color=gray>(no description)</font>";
+	}
 	var x = txt
 	.replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/\n/g, "<br>");
@@ -88,6 +91,10 @@ var DNodeView = function(viewer, node) {
 				self.divText.html(toHTML(node.text));
 				$(this).remove();
 				editflag = false;
+				setTimeout(function() {
+					self.bounds.h = self.divText.height() / self.viewer.scale + 60;
+					viewer.repaintAll();
+				}, 100);
 			});
 		}
 		viewer.dragEnd(self);
