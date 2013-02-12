@@ -74,11 +74,20 @@ window.addEventListener("load",function() {
 	$(".tool-right").click(function() {
 		viewer.nextVersion(viewer.getSelectedNode());
 	});
+	$(".tool-up").click(function() {
+		viewer.actExpandBranch(viewer.getSelectedNode(), false);
+		$(".tool-up").css("display", "none");
+		$(".tool-down").css("display", "inline");
+	});
+	$(".tool-down").click(function() {
+		viewer.actExpandBranch(viewer.getSelectedNode(), true);
+		$(".tool-up").css("display", "inline");
+		$(".tool-down").css("display", "none");
+	});
+
 	$(".tool-play").click(function() {
 		var v = viewer.getSelectedNode();
-		if(v.node.isDScript()) {
-			viewer.showDScriptExecuteWindow(v.node.getDScriptNameInEvidence());
-		}
+		viewer.showDScriptExecuteWindow(v.node.getDScriptNameInEvidence());
 	});
 
 	// hide url bar for ipod touch
@@ -94,11 +103,12 @@ window.addEventListener("load",function() {
 
 <div id="toolbar" style="display: none;">
 	<a href="#" class="tool-new"><i class="icon-plus"></i></a>
-	<a href="#" class="tool-edit"><i class="icon-edit"></i></a>
 	<a href="#" class="tool-remove"><i class="icon-remove"></i></a>
 	<a href="#" class="tool-left"><i class="icon-arrow-left"></i></a>
 	<a href="#" class="tool-right"><i class="icon-arrow-right"></i></a>
 	<a href="#" class="tool-play"><i class="icon-play"></i></a>
+	<a href="#" class="tool-up"><i class="icon-circle-arrow-up"></i></a>
+	<a href="#" class="tool-down"><i class="icon-circle-arrow-down"></i></a>
 </div>
 
 <div id="menu">

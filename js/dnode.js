@@ -48,7 +48,8 @@ DNode.getTypes = function() {
 var DSCRIPT_PREF = "D-Script:";
 var DSCRIPT_PREF_CONTEXT = "D-Script.Name:";
 DNode.prototype.isDScript = function() {
-	return this.type === "Evidence" && this.text.indexOf(DSCRIPT_PREF) == 0;
+	return this.type == "DScript";
+	//return this.type === "Evidence" && this.text.indexOf(DSCRIPT_PREF) == 0;
 }
 
 DNode.prototype.getDScriptNameInEvidence = function() {

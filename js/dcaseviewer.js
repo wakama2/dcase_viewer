@@ -133,9 +133,11 @@ DCaseViewer.prototype.showToolbox = function(node) {
 	var self = this;
 	if(this.toolboxNode != node) {
 		if(node != null) {
+			var data = node.node;
 			var b = node.div.offset();
 			var w = node.div.width();
 			var x = 120;
+
 			$("#toolbar").css({
 				display: "block",
 				left: b.left + (w - x)/2,//b.left + 80 * self.scale,
@@ -143,10 +145,14 @@ DCaseViewer.prototype.showToolbox = function(node) {
 				width: x,
 				height: 30,
 			});
-			console.log("in");
+
+			$("#toolbar .tool-left").css("display", data.prevVersion != null ? "inline" : "none");
+			$("#toolbar .tool-right").css("display", data.nextVersion != null ? "inline" : "none");
+			$("#toolbar .tool-play").css("display", data.isDScript() ? "inline" : "none");
+			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
+			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
 		} else {
 			$("#toolbar").css("display", "none");
-			console.log("out");
 		}
 		this.toolboxNode = node;
 	}
@@ -163,7 +169,7 @@ DCaseViewer.prototype.getDragLock = function() {
 DCaseViewer.prototype.setSelectedNode = function(node) {
 	this.selectedNode = node;
 	this.repaintAll();
-	//this.showToolbox(node);
+	this.showToolbox(node);
 }
 
 DCaseViewer.prototype.getSelectedNode = function() {

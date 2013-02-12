@@ -315,13 +315,16 @@ DNodeView.prototype.updateLocation = function(x, y) {
 	var maxHeight = Math.max(contextHeight, h);
 
 	// update children location
+	var cx = x;
 	$.each(this.children, function(i, e) {
 		if(i != 0) x += X_MARGIN;
 		var size = e.updateLocation(x, childrenY);
 		x = size.x;
+		cx = size.cx;
 		maxHeight = Math.max(maxHeight, size.y - y0);
 	});
 	var maxWidth = Math.max(w, x - x0);
+	var maxCWidth = Math.max(w, cx - x0);
 
 	// update this location
 	this.bounds = {
@@ -347,7 +350,10 @@ DNodeView.prototype.updateLocation = function(x, y) {
 		w: maxWidth + ARG_MARGIN * 2,
 		h: maxHeight + ARG_MARGIN * 2
 	};
-	return { x: x0 + maxWidth + ARG_MARGIN, y: y0 + maxHeight + ARG_MARGIN };
+	return {
+		x: x0 + maxWidth + ARG_MARGIN,
+		y: y0 + maxHeight + ARG_MARGIN,
+	};
 }
 
 DNodeView.prototype.animeStart = function(a) {
