@@ -26,9 +26,12 @@ DCaseViewer.prototype.setDragHandler = function() {
 		if(flag) {
 			var dx = (x - x0) * scale;
 			var dy = (y - y0) * scale;
-			self.dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
-			self.dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
-			self.repaintAll(0);
+			if(dx != 0 || dy != 0) {
+				self.showToolbox(null);
+				self.dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
+				self.dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
+				self.repaintAll(0);
+			}
 		}
 	}
 
@@ -61,22 +64,23 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 	var self = this;
 	var root = this.root;
 	$(root).mousedown(function(e) {
-		if(e.originalEvent.detail == 2) return false;
-		if(self.moving || !self.drag_flag) return false;
+		if(e.originalEvent.detail == 2) return ;
+		if(self.moving || !self.drag_flag) return ;
 		self.dragStart(e.pageX, e.pageY);
-		return false;
 	});
 	$(root).mousemove(function(e) {
 		self.drag(e.pageX, e.pageY);
-		return false;
+		e.stopPropagation();
 	});
 	$(root).mouseup(function(e) {
 		self.dragEnd();
-		return false;
 	});
 	$(root).mousewheel(function(e, delta) {
+		e.preventDefault();
+		e.stopPropagation();
 		if(self.moving) return;
-		var b = delta < 0 ? 0.95 : 1.05;
+		self.showToolbox(null);
+		var b = 1.0 + delta * 0.04;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
 			var r = root.getBoundingClientRect();
@@ -86,7 +90,6 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 			self.shiftY = y1 - (y1 - self.shiftY) * b;
 		}
 		self.repaintAll(0);
-		return false;
 	});
 }
 

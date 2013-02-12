@@ -1,5 +1,14 @@
 var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
+function toHTML(txt) {
+	if(txt == "") {
+		return "<font color=gray>(no description)</font>";
+	}
+	var x = txt
+	.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+	.replace(/\n/g, "<br>");
+	return x;
+}
 
 /* class DNodeView */
 var DNodeView = function(viewer, node) {
@@ -7,45 +16,14 @@ var DNodeView = function(viewer, node) {
 	this.viewer = viewer;
 	this.node = node;
 	this.svg = this.initSvg(node.type);
-	this.div = $("<div></div>").addClass("node-container");
-	viewer.appendElem(this.div);
+	this.div = $("<div></div>")
+			.addClass("node-container")
+			.appendTo(viewer.root);
 
-	$(this.div).toolbar({
-		content: "#toolbar-node-edit",
-		position: "top",
-		hideOnClick: true,
-	});
-
-	var touchinfo = {};
-	this.div.mouseup(function(e) {
-		viewer.dragEnd(self);
-	}).dblclick(function(e) {
-		if(node.isDScript()) {
-			viewer.showDScriptExecuteWindow(node.getDScriptNameInEvidence());
-		} else {
-			viewer.actExpandBranch(self);
-		}
-	}).bind("touchstart", function(e) {
-		var touches = e.originalEvent.touches;
-		touchinfo.count = touches.length;
-	}).bind("touchend", function(e) {
-		viewer.dragEnd(self);
-		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
-			console.log(new Date() - touchinfo.time);
-			viewer.actExpandBranch(self);
-			touchinfo.time = null;
-		}
-		if(touchinfo.count == 1) {
-			touchinfo.time = new Date();
-		} else {
-			touchinfo.time = null;
-		}
-	});
 	if(node.isUndevelop()) {
 		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
 			fill: "none", stroke: "gray"
-		});
-		viewer.appendSvg(this.svgUndevel)
+		}).appendTo(viewer.svgroot);
 	}
 	this.argumentBorder = null;
 	if(node.isArgument()) {
@@ -53,15 +31,14 @@ var DNodeView = function(viewer, node) {
 			stroke: "#8080D0",
 			fill: "none",
 			"stroke-dasharray": 3,
-		});
-		viewer.appendSvg(this.argumentBorder);
+		}).appendTo(viewer.svgroot);
 	}
 	this.argumentBounds = {};
 
 	this.divName = $("<div></div>").addClass("node-name").html(node.name);
 	this.div.append(this.divName);
 
-	this.divText = $("<div></div>").addClass("node-text").html(node.text);
+	this.divText = $("<div></div>").addClass("node-text").html(toHTML(node.text));
 	this.div.append(this.divText);
 
 	this.divNodes = $("<div></div>").addClass("node-closednodes");
@@ -82,6 +59,66 @@ var DNodeView = function(viewer, node) {
 	this.bounds = { x: 0, y: 0, w: 200, h: this.div.height() + 60 };
 	this.visible = true;
 	this.childVisible = true;
+
+	var touchinfo = {};
+	var editflag = false;
+	this.div.mouseup(function(e) {
+		if(self == viewer.getSelectedNode() && !editflag) {
+			editflag = true;
+			self.divText.text("");
+			$("<textarea></textarea>").css({
+				position: "absolute",
+				left: "0",
+				top: self.divText.attr("top"),
+				width: "100%",
+				height: "75%",
+				background: "#CCC",
+				borderStyle: "none",
+				resizable: false,
+				zIndex: 99,
+			})
+			.attr("value", node.text)
+			.appendTo(self.div)
+			.focus()
+			.mousedown(function(e) { e.stopPropagation(); })
+			.mouseup(function(e) { e.stopPropagation(); })
+			.mousemove(function(e) { e.stopPropagation(); })
+			.click(function(e) { e.stopPropagation(); })
+			.mousewheel(function(e) { e.stopPropagation(); })
+			.blur(function() {
+				node.text = $(this).attr("value");
+				self.divText.html(toHTML(node.text));
+				$(this).remove();
+				editflag = false;
+				setTimeout(function() {
+					self.bounds.h = self.divText.height() / self.viewer.scale + 60;
+					viewer.repaintAll();
+				}, 100);
+			});
+		}
+		viewer.dragEnd(self);
+	}).bind("touchstart", function(e) {
+		var touches = e.originalEvent.touches;
+		touchinfo.count = touches.length;
+	}).bind("touchend", function(e) {
+		viewer.dragEnd(self);
+		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
+			//console.log(new Date() - touchinfo.time);
+			viewer.actExpandBranch(self);
+			touchinfo.time = null;
+		}
+		if(touchinfo.count == 1) {
+			touchinfo.time = new Date();
+		} else {
+			touchinfo.time = null;
+		}
+	});
+
+	//this.div.hover(function() {
+	//	viewer.showToolbox(self);
+	//}, function() {
+	//	viewer.showToolbox(null);
+	//});
 }
 
 DNodeView.prototype.initSvg = function(type) {
@@ -113,6 +150,31 @@ DNodeView.prototype.initSvg = function(type) {
 			});
 		}
 		o.offset = { x: n/2, y: n/2 };
+	} else if(type == "DScriptContext") {
+		var o = root.createSvg("g");
+		var o1 = root.createSvg("rect");
+		var o2 = root.createSvg("polygon");
+		$(o2).attr({ stroke: "gray", fill:"gray" });
+		o.appendChild(o1);
+		o.appendChild(o2);
+		o.setBounds = function(a, x, y, w, h) {
+			var n = 20 * root.scale;
+			a.moves(o1, {
+				rx: n,
+				ry: n,
+				x : x,
+				y : y,
+				width : w,
+				height: h
+			});
+			a.movePolygon(o2, [
+				{ x: x+w*5/8, y:y-n },
+				{ x: x+w*5/8, y:y+n },
+				{ x: x+w*5/8+n*2, y:y },
+			]);
+			o.offset = { x: n/2, y: n/2 };
+		}
+		o.offset = { x: 1, y: 1 };
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(a, x, y, w, h) {
@@ -125,7 +187,7 @@ DNodeView.prototype.initSvg = function(type) {
 			]);
 		}
 		o.offset = { x: 25, y: 10 };
-	} else if(type == "Evidence" || type == "Monitor") {
+	} else if(type == "Evidence" || type == "Monitor" || type == "Rebuttal") {
 		o = root.createSvg("ellipse");
 		o.setBounds = function(a, x, y, w, h) {
 			a.moves(this, {
@@ -151,10 +213,11 @@ DNodeView.prototype.initSvg = function(type) {
 				rx: w/2,
 				ry: h/2,
 			});
+			var n = 20 * root.scale;
 			a.movePolygon(o2, [
-				{ x: x+w*5/8, y:y-h/4 },
-				{ x: x+w*5/8, y:y+h/4 },
-				{ x: x+w*7/8, y:y },
+				{ x: x+w*5/8, y:y-n },
+				{ x: x+w*5/8, y:y+n },
+				{ x: x+w*5/8+n*2, y:y },
 			]);
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
 		}
@@ -166,6 +229,7 @@ DNodeView.prototype.initSvg = function(type) {
 }
 
 function getColorByState(node) {
+	if(node.type == "Rebuttal") return "#FF8080";
 	return node.isEvidence ? "#80FF80" : "#E0E0E0";
 }
 
@@ -202,14 +266,20 @@ DNodeView.prototype.addChild = function(view) {
 	var l = this.viewer.createSvg("line");
 	$(l).attr({
 		stroke: "#404040",
-		x1: 0, y1: 0, x2: 0, y2: 0
+		x1: 0, y1: 0, x2: 0, y2: 0,
+		"marker-end": "url(#Triangle)",
 	});
-	if(view.node.type != "Context") {
-		this.lines.push(l);
-		this.children.push(view);
-	} else {
+	switch(view.node.type) {
+	case "Context":
+	case "Rebuttal":
+	case "DScriptContext":
 		this.contextLine = l;
 		this.context = view;
+		break;
+	default:
+		this.lines.push(l);
+		this.children.push(view);
+		break;
 	}
 	this.divNodesText = (this.lines.length + (this.contextLine!=null?1:0))
 			 + " nodes...";
@@ -259,13 +329,16 @@ DNodeView.prototype.updateLocation = function(x, y) {
 	var maxHeight = Math.max(contextHeight, h);
 
 	// update children location
+	var cx = x;
 	$.each(this.children, function(i, e) {
 		if(i != 0) x += X_MARGIN;
 		var size = e.updateLocation(x, childrenY);
 		x = size.x;
+		cx = size.cx;
 		maxHeight = Math.max(maxHeight, size.y - y0);
 	});
 	var maxWidth = Math.max(w, x - x0);
+	var maxCWidth = Math.max(w, cx - x0);
 
 	// update this location
 	this.bounds = {
@@ -291,10 +364,13 @@ DNodeView.prototype.updateLocation = function(x, y) {
 		w: maxWidth + ARG_MARGIN * 2,
 		h: maxHeight + ARG_MARGIN * 2
 	};
-	return { x: x0 + maxWidth + ARG_MARGIN, y: y0 + maxHeight + ARG_MARGIN };
+	return {
+		x: x0 + maxWidth + ARG_MARGIN,
+		y: y0 + maxHeight + ARG_MARGIN,
+	};
 }
 
-DNodeView.prototype.animeBegin = function(a) {
+DNodeView.prototype.animeStart = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
 	var b = this.bounds;
@@ -374,7 +450,7 @@ DNodeView.prototype.animeBegin = function(a) {
 		}).show(b, this.visible);
 	}
 	this.forEachNode(function(e) {
-		e.animeBegin(a);
+		e.animeStart(a);
 	});
 }
 
