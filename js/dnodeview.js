@@ -169,9 +169,9 @@ DNodeView.prototype.initSvg = function(type) {
 				height: h
 			});
 			a.movePolygon(o2, [
-				{ x: x+w*5/8, y:y-h/4 },
-				{ x: x+w*5/8, y:y+h/4 },
-				{ x: x+w*7/8, y:y },
+				{ x: x+w*5/8, y:y-n },
+				{ x: x+w*5/8, y:y+n },
+				{ x: x+w*5/8+n*2, y:y },
 			]);
 		}
 		o.offset = { x: n/2, y: n/2 };
@@ -206,6 +206,7 @@ DNodeView.prototype.initSvg = function(type) {
 		var o = root.createSvg("g");
 		o.appendChild(o1);
 		o.appendChild(o2);
+		var n = 20;
 		o.setBounds = function(a, x, y, w, h) {
 			a.moves(o1, {
 				cx: x + w/2,
@@ -214,9 +215,9 @@ DNodeView.prototype.initSvg = function(type) {
 				ry: h/2,
 			});
 			a.movePolygon(o2, [
-				{ x: x+w*5/8, y:y-h/4 },
-				{ x: x+w*5/8, y:y+h/4 },
-				{ x: x+w*7/8, y:y },
+				{ x: x+w*5/8, y:y-n },
+				{ x: x+w*5/8, y:y+n },
+				{ x: x+w*5/8+n*2, y:y },
 			]);
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
 		}
