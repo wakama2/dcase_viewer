@@ -77,6 +77,7 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 	});
 	$(root).mousewheel(function(e, delta) {
 		e.preventDefault();
+		e.stopPropagation();
 		if(self.moving) return;
 		self.showToolbox(null);
 		var b = 1.0 + delta * 0.04;
