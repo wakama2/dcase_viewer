@@ -173,8 +173,9 @@ DNodeView.prototype.initSvg = function(type) {
 				{ x: x+w*5/8, y:y+n },
 				{ x: x+w*5/8+n*2, y:y },
 			]);
+			o.offset = { x: n/2, y: n/2 };
 		}
-		o.offset = { x: n/2, y: n/2 };
+		o.offset = { x: 1, y: 1 };
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
 		o.setBounds = function(a, x, y, w, h) {
