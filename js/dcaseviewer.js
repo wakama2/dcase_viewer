@@ -114,7 +114,6 @@ DCaseViewer.prototype.prevVersion = function(v) {
 				if(prev.parents.length == 0) {
 					prev.parents.push(parent);
 				}
-				console.log("node " + i);
 				this.setModel(this.model);
 				break;
 			}
@@ -133,7 +132,6 @@ DCaseViewer.prototype.nextVersion = function(v) {
 				if(next.parents.length == 0) {
 					next.parents.push(parent);
 				}
-				console.log("node " + i);
 				this.setModel(this.model);
 				break;
 			}
@@ -152,7 +150,7 @@ DCaseViewer.prototype.showToolbox = function(node) {
 
 			$("#toolbar").css({
 				display: "block",
-				left: b.left + (w - x)/2,//b.left + 80 * self.scale,
+				left: b.left + (w - x)/2,
 				top: b.top - 40,
 				width: x,
 				height: 30,
@@ -240,6 +238,7 @@ DCaseViewer.prototype.createSvg = function(name) {
 
 DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
 	var self = this;
+	self.showToolbox(null);
 	var r = DCaseAPI.call("search", { filter: ["Context"] });
 	var nn = null;
 	for(var i=0; i<r[0].length; i++) {
