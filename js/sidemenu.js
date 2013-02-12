@@ -26,6 +26,7 @@ var SideMenu = function(root, viewer) {
 	}
 
 	this.actInsertToSelectedNode = function() {
+      console.log(viewer);
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {

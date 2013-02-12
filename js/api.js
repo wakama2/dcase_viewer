@@ -1,6 +1,6 @@
 var DCaseAPI = new Object();
 
-DCaseAPI.cgi = "cgi/interface.cgi";
+DCaseAPI.cgi = "http://localhost/cgi-bin/reveal/interface.cgi";
 
 DCaseAPI.call = function(method, params) {
 	var cmd = {
@@ -16,12 +16,14 @@ DCaseAPI.call = function(method, params) {
 		data: JSON.stringify(cmd),
 		dataType: "json",
 		error: function(req, stat, err) {
-			alert(stat);
+			//alert(stat);
 		}
 	});
-	console.log(res.responseText);
+	var resText = res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, "");
+	//console.log(res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, ""));
 	try {
-		var jres = JSON.parse(res.responseText);
+		var jres = JSON.parse(resText);
+		//var jres = JSON.parse(res.responseText);
 		return jres.result;
 	} catch(e) {
 	}
