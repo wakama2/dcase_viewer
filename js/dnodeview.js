@@ -11,6 +11,8 @@ function toHTML(txt) {
 	return x;
 }
 
+var DEF_WIDTH = 200;
+
 /* class DNodeView */
 var DNodeView = function(viewer, node) {
 	var self = this;
@@ -19,6 +21,7 @@ var DNodeView = function(viewer, node) {
 	this.svg = this.initSvg(node.type);
 	this.div = $("<div></div>")
 			.addClass("node-container")
+			.width(DEF_WIDTH)
 			.appendTo(viewer.root);
 
 	if(node.isUndevelop()) {
@@ -56,8 +59,7 @@ var DNodeView = function(viewer, node) {
 	this.lines = [];
 	this.contextLine = null;
 	// for animation
-	this.div.width(200);
-	this.bounds = { x: 0, y: 0, w: 200, h: this.div.height() + 60 };
+	this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };//200, h: this.div.height() + 60 };
 	this.visible = true;
 	this.childVisible = true;
 
@@ -92,7 +94,8 @@ var DNodeView = function(viewer, node) {
 				$(this).remove();
 				editflag = false;
 				setTimeout(function() {
-					self.bounds.h = self.divText.height() / self.viewer.scale + 60;
+					var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
+					self.bounds.h = b.h;
 					viewer.repaintAll();
 				}, 100);
 			});
@@ -136,6 +139,9 @@ DNodeView.prototype.initSvg = function(type) {
 				height: h,
 			});
 		}
+		this.getOuterSize = function(w, h) {
+			return { w: w + n*2, h: h + n*2 };
+		}
 		o.offset = { x: n, y: n };
 	} else if(type == "Context") {
 		o = root.createSvg("rect");
@@ -149,6 +155,9 @@ DNodeView.prototype.initSvg = function(type) {
 				width : w,
 				height: h
 			});
+		}
+		this.getOuterSize = function(w, h) {
+			return { w: w + n, h: h + n };
 		}
 		o.offset = { x: n/2, y: n/2 };
 	} else if(type == "DScriptContext") {
@@ -175,6 +184,9 @@ DNodeView.prototype.initSvg = function(type) {
 			]);
 			o.offset = { x: n/2, y: n/2 };
 		}
+		this.getOuterSize = function(w, h) {
+			return { w: w + 20, h: h + 20 };
+		}
 		o.offset = { x: 1, y: 1 };
 	} else if(type == "Strategy") {
 		o = root.createSvg("polygon");
@@ -187,6 +199,9 @@ DNodeView.prototype.initSvg = function(type) {
 				{ x: x, y: y+h }
 			]);
 		}
+		this.getOuterSize = function(w, h) {
+			return { w: w + 20*2, h: h + 10*2 };
+		}
 		o.offset = { x: 25, y: 10 };
 	} else if(type == "Evidence" || type == "Monitor" || type == "Rebuttal") {
 		o = root.createSvg("ellipse");
@@ -198,6 +213,9 @@ DNodeView.prototype.initSvg = function(type) {
 				ry: h/2,
 			});
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
+		}
+		this.getOuterSize = function(w, h) {
+			return { w: w*8/6, h: h*8/6 };
 		}
 		o.offset = { x: 0, y: 0 };
 	} else if(type == "DScript") {
@@ -221,6 +239,9 @@ DNodeView.prototype.initSvg = function(type) {
 				{ x: x+w*5/8+n*2, y:y },
 			]);
 			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
+		}
+		this.getOuterSize = function(w, h) {
+			return { w: w*8/6, h: h*8/6 };
 		}
 		o.offset = { x: 200/6, y: 200/6 };
 	} else {
@@ -426,7 +447,7 @@ DNodeView.prototype.animeStart = function(a) {
 			x2: (e.bounds.x) * scale,
 			y2: (e.bounds.y + e.bounds.h/2) * scale,
 		}).show(l, self.childVisible);
-	};
+	}
 	if(this.svgUndevel != null) {
 		var sx = (b.x + b.w/2) * scale;
 		var sy = (b.y + b.h) * scale;

@@ -53,7 +53,19 @@ DCaseViewer.prototype.setModel = function(model) {
 	this.shiftX = ($(this.root).width() - this.rootview.updateLocation(0, 0).x * this.scale)/2;
 	this.shiftY = 20;
 	this.model = model;
-	this.repaintAll(0);
+
+	setTimeout(function() {
+		function f(v) {
+			var b = v.getOuterSize(200, v.divText.height() + 60);
+			v.bounds.w = b.w;
+			v.bounds.h = b.h;
+			v.forEachNode(function(e) {
+				f(e);
+			});
+		}
+		f(self.rootview);
+		self.repaintAll(0);
+	}, 100);
 }
 
 DCaseViewer.prototype.centerize = function(view, ms) {
