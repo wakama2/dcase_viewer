@@ -10,10 +10,15 @@ var Animation = function() {
 				set: function(key, value) { dom.setAttribute(key, value); },
 				get: function(key) { return dom.getAttribute(key); }
 			};
-		} else {
+		} else if(dom.css != undefined){
 			return {
 				set: function(key, value) { dom.css(key, value); },
 				get: function(key) { return dom.css(key); }
+			};
+		} else {
+			return {
+				set: function(key, value) { dom[key] = value; },
+				get: function(key) { return dom[key]; }
 			};
 		}
 	}
