@@ -1,6 +1,5 @@
 var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
-
 function toHTML(txt) {
 	if(txt == "") {
 		return "<font color=gray>(no description)</font>";
@@ -267,7 +266,8 @@ DNodeView.prototype.addChild = function(view) {
 	var l = this.viewer.createSvg("line");
 	$(l).attr({
 		stroke: "#404040",
-		x1: 0, y1: 0, x2: 0, y2: 0
+		x1: 0, y1: 0, x2: 0, y2: 0,
+		"marker-end": "url(#Triangle)",
 	});
 	switch(view.node.type) {
 	case "Context":
