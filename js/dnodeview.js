@@ -286,9 +286,9 @@ DNodeView.prototype.setVisible = function(b) {
 DNodeView.prototype.addChild = function(view) {
 	var l = this.viewer.createSvg("line");
 	$(l).attr({
-		stroke: "#404040",
+		stroke: "#444",
 		x1: 0, y1: 0, x2: 0, y2: 0,
-		"marker-end": "url(#Triangle)",
+		"marker-end": "url(#Triangle-black)",
 	});
 	switch(view.node.type) {
 	case "Context":
@@ -334,9 +334,9 @@ DNodeView.prototype.updateLocation = function(x, y) {
 			h += ARG_MARGIN;
 		}
 		if(this.visible) {
-			return { x: x+w, y: y+h };
+			return { x: x+w, cx: x+w, y: y+h };
 		} else {
-			return { x: x, y: y };
+			return { x: x, cx: x, y: y };
 		}
 	}
 	// calc context height
