@@ -1,12 +1,12 @@
 var DCaseAPI = new Object();
 
-DCaseAPI.cgi = "http://localhost/cgi-bin/reveal/interface.cgi";
+DCaseAPI.cgi = "http://localhost/cgi-bin/api.cgi";
 
 DCaseAPI.call = function(method, params) {
 	var cmd = {
-		jsonproc: "2.0",
+		jsonrpc: "2.0",
 		method: method,
-		version: "1",
+		version: "1.0",
 		params: params
 	};
 	var res = $.ajax({
@@ -49,3 +49,6 @@ DCaseAPI.commit = function(msg) {
 	return this.call("commit", { message: msg });
 }
 
+DCaseAPI.search = function(args) {
+	return this.call("FindNodeByDescription", args);
+}
