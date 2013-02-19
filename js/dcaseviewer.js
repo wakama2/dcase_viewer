@@ -161,8 +161,11 @@ DCaseViewer.prototype.showToolbox = function(node) {
 			$("#toolbar .tool-play").css("display", data.isDScript() ? "inline" : "none");
 			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
 			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
+
+			$("#timeline").css("display", "block");
 		} else {
 			$("#toolbar").css("display", "none");
+			$("#timeline").css("display", "none");
 		}
 		this.toolboxNode = node;
 	}

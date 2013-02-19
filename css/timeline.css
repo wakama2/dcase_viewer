@@ -1,0 +1,12 @@
+#timeline {
+	position: absolute;
+	left: 10%;
+	width: 80%;
+	height: 60px;
+	background: #EEE;
+	opacity: 0.9;
+	zIndex: 10;
+	border-style: solid;
+	border-width: 1px;
+}
+
