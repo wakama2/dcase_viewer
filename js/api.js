@@ -16,7 +16,7 @@ DCaseAPI.call = function(method, params) {
 		data: JSON.stringify(cmd),
 		dataType: "json",
 		error: function(req, stat, err) {
-			alert(stat);
+			console.log("ajax error! " + stat);
 		}
 	});
 	console.log(res.responseText);
@@ -24,6 +24,7 @@ DCaseAPI.call = function(method, params) {
 		var jres = JSON.parse(res.responseText);
 		return jres.result;
 	} catch(e) {
+		console.log("json parse error!");
 	}
 }
 

@@ -1,7 +1,7 @@
 #timeline {
 	position: absolute;
-	left: 10%;
-	width: 80%;
+	left: 250px;
+	right: 50px;
 	height: 60px;
 	background: #EEE;
 	opacity: 0.9;

@@ -86,27 +86,28 @@ function contextParams(params) {
 function createNodeFromJson(json) {
 	console.log(json);
 	var nodes = [];
-	for(var i=0; i<json.nodes.length; i++) {
-		var c = json.nodes[i];
-		nodes[c.node_id] = c;
+	for(var i=0; i<json.NodeList.length; i++) {
+		var c = json.NodeList[i];
+		nodes[c.ThisNodeId] = c;
 	}
-		
-	function createChildren(l, node) {
-		for(var i=0; i<l.children.length; i++) {
-			var child = l.children[i];
-			var n = nodes[child.node_id];
-			n.name = n.type.charAt(0) + n.node_id;
-			var desc = n.description ? n.description : contextParams(n.properties);
-			var newNode = new DNode(n.node_id, n.name, n.type, desc);
-			newNode.isEvidence = n.isEvidence;
-			node.addChild(newNode);
-			createChildren(child, newNode);
+	var counts = {};
+	var types = DNode.getTypes();
+	for(var i=0; i<types.length; i++) {
+		counts[types[i]] = 1;
+	}
+	function create(id) {
+		var data = nodes[id];
+		var type = data.NodeType;
+		var name = type[0] + (counts[type]++);
+		var desc = data.Description;
+		var node = new DNode(id, name, type, desc);
+		for(var i=0; i<data.Children.length; i++) {
+			node.addChild(create(data.Children[i]));
 		}
+		return node;
 	}
-	var n = nodes[json.links.node_id];
-	var topNode = new DNode(0, "TopGoal", n.type, n.description);
-	createChildren(json.links, topNode);
-	return topNode;
+	var topId = json.TopGoalId;
+	return create(topId);
 }
 
 function createBinNode(n) {
