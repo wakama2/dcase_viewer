@@ -1,6 +1,6 @@
 var DCaseAPI = new Object();
 
-DCaseAPI.cgi = "http://localhost/cgi-bin/api.cgi";
+DCaseAPI.cgi = CONFIG.cgi_url;
 
 DCaseAPI.call = function(method, params) {
 	var cmd = {

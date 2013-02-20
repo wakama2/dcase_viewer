@@ -69,28 +69,25 @@ function contextParams(params) {
 }
 
 function createNodeFromJson(json) {
-	console.log(json);
-	var nodes = [];
-	for(var i=0; i<json.nodes.length; i++) {
-		var c = json.nodes[i];
-		nodes[c.node_id] = c;
+	var nodes = new Object();
+	for(var i=0; i<json.Tree.NodeList.length; i++) {
+		var c = json.Tree.NodeList[i];
+		nodes[String(c.ThisNodeId)] = c;
 	}
-		
-	function createChildren(l, node) {
-		for(var i=0; i<l.children.length; i++) {
-			var child = l.children[i];
-			var n = nodes[child.node_id];
-			n.name = n.type.charAt(0) + n.node_id;
-			var desc = n.description ? n.description : contextParams(n.properties);
-			var newNode = new DNode(n.node_id, n.name, n.type, desc);
-			newNode.isEvidence = n.isEvidence;
+	function createChildren(node, l) {
+		for(var i=0; i < l.Children.length; i++) {
+			var child = l.Children[i];
+			var n = nodes[String(child.ThisNodeId)];
+			n.Name = n.NodeType.charAt(0) + n.ThisNodeId;
+			var desc = n.Description ? n.Description : contextParams(n.Properties);
+			var newNode = new DNode(n.ThisNodeId, n.Name, n.NodeType, desc);
 			node.addChild(newNode);
-			createChildren(child, newNode);
+			createChildren(newNode, child);
 		}
 	}
-	var n = nodes[json.links.node_id];
-	var topNode = new DNode(0, "TopGoal", n.type, n.description);
-	createChildren(json.links, topNode);
+	var n = nodes[String(json.Tree.TopGoalId)];
+	var topNode = new DNode(0, "TopGoal", n.NodeType, n.Description);
+	createChildren(topNode, n);
 	return topNode;
 }
 
@@ -105,7 +102,8 @@ function createBinNode(n) {
 	}
 }
 
-var id_count = 1;
+var id_count = 1; // ?
+/*
 function createNodeFromJson2(json) {
 	var id = json.id != null ? parseInt(json.id) : id_count++;
 	var desc = json.desc ? json.desc : contextParams(json.prop);
@@ -175,5 +173,16 @@ function createSampleNode() {
 			}
 		]
 	});
+}
+*/
+
+function initViewer(id) {
+	var node = getNodeFromServer(id);
+	var opts = {
+		argument_id: id,
+	};
+	console.log(node);
+	DCase_Viewer.setModel(node);
+	console.log(DCase_Viewer.rootview);
 }
 

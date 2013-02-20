@@ -28,36 +28,34 @@ body {
 <script type="text/javascript" src="lib/jquery.svg.min.js"></script>
 <script type="text/javascript" src="lib/jquery.svganim.min.js"></script>
 <script type="text/javascript" src="lib/codemirror.js"></script>
+<script type="text/javascript" src="js/config.js"></script>
 <script type="text/javascript" src="js/dcaseviewer.js"></script>
 <script type="text/javascript" src="js/dnode.js"></script>
 <script type="text/javascript" src="js/dnodeview.js"></script>
 <script type="text/javascript" src="js/handler.js"></script>
 <script type="text/javascript" src="js/edit.js"></script>
-<script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript" src="js/animation.js"></script>
 <script type="text/javascript">
 
 function getNodeFromServer(id) {
-	var res1 = DCaseAPI.get(["Argument"]);
+	var res1 = DCaseAPI.call("getArgumentList");
 	//var id = res1[0].argument_id;
 	//var id = "0";//FIXME
 	console.log("get id=" + id);
-	var res2 = DCaseAPI.get([], id);
+	var res2 = DCaseAPI.call("getNodeTree", {BelongedArgumentId: id});
 	console.log(res2);
 	var node = createNodeFromJson(res2);
 	return node;
 }
 
+// sorry matz.
+var DCase_Viewer;
+
 window.addEventListener("load",function() {
-	var node = createSampleNode();
-	var id = "1";
-	//var node = getNodeFromServer(id);
-	var opts = {
-		argument_id: id,
-	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
-	var menu = new SideMenu(document.body, viewer);
+	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), null);
+	var menu = new SideMenu(document.body, DCase_Viewer);
 
 	$(".tool-new").click(function() {
 		menu.actInsertToSelectedNode();
@@ -128,6 +126,7 @@ window.addEventListener("load",function() {
 		<i class="icon-search"></i>
 	</div>
 	<div id="menu-search" class="menu-box">
+		<p>search query</p>
 		<input type="text"></input>
 		<ul style="list-style-type: none; overflow: auto;"></ul>
 	</div>
@@ -140,11 +139,15 @@ window.addEventListener("load",function() {
 		<input id="menu-export-png"  type="button" value="export png"></input>
 	</div>
 
-	<div id="menu-info-i" class="menu-i" style="left: 80px;">
-		<i class="icon-info-sign"></i>
+	<div id="menu-create-i" class="menu-i" style="left: 80px;">
+		<i class="icon-plus"></i>
 	</div>
-	<div id="menu-info" class="menu-box">
-		<table id="menu-info-table"></table>
+	<div id="menu-create" class="menu-box">
+		<p>committer name</p>
+		<input id="argument_committer"></input>
+		<p>descriptions</p>
+		<textarea id="argument_description" cols=20 rows=4>Enter new Argument descriptions.  </textarea>
+		<button id="menu-create-argument">Create</button>
 	</div>
 
 	<div id="menu-tool-i" class="menu-i" style="left: 120px;">

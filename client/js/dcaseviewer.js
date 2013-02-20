@@ -37,6 +37,8 @@ DCaseViewer.prototype.setModel = function(model) {
 	$(this.root)
 		.empty()
 		.append(this.svgroot);
+	this.model = model;
+	if(model == null) return;
 
 	var self = this;
 	function create(node) {
@@ -50,7 +52,6 @@ DCaseViewer.prototype.setModel = function(model) {
 		return view;
 	}
 	this.rootview = create(model);
-	this.model = model;
 
 	setTimeout(function() {
 		function f(v) {
@@ -79,7 +80,12 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 
 DCaseViewer.prototype.repaintAll = function(ms) {
 	var self = this;
+	if (self.rootview == null) {
+		return;
+	}
 	var rootview = self.rootview;
+	console.log(self.rootview);
+	console.log(self);
 	rootview.updateLocation(
 			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
 	var a = new Animation();
