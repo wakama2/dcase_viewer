@@ -1,54 +1,59 @@
-var DCaseAPI = new Object();
+var DCaseAPI = (function() {
+    function DCaseAPI(url) {
+        this.cgi = url;
+    }
+    DCaseAPI.call = function(method, params) {
+        var cmd = {
+            jsonrpc: '2.0',
+            method: method,
+            version: '1.0',
+            params: params
+        };
+        var res = $.ajax({
+            type: 'POST',
+            url: DCaseAPI.cgi,
+            async: false,
+            data: JSON.stringify(cmd),
+            dataType: 'json',
+            error: function(req, stat, err) {
+                //alert(stat);
+            }
+        });
+        var resText = res.responseText;
+        resText = resText.replace(/\n/g, ' \\n ');
+        resText = resText.replace(/\t/g, '');
+        try {
+            var jres = JSON.parse(resText);
+            return jres.result;
+        } catch (e) {
+        }
+    };
 
-DCaseAPI.cgi = CONFIG.cgi_url;
+    DCaseAPI.get = function(filter, id) {
+        return this.call('get', { filter: filter, argument_id: id });
+    };
 
-DCaseAPI.call = function(method, params) {
-	var cmd = {
-		jsonrpc: "2.0",
-		method: method,
-		version: "1.0",
-		params: params
-	};
-	var res = $.ajax({
-		type: "POST",
-		url: DCaseAPI.cgi,
-		async: false,
-		data: JSON.stringify(cmd),
-		dataType: "json",
-		error: function(req, stat, err) {
-			//alert(stat);
-		}
-	});
-	var resText = res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, "");
-	//console.log(res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, ""));
-	try {
-		var jres = JSON.parse(resText);
-		//var jres = JSON.parse(res.responseText);
-		return jres.result;
-	} catch(e) {
-	}
-}
+    DCaseAPI.update = function(args) {
+        return this.call('update', args);
+    };
 
-DCaseAPI.get = function(filter, id) {
-	return this.call("get", { filter: filter, argument_id: id });
-}
+    DCaseAPI.insert = function(args) {
+        return this.call('insert', args);
+    };
 
-DCaseAPI.update = function(args) {
-	return this.call("update", args);
-}
+    DCaseAPI.del = function(args) {
+        return this.call('delete', args);
+    };
 
-DCaseAPI.insert = function(args) {
-	return this.call("insert", args);
-}
+    DCaseAPI.commit = function(msg) {
+        return this.call('commit', { message: msg });
+    };
 
-DCaseAPI.del = function(args) {
-	return this.call("delete", args);
-}
+    DCaseAPI.search = function(args) {
+        return this.call('FindNodeByDescription', args);
+    };
 
-DCaseAPI.commit = function(msg) {
-	return this.call("commit", { message: msg });
-}
+    return DCaseAPI;
+})();
 
-DCaseAPI.search = function(args) {
-	return this.call("FindNodeByDescription", args);
-}
+var DCaseAPI = new DCaseAPI(CONFIG.cgi_url);
