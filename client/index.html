@@ -55,7 +55,7 @@ var DCase_Viewer;
 
 window.addEventListener("load",function() {
 	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), null);
-	var menu = new SideMenu(document.body, viewer);
+	var menu = new SideMenu(document.body, DCase_Viewer);
 
 	$(".tool-new").click(function() {
 		menu.actInsertToSelectedNode();

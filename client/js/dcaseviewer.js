@@ -80,6 +80,9 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 
 DCaseViewer.prototype.repaintAll = function(ms) {
 	var self = this;
+	if (self.rootview == null) {
+		return;
+	}
 	var rootview = self.rootview;
 	console.log(self.rootview);
 	console.log(self);
