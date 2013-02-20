@@ -26,6 +26,7 @@ var SideMenu = function(root, viewer) {
 	}
 
 	this.actInsertToSelectedNode = function() {
+      console.log(viewer);
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {
@@ -102,34 +103,48 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 
-	$("#menu-search input").focus(function(e) {
-		var i = this;
-		this.interval_id = setInterval(function() {
-			self.search_inc(i.value);
-		}, 1000/5);
-	}).blur(function(e) {
+	$("#menu-search input").blur(function(e) {
 		clearInterval(this.interval_id);
 		delete this.interval_id;
+	}).keydown(function (e) {
+		if (e.keyCode == 13) { // Enter key
+			var i = this;
+			var r = DCaseAPI.search({
+				SearchText: i.value
+			});
+			self.search_inc(i.value);
+		}
 	});
 
 	this.search = function(text) {
 		var $res = $("#menu-search ul");
 		$res.empty();
 		text = text.toLowerCase();
-		function cmp(v) {
-			var name = v.node.name;
-			var index = name.toLowerCase().indexOf(text);
-			if(index != -1) {
-				var s = name.substr(0, index) +
-						"<b>" + name.substr(index, text.length) +
-						"</b>" + name.substr(index + text.length)
-				$("<li>")
+		function getPreviewText(target, text) { // [TODO] add color
+			var index = target.toLowerCase().indexOf(text);
+			var ret = target.substr(0, index) +
+				"<b>" + target.substr(index, text.length) +
+				"</b>" + target.substr(index + text.length)
+			return ret;
+		};
+		function showResult($res, v, name, desc) {
+			$("<ul>")
 					.addClass("sidemenu-result")
-					.html(s)
+					.html("<li>" + name + "</li>")
+					//.html("<li>" + name + "<ul>" + desc + "</ul></li>")
 					.click(function() {
 						viewer.centerize(v, 500);
 					})
 					.appendTo($res);
+		};
+		function cmp(v) {
+			var name = v.node.name;
+			var desc = v.node.text;
+			var d_index = desc.toLowerCase().indexOf(text);
+			var n_index = name.toLowerCase().indexOf(text);
+			if(d_index != -1 || n_index != -1) {
+				var ptext = getPreviewText(desc, text);
+				showResult($res, v, name, ptext);
 			}
 			v.forEachNode(cmp);
 		}
@@ -200,4 +215,5 @@ var SideMenu = function(root, viewer) {
 	});
 
 }
+
 
