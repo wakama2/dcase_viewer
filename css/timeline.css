@@ -2,7 +2,8 @@
 	position: absolute;
 	left: 250px;
 	right: 50px;
-	height: 60px;
+	top: 8px;
+	height: 40px;
 	background: #EEE;
 	opacity: 0.9;
 	zIndex: 10;

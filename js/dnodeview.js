@@ -88,8 +88,11 @@ var DNodeView = function(viewer, node) {
 			.click(function(e) { e.stopPropagation(); })
 			.mousewheel(function(e) { e.stopPropagation(); })
 			.blur(function() {
-				node.text = $(this).attr("value");
-				self.divText.html(toHTML(node.text));
+				//node.text = $(this).attr("value");
+				var newText = $(this).attr("value");
+				var op = new EditOperation(node, node.text, newText);
+				viewer.applyOperation(op);
+				self.divText.html(toHTML(newText));
 				$(this).remove();
 				editflag = false;
 				setTimeout(function() {

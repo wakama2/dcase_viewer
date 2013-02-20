@@ -26,6 +26,9 @@ var DCaseViewer = function(root, model, opts) {
 	this.drag_flag = true;
 	this.selectedNode = null;
 	this.rootview = null;
+	this.nodeCount = {};
+	this.opQueue = [];
+	this.undoCount = 0;
 	this.model = model;
 	this.setModel(model);
 	this.addEventHandler();
@@ -75,6 +78,37 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
 	this.shiftY = -b.y * this.scale + $(this.root).height() / 5 * this.scale;
 	this.repaintAll(ms);
+}
+
+DCaseViewer.prototype.applyOperation = function(op) {
+	this.opQueue.push(op);
+	this.undoCount = 0;
+	op.redo();
+	this.setModel(this.model);
+}
+
+DCaseViewer.prototype.commit = function(msg) {
+	this.undoCount = 0;
+	this.opQueue = [];
+}
+
+DCaseViewer.prototype.undo = function() {
+	var n = this.opQueue.length;
+	if(n > this.undoCount) {
+		this.undoCount++;
+		var op = this.opQueue[n - this.undoCount];
+		op.undo();
+		this.setModel(this.model);
+	}
+}
+
+DCaseViewer.prototype.redo = function() {
+	if(this.undoCount > 0) {
+		var op = this.opQueue[this.opQueue.length - this.undoCount];
+		this.undoCount--;
+		op.redo();
+		this.setModel(this.model);
+	}
 }
 
 DCaseViewer.prototype.repaintAll = function(ms) {

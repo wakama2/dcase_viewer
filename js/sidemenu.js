@@ -11,38 +11,26 @@ var SideMenu = function(root, viewer) {
 		viewer.setTextSelectable(!flag);
 	}
 
-	this.actEditSelectedNode = function() {
-		var view = viewer.getSelectedNode();
-		if(view != null) {
-			DNodeEditWindow.open(view.node, function(node) {
-				viewer.setModel(viewer.model);
-				var r = DCaseAPI.update({
-					argument_id: viewer.opts.argument_id,
-					node_id: node.id,
-					description: node.text
-				});
-			});
-		}
-	}
+	//this.actEditSelectedNode = function() {
+	//	var view = viewer.getSelectedNode();
+	//	if(view != null) {
+	//		DNodeEditWindow.open(view.node, function(node) {
+	//			viewer.setModel(viewer.model);
+	//			//var r = DCaseAPI.update({
+	//			//	argument_id: viewer.opts.argument_id,
+	//			//	node_id: node.id,
+	//			//	description: node.text
+	//			//});
+	//		});
+	//	}
+	//}
 
 	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {
-				view.node.addChild(newNode);
-				viewer.setModel(viewer.model);
-				var r = DCaseAPI.insert({
-					new: {
-						type: newNode.type,
-						description: newNode.text,
-					},
-					argument_id: viewer.opts.argument_id,
-					parent: {
-						argument_id: viewer.opts.argument_id,
-						node_id: view.node.id,
-					}
-				});
-				newNode.id = r.node_id;
+				var op = new InsertOperation(view.node, newNode);
+				viewer.applyOperation(op);
 			});
 		}
 	}
@@ -50,15 +38,11 @@ var SideMenu = function(root, viewer) {
 	this.actRemoveSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			if(confirm("ノードを削除しますか？")) {
-				var parent = view.node.parents;
-				if(parent.length > 0) {
-					parent[0].removeChild(view.node);
-					viewer.setModel(viewer.model);
-					var r = DCaseAPI.del({
-						argument_id: viewer.opts.argument_id,
-						node_id: view.node.id,
-					});
+			var parent = view.node.parents;
+			if(parent.length > 0) {
+				if(confirm("ノードを削除しますか？")) {
+					var op = new RemoveOperation(parent, view.node);
+					viewer.applyOperation(op);
 				}
 			}
 		}
@@ -72,13 +56,6 @@ var SideMenu = function(root, viewer) {
 	this.actExportPng = function() {
 		//TODO
 		alert("TODO");
-	}
-
-	this.actCommit = function() {
-		var msg = prompt("コミットメッセージを入力して下さい");
-		if(msg != null) {
-			DCaseAPI.commit(msg);
-		}
 	}
 
 	this.show = function(m) {
@@ -196,8 +173,19 @@ var SideMenu = function(root, viewer) {
 			.appendTo(root);
 
 	$("#menu-tool-commit").click(function() {
-		self.actCommit();
+		var msg = prompt("コミットメッセージを入力して下さい");
+		if(msg != null) {
+			//DCaseAPI.commit(msg);
+			viewer.commit(msg);
+		}
 	});
 
+	$("#menu-tool-undo").click(function() {
+		viewer.undo();
+	});
+
+	$("#menu-tool-redo").click(function() {
+		viewer.redo();
+	});
 }
 
