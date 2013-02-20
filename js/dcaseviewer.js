@@ -225,9 +225,9 @@ DCaseViewer.prototype.showTimeline = function(dom_id) {
 	
 	console.log(dates);
 	var timeline =  {
-		"headline":"The Main Timeline Headline Goes here",
-		"type":"default",
-		"text":"",
+		"headline": "The Main Timeline Headline Goes here",
+		"type": "default",
+		"text": "",
 		"asset": {
 			"credit":"Credit Name Goes Here",
 			"caption":"Caption text goes here"
