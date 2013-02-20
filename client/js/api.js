@@ -2,7 +2,7 @@ var DCaseAPIModule = (function() {
     function DCaseAPI(url) {
         this.cgi = url;
     }
-    DCaseAPI.call = function(method, params) {
+    DCaseAPI.prototype.call = function(method, params) {
         var cmd = {
             jsonrpc: '2.0',
             method: method,
@@ -11,7 +11,7 @@ var DCaseAPIModule = (function() {
         };
         var res = $.ajax({
             type: 'POST',
-            url: DCaseAPI.cgi,
+            url: this.cgi,
             async: false,
             data: JSON.stringify(cmd),
             dataType: 'json',
@@ -29,27 +29,27 @@ var DCaseAPIModule = (function() {
         }
     };
 
-    DCaseAPI.get = function(filter, id) {
+    DCaseAPI.prototype.get = function(filter, id) {
         return this.call('get', { filter: filter, argument_id: id });
     };
 
-    DCaseAPI.update = function(args) {
+    DCaseAPI.prototype.update = function(args) {
         return this.call('update', args);
     };
 
-    DCaseAPI.insert = function(args) {
+    DCaseAPI.prototype.insert = function(args) {
         return this.call('insert', args);
     };
 
-    DCaseAPI.del = function(args) {
+    DCaseAPI.prototype.del = function(args) {
         return this.call('delete', args);
     };
 
-    DCaseAPI.commit = function(msg) {
+    DCaseAPI.prototype.commit = function(msg) {
         return this.call('commit', { message: msg });
     };
 
-    DCaseAPI.search = function(args) {
+    DCaseAPI.prototype.search = function(args) {
         return this.call('FindNodeByDescription', args);
     };
 
