@@ -1,125 +1,102 @@
-/* class DNode */
-var DNode = function(id, name, type, text) {
+//-----------------------------------------------------------------------------
+
+var DNode = function(id, name, type, desc) {
 	this.id = id;
 	this.name = name;
-	this.text = text;
+	this.desc = desc;
 	this.type = type;
 	this.children = [];
 	this.context = null;
 	this.parents = [];
 	this.prevVersion = null;
 	this.nextVersion = null;
-}
 
-DNode.prototype.addChild = function(node) {
-	if(node.type != "Context") {
+	this.updateFlags();
+	if(type == "DScriptEvidence") {
+		this.isDScript = false;
+	}
+	if(type == "Context" || type == "DScriptContext") {
+		this.isContext = true;
+	}
+};
+
+DNode.prototype.isContext = false;
+DNode.prototype.isArgument = false;
+DNode.prototype.isUndeveloped = false;
+DNode.prototype.isDScript = false;
+
+//-----------------------------------------------------------------------------
+
+DNode.prototype.getNodeCount = function() {
+	return this.children.length + (this.context != null ? 1 : 0);
+};
+
+DNode.prototype.eachNode = function(f) {
+	$.each(this.children, function(i, node) {
+		f(node);
+	});
+	$.each(this.contexts, function(i, node) {
+		f(node);
+	});
+};
+
+DNode.prototype.traverse = function(f, parent, index) {
+	f(this, parent, index);
+	var self = this;
+	$.each(this.children, function(i, node) {
+		node.traverse(f, self, i);
+	});
+	$.each(this.contexts, function(i, node) {
+		node.traverse(f, self, i);
+	});
+};
+
+//-----------------------------------------------------------------------------
+
+DNode.prototype.addChild = function(node, index) {
+	// TODO index
+	if(!node.isContext) {
 		this.children.push(node);
 	} else {
 		this.context = node;
 	}
 	node.parents.push(this);
-}
+	this.updateFlags();
+};
 
 DNode.prototype.removeChild = function(node) {
 	if(this.context == node) {
 		this.context = null;
 	} else {
 		var n = this.children.indexOf(node);
-		this.children.splice(n, 1);
-	}
-}
-
-DNode.prototype.isArgument = function() {
-	return this.context != null && this.type == "Goal";
-}
-
-DNode.prototype.isUndevelop = function() {
-	return this.children.length == 0 && this.type == "Goal";
-}
-
-DNode.getTypes = function() {
-	return [
-			"Goal", "Context", "Strategy", "Evidence", "Monitor", "DScript", "Rebuttal",
-	];
-}
-
-//-------------------------------------
-// FIXME?
-var DSCRIPT_PREF = "D-Script:";
-var DSCRIPT_PREF_CONTEXT = "D-Script.Name:";
-DNode.prototype.isDScript = function() {
-	return this.type == "DScript";
-	//return this.type === "Evidence" && this.text.indexOf(DSCRIPT_PREF) == 0;
-}
-
-DNode.prototype.getDScriptNameInEvidence = function() {
-	return this.text.substr(DSCRIPT_PREF.length);
-}
-
-DNode.prototype.getDScriptNameInContext = function() {
-	if(this.type == "Context" && this.text.indexOf(DSCRIPT_PREF_CONTEXT) == 0) {
-		return this.text.substr(DSCRIPT_PREF_CONTEXT.length);
-	} else {
-		return null;
-	}
-}
-
-//-------------------------------------
-function createNodeFromURL(url) {
-	var a = $.ajax({
-		type: "GET",
-		url : url,
-		async: false,
-		dataType: "json",
-	});
-	return createNodeFromJson(JSON.parse(a.responseText));
-}
-
-function contextParams(params) {
-	var s = "";
-	for(key in params) {
-		s += "@" + key + " : " + params[key] + "\n";
-	}
-	return s;
-}
-
-function createNodeFromJson(json) {
-	console.log(json);
-	var nodes = [];
-	for(var i=0; i<json.NodeList.length; i++) {
-		var c = json.NodeList[i];
-		nodes[c.ThisNodeId] = c;
-	}
-	var counts = {};
-	var types = DNode.getTypes();
-	for(var i=0; i<types.length; i++) {
-		counts[types[i]] = 1;
-	}
-	function create(id) {
-		var data = nodes[id];
-		var type = data.NodeType;
-		var name = type[0] + (counts[type]++);
-		var desc = data.Description;
-		var node = new DNode(id, name, type, desc);
-		for(var i=0; i<data.Children.length; i++) {
-			node.addChild(create(data.Children[i]));
+		if(n != -1) {
+			this.children.splice(n, 1);
 		}
-		return node;
 	}
-	var topId = json.TopGoalId;
-	return create(topId);
-}
+	this.updateFlags();
+};
 
-function createBinNode(n) {
-	if(n > 0) {
-		var node = new DNode(0, "Goal", "Goal", "description");
-		node.addChild(createBinNode(n-1));
-		node.addChild(createBinNode(n-1));
-		return node;
-	} else {
-		return new DNode(0, "Goal", "Goal", "description");
+DNode.prototype.updateFlags = function() {
+	if(this.type == "Goal") {
+		this.isArgument = this.context != null;
+		this.isUndeveloped = this.children.length == 0;
 	}
-}
+};
+
+DNode.prototype.getHtmlDescription = function() {
+	if(this.desc == "") {
+		return "<font color=\"gray\">(no description)</font>";
+	} else {
+		return this.desc
+			.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+			.replace(/\n/g, "<br>");
+	}
+};
+
+DNode.TYPES = [
+	"Goal", "Context", "DScriptContext",
+	"Strategy", "Evidence", "DScriptEvidence", "Rebuttal"
+];
 
 var id_count = 1;
 function createNodeFromJson2(json) {

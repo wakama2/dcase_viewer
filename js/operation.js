@@ -60,10 +60,10 @@ var EditOperation = function(node, prevDesc, nextDesc) {
 EditOperation.prototype = Object.create(DNodeOperation.prototype);
 
 EditOperation.prototype.undo = function() {
-	this.node.text = this.prevDesc;//FIXME
+	this.node.desc = this.prevDesc;
 };
 
 EditOperation.prototype.redo = function() {
-	this.node.text = this.nextDesc;//FIXME
+	this.node.desc = this.nextDesc;
 };
 

@@ -41,20 +41,12 @@ body {
 <script type="text/javascript" src="js/operation.js"></script>
 <script type="text/javascript">
 
-function getNodeFromServer() {
-	var args = DCaseAPI.call("getArgumentList", {});
-	var tree = DCaseAPI.call("getNodeTree", { BelongedArgumentId: args.id[0]});
-	var node = createNodeFromJson(tree.Tree);
-	return node;
-}
-
 window.addEventListener("load",function() {
 	//var node = createSampleNode();
-	var node = getNodeFromServer();
-	var opts = {
-		argument_id: "1",//FIXME
-	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
+	var args = DCaseAPI.call("getArgumentList", {});
+	var tree = DCaseAPI.call("getNodeTree", { BelongedArgumentId: args.id[0]});
+	var node = DCaseAPI.createNode(tree.Tree);
+	var viewer = new DCaseViewer(document.getElementById("viewer"), node);
 	var menu = new SideMenu(document.body, viewer);
 
 	viewer.showTimeline('timeline-embed');

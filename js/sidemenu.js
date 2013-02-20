@@ -147,7 +147,7 @@ var SideMenu = function(root, viewer) {
 			.appendTo(root);
 	
 	(function() {
-		var types = DNode.getTypes();
+		var types = DNode.TYPES;
 		var count = {};
 		for(var i=0; i<types.length; i++) {
 			count[types[i]] = 0;

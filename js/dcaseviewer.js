@@ -192,7 +192,7 @@ DCaseViewer.prototype.showToolbox = function(node) {
 
 			$("#toolbar .tool-left").css("display", data.prevVersion != null ? "inline" : "none");
 			$("#toolbar .tool-right").css("display", data.nextVersion != null ? "inline" : "none");
-			$("#toolbar .tool-play").css("display", data.isDScript() ? "inline" : "none");
+			$("#toolbar .tool-play").css("display", data.isDScript ? "inline" : "none");
 			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
 			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
 			$("#timeline").css("display", "block");
