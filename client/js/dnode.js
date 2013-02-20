@@ -181,6 +181,11 @@ function initViewer(id) {
 	var opts = {
 		argument_id: id,
 	};
+	console.log('init viewer');
+	delete DCase_Viewer;
+	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
+	console.log(node);
 	DCase_Viewer.setModel(node);
+	console.log(DCase_Viewer.rootview);
 }
 

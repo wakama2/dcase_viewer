@@ -81,6 +81,8 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 DCaseViewer.prototype.repaintAll = function(ms) {
 	var self = this;
 	var rootview = self.rootview;
+	console.log(self.rootview);
+	console.log(self);
 	rootview.updateLocation(
 			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
 	var a = new Animation();

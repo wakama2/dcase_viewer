@@ -1,24 +1,24 @@
 var SideMenu = function(root, viewer) {
-	this.viewer = viewer;
+	//this.viewer = viewer;
 	var width = 200;
 	var animeTime = 250;
 	var self = this;
 
 	//--------------------------------------------------------
 	this.actChangeLock = function() {
-		var flag = !this.viewer.getDragLock();
-		this.viewer.setDragLock(flag);
+		var flag = !viewer.getDragLock();
+		viewer.setDragLock(flag);
 		this.value = flag ? "lock" : "unlock";
-		this.viewer.setTextSelectable(!flag);
+		viewer.setTextSelectable(!flag);
 	}
 
 	this.actEditSelectedNode = function() {
-		var view = this.viewer.getSelectedNode();
+		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(view.node, function(node) {
-				this.viewer.setModel(this.viewer.model);
+				viewer.setModel(viewer.model);
 				var r = DCaseAPI.update({
-					argument_id: this.viewer.opts.argument_id,
+					argument_id: viewer.opts.argument_id,
 					node_id: node.id,
 					description: node.text
 				});
@@ -27,19 +27,19 @@ var SideMenu = function(root, viewer) {
 	}
 
 	this.actInsertToSelectedNode = function() {
-		var view = this.viewer.getSelectedNode();
+		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {
 				view.node.addChild(newNode);
-				this.viewer.setModel(this.viewer.model);
+				viewer.setModel(viewer.model);
 				var r = DCaseAPI.insert({
 					new: {
 						type: newNode.type,
 						description: newNode.text,
 					},
-					argument_id: this.viewer.opts.argument_id,
+					argument_id: viewer.opts.argument_id,
 					parent: {
-						argument_id: this.viewer.opts.argument_id,
+						argument_id: viewer.opts.argument_id,
 						node_id: view.node.id,
 					}
 				});
@@ -49,15 +49,15 @@ var SideMenu = function(root, viewer) {
 	}
 
 	this.actRemoveSelectedNode = function() {
-		var view = this.viewer.getSelectedNode();
+		var view = viewer.getSelectedNode();
 		if(view != null) {
 			if(confirm("ノードを削除しますか？")) {
 				var parent = view.node.parents;
 				if(parent.length > 0) {
 					parent[0].removeChild(view.node);
-					this.viewer.setModel(this.viewer.model);
+					viewer.setModel(viewer.model);
 					var r = DCaseAPI.del({
-						argument_id: this.viewer.opts.argument_id,
+						argument_id: viewer.opts.argument_id,
 						node_id: view.node.id,
 					});
 				}
@@ -130,7 +130,7 @@ var SideMenu = function(root, viewer) {
 					//.html("<li>" + name + "<ul>" + desc + "</ul></li>")
 					.click(function() {
 						initViewer(result.Node.BelongedArgumentId);
-						//this.viewer.centerize(v, 500);
+						//viewer.centerize(v, 500);
 					})
 					.appendTo($field);
 		};
@@ -153,7 +153,7 @@ var SideMenu = function(root, viewer) {
 	//				.html("<li>" + name + "</li>")
 	//				//.html("<li>" + name + "<ul>" + desc + "</ul></li>")
 	//				.click(function() {
-	//					this.viewer.centerize(v, 500);
+	//					viewer.centerize(v, 500);
 	//				})
 	//				.appendTo($res);
 	//	};
@@ -168,7 +168,7 @@ var SideMenu = function(root, viewer) {
 	//		}
 	//		v.forEachNode(cmp);
 	//	}
-	//	cmp(this.viewer.rootview);
+	//	cmp(viewer.rootview);
 	//}
 
 	//var prev_isesarch = "";
