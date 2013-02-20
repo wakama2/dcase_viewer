@@ -87,7 +87,7 @@ window.addEventListener("load",function() {
 
 	$(".tool-play").click(function() {
 		var v = viewer.getSelectedNode();
-		viewer.showDScriptExecuteWindow(v.node.getDScriptNameInEvidence());
+		viewer.showDScriptExecuteWindow(v.node.name);
 	});
 
 	// hide url bar for ipod touch
