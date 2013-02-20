@@ -2,7 +2,7 @@ var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
 function toHTML(txt) {
     if (txt == '') {
-        return '<font color=gray>(no description)</font>';
+        return '<font color=' + CONFIG.DefaultTextColor + '>(no description)</font>';
     }
     var x = txt
     .replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -25,13 +25,13 @@ var DNodeView = function(viewer, node) {
 
     if (node.isUndevelop()) {
         this.svgUndevel = $(document.createElementNS(SVG_NS, 'polygon')).attr({
-            fill: 'none', stroke: 'gray'
+            fill: 'none', stroke: CONFIG.Color.UndevelopedEntity
         }).appendTo(viewer.svgroot);
     }
     this.argumentBorder = null;
     if (node.isArgument()) {
         this.argumentBorder = $(document.createElementNS(SVG_NS, 'rect')).attr({
-            stroke: '#8080D0',
+            stroke: CONFIG.Color.ArgumentStroke,
             fill: 'none',
             'stroke-dasharray': 3
         }).appendTo(viewer.svgroot);
@@ -58,7 +58,7 @@ var DNodeView = function(viewer, node) {
     this.lines = [];
     this.contextLine = null;
     // for animation
-    this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };//200, h: this.div.height() + 60 };
+    this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };
     this.visible = true;
     this.childVisible = true;
 
@@ -97,7 +97,7 @@ var DNodeView = function(viewer, node) {
                     top: self.divText.attr('top'),
                     width: '400px',
                     height: '300px',
-                    background: '#CCC',
+                    background: CONFIG.Color.TextArea,
                     borderStyle: 'none',
                     resizable: false,
                     zIndex: 99
@@ -186,7 +186,9 @@ DNodeView.prototype.initSvg = function(type) {
         var o = root.createSvg('g');
         var o1 = root.createSvg('rect');
         var o2 = root.createSvg('polygon');
-        $(o2).attr({ stroke: 'gray', fill: 'gray' });
+        $(o2).attr({
+            stroke: CONFIG.Color.DScriptContextStroke,
+            fill: CONFIG.Color.DScriptContextBackGround });
         o.appendChild(o1);
         o.appendChild(o2);
         o.setBounds = function(a, x, y, w, h) {
@@ -243,7 +245,9 @@ DNodeView.prototype.initSvg = function(type) {
     } else if (type == 'DScriptEvidence') {
         var o1 = root.createSvg('ellipse');
         var o2 = root.createSvg('polygon');
-        $(o2).attr({ stroke: 'gray', fill: 'gray' });
+        $(o2).attr({
+            stroke: CONFIG.Color.DScriptEvidenceStroke,
+            fill: CONFIG.Color.DScriptEvidenceBackGround });
         var o = root.createSvg('g');
         o.appendChild(o1);
         o.appendChild(o2);
@@ -273,8 +277,11 @@ DNodeView.prototype.initSvg = function(type) {
 };
 
 function getColorByState(node) {
-    if (node.type == 'Rebuttal') return '#FF8080';
-    return node.isEvidence ? '#80FF80' : '#E0E0E0';
+    if (node.type == 'Rebuttal')
+        return CONFIG.Color.RebuttalBackGround;
+    if (node.isEvidence)
+        return CONFIG.Color.EvidenceBackGround;
+    return CONFIG.Color.DefaultBackGround;
 }
 
 DNodeView.prototype.forEachNode = function(f) {
@@ -314,7 +321,7 @@ DNodeView.prototype.addChild = function(view) {
         var l = this.viewer.createSvg('line');
         $(l).attr({
             fill: 'none',
-            stroke: '#404040',
+            stroke: CONFIG.Color.DefaultStroke,
             x1: 0, y1: 0, x2: 0, y2: 0,
             'marker-end': 'url(#Triangle-black)'
         });
@@ -327,7 +334,7 @@ DNodeView.prototype.addChild = function(view) {
         $(l).attr({
             d: 'M0,0 C0,0 0,0 0,0',
             fill: 'none',
-            stroke: '#404040',
+            stroke: CONFIG.Color.DefaultStroke,
             'marker-end': 'url(#Triangle-black)'
         });
 
@@ -448,7 +455,7 @@ DNodeView.prototype.animeStart = function(a) {
 
     this.svg.setAttribute('fill', getColorByState(this.node));
     if (this.viewer.selectedNode == this) {
-        this.svg.setAttribute('stroke', 'orange');
+        this.svg.setAttribute('stroke', CONFIG.Color.FocusedEntity);
     } else {
         this.svg.setAttribute('stroke', 'none');
     }

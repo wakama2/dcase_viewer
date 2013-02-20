@@ -87,7 +87,8 @@ DCaseViewer.prototype.repaintAll = function(ms) {
     console.log(self.rootview);
     console.log(self);
     rootview.updateLocation(
-            (self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
+            (self.shiftX + self.dragX) / self.scale,
+            (self.shiftY + self.dragY) / self.scale);
     var a = new Animation();
     rootview.animeStart(a);
     if (ms == 0) {
