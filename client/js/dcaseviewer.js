@@ -37,6 +37,8 @@ DCaseViewer.prototype.setModel = function(model) {
 	$(this.root)
 		.empty()
 		.append(this.svgroot);
+	this.model = model;
+	if(model == null) return;
 
 	var self = this;
 	function create(node) {
@@ -50,7 +52,6 @@ DCaseViewer.prototype.setModel = function(model) {
 		return view;
 	}
 	this.rootview = create(model);
-	this.model = model;
 
 	setTimeout(function() {
 		function f(v) {

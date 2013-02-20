@@ -69,7 +69,6 @@ function contextParams(params) {
 }
 
 function createNodeFromJson(json) {
-	//console.log(json);
 	var nodes = new Object();
 	for(var i=0; i<json.Tree.NodeList.length; i++) {
 		var c = json.Tree.NodeList[i];
@@ -182,7 +181,6 @@ function initViewer(id) {
 	var opts = {
 		argument_id: id,
 	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
-	var menu = new SideMenu(document.body, viewer);
+	DCase_Viewer.setModel(node);
 }
 

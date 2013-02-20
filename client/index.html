@@ -50,16 +50,12 @@ function getNodeFromServer(id) {
 	return node;
 }
 
+// sorry matz.
+var DCase_Viewer;
+
 window.addEventListener("load",function() {
-	//var node = createSampleNode();
-	//var id = "1";
-	////var node = getNodeFromServer(id);
-	//var opts = {
-	//	argument_id: id,
-	//};
-	//var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
-	//var menu = new SideMenu(document.body, viewer);
-	var menu = new SideMenu(document.body, null);
+	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), null);
+	var menu = new SideMenu(document.body, viewer);
 
 	$(".tool-new").click(function() {
 		menu.actInsertToSelectedNode();
@@ -130,6 +126,7 @@ window.addEventListener("load",function() {
 		<i class="icon-search"></i>
 	</div>
 	<div id="menu-search" class="menu-box">
+		<p>search query</p>
 		<input type="text"></input>
 		<ul style="list-style-type: none; overflow: auto;"></ul>
 	</div>
