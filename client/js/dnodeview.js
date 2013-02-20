@@ -25,13 +25,13 @@ var DNodeView = function(viewer, node) {
 
     if (node.isUndevelop()) {
         this.svgUndevel = $(document.createElementNS(SVG_NS, 'polygon')).attr({
-            fill: 'none', stroke: CONFIG.Color.UndevelopedEntity
+            fill: 'none', stroke: CONFIG.Color.Stroke.UndevelopedEntity
         }).appendTo(viewer.svgroot);
     }
     this.argumentBorder = null;
     if (node.isArgument()) {
         this.argumentBorder = $(document.createElementNS(SVG_NS, 'rect')).attr({
-            stroke: CONFIG.Color.ArgumentStroke,
+            stroke: CONFIG.Color.Stroke.Argument,
             fill: 'none',
             'stroke-dasharray': 3
         }).appendTo(viewer.svgroot);
@@ -147,141 +147,166 @@ var DNodeView = function(viewer, node) {
     //});
 };
 
+function CreateGoal(Viewer, root) {
+    var n = 10;
+    var o = root.createSvg('rect');
+    o.setBounds = function(a, x, y, w, h) {
+        a.moves(this, {
+            x: x,
+            y: y,
+            width: w,
+            height: h
+        });
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w + n * 2, h: h + n * 2 };
+    };
+    o.offset = { x: n, y: n };
+    return o;
+}
+function CreateContext(Viewer, root) {
+    var n = 20;
+    var o = root.createSvg('rect');
+    o.setBounds = function(a, x, y, w, h) {
+        a.moves(this, {
+            rx: n * root.scale,
+            ry: n * root.scale,
+            x: x,
+            y: y,
+            width: w,
+            height: h
+        });
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w + n, h: h + n };
+    };
+    o.offset = { x: n / 2, y: n / 2 };
+
+    return o;
+}
+function CreateStrategy(Viewer, root) {
+    var o = root.createSvg('polygon');
+    o.setBounds = function(a, x, y, w, h) {
+        var n = 20 * root.scale;
+        a.movePolygon(this, [
+            { x: x + n, y: y },
+            { x: x + w, y: y },
+            { x: x + w - n, y: y + h },
+            { x: x, y: y + h }
+        ]);
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w + 20 * 2, h: h + 10 * 2 };
+    };
+    o.offset = { x: 25, y: 10 };
+    return o;
+}
+function CreateDScriptContext(Viewer, root) {
+    var o = root.createSvg('g');
+    var o1 = root.createSvg('rect');
+    var o2 = root.createSvg('polygon');
+    $(o2).attr({
+        stroke: CONFIG.Color.Stroke.DScriptContext,
+        fill: CONFIG.Color.BackGround.DScriptContext });
+    o.appendChild(o1);
+    o.appendChild(o2);
+    o.setBounds = function(a, x, y, w, h) {
+        var n = 20 * root.scale;
+        a.moves(o1, {
+            rx: n,
+            ry: n,
+            x: x,
+            y: y,
+            width: w,
+            height: h
+        });
+        a.movePolygon(o2, [
+            { x: x + w * 5 / 8, y: y - n },
+            { x: x + w * 5 / 8, y: y + n },
+            { x: x + w * 5 / 8 + n * 2, y: y }
+        ]);
+        o.offset = { x: n / 2, y: n / 2 };
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w + 20, h: h + 20 };
+    };
+    o.offset = { x: 1, y: 1 };
+    return o;
+}
+function CreateDScriptEvidence(Viewer, root) {
+    var o1 = root.createSvg('ellipse');
+    var o2 = root.createSvg('polygon');
+    $(o2).attr({
+        stroke: CONFIG.Color.Stroke.DScriptEvidence,
+        fill: CONFIG.Color.BackGround.DScriptEvidence });
+    var o = root.createSvg('g');
+    o.appendChild(o1);
+    o.appendChild(o2);
+    o.setBounds = function(a, x, y, w, h) {
+        a.moves(o1, {
+            cx: x + w / 2,
+            cy: y + h / 2,
+            rx: w / 2,
+            ry: h / 2
+        });
+        var n = 20 * root.scale;
+        a.movePolygon(o2, [
+            { x: x + w * 5 / 8, y: y - n },
+            { x: x + w * 5 / 8, y: y + n },
+            { x: x + w * 5 / 8 + n * 2, y: y }
+        ]);
+        o.offset = { x: w / 6 / root.scale, y: h / 6 / root.scale };
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w * 8 / 6, h: h * 8 / 6 };
+    };
+    o.offset = { x: 200 / 6, y: 200 / 6 };
+
+    return o;
+}
+function CreateCommonNode(Viewer, root) {
+    var o = root.createSvg('ellipse');
+    o.setBounds = function(a, x, y, w, h) {
+        a.moves(this, {
+            cx: x + w / 2,
+            cy: y + h / 2,
+            rx: w / 2,
+            ry: h / 2
+        });
+        o.offset = { x: w / 6 / root.scale, y: h / 6 / root.scale };
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w * 8 / 6, h: h * 8 / 6 };
+    };
+    o.offset = { x: 0, y: 0 };
+    return o;
+}
+
 DNodeView.prototype.initSvg = function(type) {
-    var o = null;
     var root = this.viewer;
     if (type == 'Goal') {
-        var n = 10;
-        o = root.createSvg('rect');
-        o.setBounds = function(a, x, y, w, h) {
-            a.moves(this, {
-                x: x,
-                y: y,
-                width: w,
-                height: h
-            });
-        };
-        this.getOuterSize = function(w, h) {
-            return { w: w + n * 2, h: h + n * 2 };
-        };
-        o.offset = { x: n, y: n };
+        return CreateGoal(this, root);
     } else if (type == 'Context') {
-        var n = 20;
-        o = root.createSvg('rect');
-        o.setBounds = function(a, x, y, w, h) {
-            a.moves(this, {
-                rx: n * root.scale,
-                ry: n * root.scale,
-                x: x,
-                y: y,
-                width: w,
-                height: h
-            });
-        };
-        this.getOuterSize = function(w, h) {
-            return { w: w + n, h: h + n };
-        };
-        o.offset = { x: n / 2, y: n / 2 };
+        return CreateContext(this, root);
     } else if (type == 'DScriptContext') {
-        var o = root.createSvg('g');
-        var o1 = root.createSvg('rect');
-        var o2 = root.createSvg('polygon');
-        $(o2).attr({
-            stroke: CONFIG.Color.DScriptContextStroke,
-            fill: CONFIG.Color.DScriptContextBackGround });
-        o.appendChild(o1);
-        o.appendChild(o2);
-        o.setBounds = function(a, x, y, w, h) {
-            var n = 20 * root.scale;
-            a.moves(o1, {
-                rx: n,
-                ry: n,
-                x: x,
-                y: y,
-                width: w,
-                height: h
-            });
-            a.movePolygon(o2, [
-                { x: x + w * 5 / 8, y: y - n },
-                { x: x + w * 5 / 8, y: y + n },
-                { x: x + w * 5 / 8 + n * 2, y: y }
-            ]);
-            o.offset = { x: n / 2, y: n / 2 };
-        };
-        this.getOuterSize = function(w, h) {
-            return { w: w + 20, h: h + 20 };
-        };
-        o.offset = { x: 1, y: 1 };
+        return CreateDScriptContext(this, root);
     } else if (type == 'Strategy') {
-        o = root.createSvg('polygon');
-        o.setBounds = function(a, x, y, w, h) {
-            var n = 20 * root.scale;
-            a.movePolygon(this, [
-                { x: x + n, y: y },
-                { x: x + w, y: y },
-                { x: x + w - n, y: y + h },
-                { x: x, y: y + h }
-            ]);
-        };
-        this.getOuterSize = function(w, h) {
-            return { w: w + 20 * 2, h: h + 10 * 2 };
-        };
-        o.offset = { x: 25, y: 10 };
-    } else if (type == 'Evidence' || type == 'Monitor' || type == 'Rebuttal') {
-        o = root.createSvg('ellipse');
-        o.setBounds = function(a, x, y, w, h) {
-            a.moves(this, {
-                cx: x + w / 2,
-                cy: y + h / 2,
-                rx: w / 2,
-                ry: h / 2
-            });
-            o.offset = { x: w / 6 / root.scale, y: h / 6 / root.scale };
-        };
-        this.getOuterSize = function(w, h) {
-            return { w: w * 8 / 6, h: h * 8 / 6 };
-        };
-        o.offset = { x: 0, y: 0 };
+        return CreateStrategy(this, root);
     } else if (type == 'DScriptEvidence') {
-        var o1 = root.createSvg('ellipse');
-        var o2 = root.createSvg('polygon');
-        $(o2).attr({
-            stroke: CONFIG.Color.DScriptEvidenceStroke,
-            fill: CONFIG.Color.DScriptEvidenceBackGround });
-        var o = root.createSvg('g');
-        o.appendChild(o1);
-        o.appendChild(o2);
-        o.setBounds = function(a, x, y, w, h) {
-            a.moves(o1, {
-                cx: x + w / 2,
-                cy: y + h / 2,
-                rx: w / 2,
-                ry: h / 2
-            });
-            var n = 20 * root.scale;
-            a.movePolygon(o2, [
-                { x: x + w * 5 / 8, y: y - n },
-                { x: x + w * 5 / 8, y: y + n },
-                { x: x + w * 5 / 8 + n * 2, y: y }
-            ]);
-            o.offset = { x: w / 6 / root.scale, y: h / 6 / root.scale };
-        };
-        this.getOuterSize = function(w, h) {
-            return { w: w * 8 / 6, h: h * 8 / 6 };
-        };
-        o.offset = { x: 200 / 6, y: 200 / 6 };
-    } else {
-        throw type + ' is not GSN type';
+        return CreateDScriptEvidence(this, root);
+    } else if (type == 'Evidence' || type == 'Monitor' || type == 'Rebuttal') {
+        return CreateCommonNode(this, root);
     }
-    return o;
+    /* unreachable */
+    throw type + ' is not GSN type';
 };
 
 function getColorByState(node) {
     if (node.type == 'Rebuttal')
-        return CONFIG.Color.RebuttalBackGround;
+        return CONFIG.Color.BackGround.Rebuttal;
     if (node.isEvidence)
-        return CONFIG.Color.EvidenceBackGround;
-    return CONFIG.Color.DefaultBackGround;
+        return CONFIG.Color.BackGround.Evidence;
+    return CONFIG.Color.BackGround.Default;
 }
 
 DNodeView.prototype.forEachNode = function(f) {
@@ -321,7 +346,7 @@ DNodeView.prototype.addChild = function(view) {
         var l = this.viewer.createSvg('line');
         $(l).attr({
             fill: 'none',
-            stroke: CONFIG.Color.DefaultStroke,
+            stroke: CONFIG.Color.Stroke.Default,
             x1: 0, y1: 0, x2: 0, y2: 0,
             'marker-end': 'url(#Triangle-black)'
         });
@@ -334,7 +359,7 @@ DNodeView.prototype.addChild = function(view) {
         $(l).attr({
             d: 'M0,0 C0,0 0,0 0,0',
             fill: 'none',
-            stroke: CONFIG.Color.DefaultStroke,
+            stroke: CONFIG.Color.Stroke.Default,
             'marker-end': 'url(#Triangle-black)'
         });
 
@@ -455,7 +480,7 @@ DNodeView.prototype.animeStart = function(a) {
 
     this.svg.setAttribute('fill', getColorByState(this.node));
     if (this.viewer.selectedNode == this) {
-        this.svg.setAttribute('stroke', CONFIG.Color.FocusedEntity);
+        this.svg.setAttribute('stroke', CONFIG.Color.Stroke.FocusedEntity);
     } else {
         this.svg.setAttribute('stroke', 'none');
     }

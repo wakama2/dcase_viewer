@@ -75,14 +75,15 @@ function createNodeFromJson(json) {
         nodes[String(c.ThisNodeId)] = c;
     }
     function createChildren(node, l) {
-        for (var i = 0; i < l.Children.length; i++) {
-            var child = l.Children[i];
-            var n = nodes[String(child.ThisNodeId)];
+        var childs = l.Children;
+        for (var i = 0; i < childs.length; i++) {
+            var ThisId = childs[i];
+            var n = nodes[ThisId];
             n.Name = n.NodeType.charAt(0) + n.ThisNodeId;
             var desc = n.Description ? n.Description : contextParams(n.Properties);
             var newNode = new DNode(n.ThisNodeId, n.Name, n.NodeType, desc);
             node.addChild(newNode);
-            createChildren(newNode, child);
+            createChildren(newNode, n);
         }
     }
     var n = nodes[String(json.Tree.TopGoalId)];

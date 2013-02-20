@@ -1,21 +1,28 @@
 var CONFIG = {
     cgi_url: 'http://localhost/cgi-bin/api.cgi',
     Color : {
-      TextArea : '#CCC',
-      DefaultText : 'black',
-
-      DefaultStroke : '#ff00ff',
-      UndevelopedEntityStroke : 'pink',
-      ArgumentStroke : '#8080D0',
-      FocusedEntityStroke  : 'read',
-
-      DScriptContextStroke: '#999900',
-      DScriptEvidenceStroke: '#999900',
-
-      DefaultBackGround : 'green',
-      DScriptContextBackGround: '#009999',
-      DScriptEvidenceBackGround: '#009999',
-      RebuttalBackGround : 'red',
-      EvidenceBackGround : 'blue',
+        TextArea : '#dbf5f3',
+        DefaultText : 'black',
+        Stroke : {
+            Default : 'black',
+            Argument : '#8080D0',
+            FocusedEntity  : 'red',
+            DScriptContext: 'pink',
+            DScriptEvidence: 'red',
+            UndevelopedEntity : 'pink'
+        },
+        BackGround : {
+            Default : '#dbf5f3',
+            Goal : '#dbf5f3',
+            DScriptContext: 'blue',
+            DScriptEvidence: 'gray',
+            Rebuttal : '#FF6D45',
+            Evidence : '#80FF80'
+        }
     }
 };
+
+//#b4d8df
+//#ffffff
+//#08bab5
+//#6adbd8
