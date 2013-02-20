@@ -37,12 +37,10 @@ var DNode = (function() {
         return this.children.length == 0 && this.type == 'Goal';
     };
 
-    DNode.prototype.getTypes = function() {
-        return [
-            'Goal', 'Context', 'Strategy', 'Evidence', 'Monitor',
-            'DScriptContext', 'DScriptEvidence', 'Rebuttal'
-        ];
-    };
+    DNode.NODE_TYPES = [
+        'Goal', 'Context', 'Strategy', 'Evidence', 'Monitor',
+        'DScriptContext', 'DScriptEvidence', 'Rebuttal'
+    ];
 
     //-------------------------------------
     DNode.prototype.isDScript = function() {

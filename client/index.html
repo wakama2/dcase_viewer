@@ -54,7 +54,7 @@ function getNodeFromServer(id) {
 var DCase_Viewer;
 
 window.addEventListener("load",function() {
-	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), null);
+	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), {});
 	var menu = new SideMenu(document.body, DCase_Viewer);
 
 	$(".tool-new").click(function() {
