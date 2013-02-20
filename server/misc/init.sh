@@ -1,4 +1,2 @@
 #!/bin/bash
-mysql -u root -p < drop.sql
-mysql -u root -p < DCaseCloud.sql
-mysql -u root -p < init.sql
+cat drop.sql DCaseCloud.sql init.sql|mysql -u root -p
