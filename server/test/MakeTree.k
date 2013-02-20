@@ -5,6 +5,7 @@ Import("JavaScript.Array");
 void main() {
 	DCaseModel model = new DCaseModel("dcasedb","dcasedb");
 	int id = model.CreateTopGoal("description test",1,"this is the test justification","foo commiter");
+	System.p(id);
 	Json nodeTree = model.GetNodeTree(id);
 	System.p(nodeTree);
 	int top_id = nodeTree.getInt("TopGoalId");

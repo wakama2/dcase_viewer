@@ -191,7 +191,7 @@ class DCaseModel {
 	}
 
 	Json GetNodeList(int snapshot_id) {
-		PreparedStatement q = this.db.newPreparedStatement("SELECT node_data.id AS node_id,node_identity_id, url, description, delete_flag,type_name,argument_id FROM node_data INNER JOIN snapshot_has_node_data ON node_data_id=node_data.id  INNER JOIN node_type ON node_type_id=node_type.id WHERE snapshot_id=?");
+		PreparedStatement q = this.db.newPreparedStatement("SELECT node_data.id AS node_id,node_identity_id, url, description, delete_flag,type_name,argument_id FROM node_data INNER JOIN snapshot_has_node_data ON node_data_id=node_data.id  INNER JOIN node_type ON node_type_id=node_type.id INNER JOIN node_identity ON node_data.node_identity_id=node_identity.id WHERE snapshot_id=?");
 		q.setInt("@a", snapshot_id);
 		ResultSet r = q.execute();
 		Json json_array = new Json([]);
