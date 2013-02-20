@@ -1,0 +1,366 @@
+//--------getArgumentList-------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getArgumentList",
+	"params":{}
+}
+//response
+{
+	"jsonrpc":"2.0","version":"1.0",
+	"result":{
+		"ArgumentIdList":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+	}
+}
+
+//--------FindNodeByDescription-------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"FindNodeByDescription",
+	"params":{
+		"SearchText":"hoge"
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"NodeIdList":[1,2,3,4,5,6,7,8,9,10,11]
+	}
+}
+
+//--------FindContextByAttribute-------------
+//request
+{
+	"method":"FindContextByAttribute",
+	"params":{
+		"SearchText":"hoge"
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"NodeIdList":[68]
+	}
+}
+
+//--------CreateTopGoal-------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"CreateTopGoal",
+	"params":{
+		"Justification":"Sample Justification",
+		"Description" :"Sample Description",
+		"Commiter":"uchida",
+		"ProcessType" : 1 
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"BelongedArgumentId":24
+	}
+}
+
+//--------CreateTopGoal-------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"CreateTopGoal",
+	"params":{
+		"Justification":"Sample Justification",
+		"Description" :"Sample Description",
+		"Commiter":"uchida",
+		"ProcessType" : 1 
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"ArgumentId":26
+	}
+}
+
+//----------Commit-----------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"Commit",
+	"params": {
+		"commit":[
+			{
+				"BelongedArgumentId":26,
+				"command":"insert", //insert,replace,delete
+				"NodeList":[
+					{
+						"ParentNodeId":71,
+						"NodeType":"Context",
+						"Description":"test description",
+						"ThisNodeId":0,
+						"PrevNodeId":0,
+						"BelongedArgumentId":26,
+						"Children":[],
+						"Attributes":{"hoge":"hogehjoh"},
+						"NextNodeId":0
+					}
+				]
+			}
+		]
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{}
+}
+
+//--------getNode-------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNode",
+	"params":{
+		"NodeId": 1 
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Node":{
+			"NodeType":"Goal",
+			"Description":"description test",
+			"ThisNodeId":1,
+			"NodeIdentityId":1,
+			"PrevNodeId":0,
+			"Children":[],
+			"DeleteFlag":false,
+			"Attributes":{},
+			"NextNodeId":0,
+			"Url":""
+		}
+	}
+}
+
+//-------------getNodeTree--------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNodeTree",
+	"params":{
+		"BelongedArgumentId":1
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":{
+			"NodeList":[
+				{
+					"NodeType":"Goal",
+					"Description":"description test",
+					"ThisNodeId":1,
+					"NodeIdentityId":1,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				}
+			],
+			"TopGoalId":1,
+			"BelongedArgumentId":1,
+			"SnapshotId":1
+		}
+	}
+}
+
+//-------------getNodeTreeFromSnapshotId--------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNodeTreeFromSnapshotId",
+	"params":{
+		"BelongedArgumentId": 1,
+		"SnapshotId" : 1
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":{
+			"NodeList":[
+				{
+					"NodeType":"Goal",
+					"Description":"description test",
+					"ThisNodeId":1,
+					"NodeIdentityId":1,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				}
+			],
+			"TopGoalId":1,
+			"BelongedArgumentId":1,
+			"SnapshotId":1
+		}
+	}
+}
+
+//-------------getNodeTreeBetween--------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNodeTreeBetween",
+	"params":{
+		"BelongedArgumentId": 25,
+		"StartId" : 35,
+		"EndId" : 36
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":[
+			{
+				"NodeList":[
+					{
+						"NodeType":"Goal",
+						"Description":"description test",
+						"ThisNodeId":71,
+						"NodeIdentityId":74,
+						"PrevNodeId":0,
+						"Children":[],
+						"DeleteFlag":false,
+						"Attributes":{},
+						"NextNodeId":0,
+						"Url":""
+					}
+				],
+				"TopGoalId":71,
+				"BelongedArgumentId":25,
+				"SnapshotId":35
+			},{
+				"NodeList":[
+					{
+						"NodeType":"Goal",
+						"Description":"description test",
+						"ThisNodeId":71,
+						"NodeIdentityId":74,
+						"PrevNodeId":0,
+						"Children":[72],
+						"DeleteFlag":false,
+						"Attributes":{},
+						"NextNodeId":0,
+						"Url":""
+					},{
+						"NodeType":"Context",
+						"Description":"test description",
+						"ThisNodeId":72,
+						"NodeIdentityId":75,
+						"PrevNodeId":0,
+						"Children":[],
+						"DeleteFlag":false,
+						"Attributes":{},
+						"NextNodeId":0,
+						"Url":""
+					}
+				],
+				"TopGoalId":71,
+				"BelongedArgumentId":25,
+				"SnapshotId":36
+			}
+		]
+	}
+}
+
+//-------------OpenProcessContext--------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method" :"OpenProcessContext",
+	"params" :{
+		"Justification" : "Sample Justification",
+		"ProcessType"    : 2,
+		"BelongedArgumentId" : 25,
+		"Commiter" : "uchida"
+	}
+}
+
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"ProcessId":30
+	}
+}
+
+//-------------getProcessContextIds--------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getProcessContextIds",
+	"params":{
+		"BelongedArgumentId":26
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"ProcessIdList":[26,37]
+	}
+}
+
+//-------------getSnapshotList--------------------
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getProcessContextIds",
+	"params":{
+		"BelongedArgumentId":26
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"SnapshotIdList":[41,47,48,49,50,51,52]
+	}
+}
