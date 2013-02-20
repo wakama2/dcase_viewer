@@ -1,4 +1,7 @@
 //--------getArgumentList-------------
+//ArgumentのId一覧を取ってくる
+//引数:なし
+//戻り値:ArgumentIdのリスト
 //request
 {
 	"jsonrpc":"2.0",
@@ -15,6 +18,9 @@
 }
 
 //--------FindNodeByDescription-------------
+//Descriptionの内容からNodeIdを検索する
+//引数:検索したい文字列
+//戻り値:NodeIdのリスト
 //request
 {
 	"jsonrpc":"2.0",
@@ -34,6 +40,9 @@
 }
 
 //--------FindContextByAttribute-------------
+//Contextの内容(key,value両方)からNodeIdを検索する
+//引数:検索したい文字列
+//戻り値:NodeIdのリスト
 //request
 {
 	"method":"FindContextByAttribute",
@@ -51,6 +60,9 @@
 }
 
 //--------CreateTopGoal-------------
+//ArgumentIdの新規作成
+//引数:コミットログ的なJustification、TopGoalのDescription、コミット名Commiter,プロセスタイプ(現状数値なので、適当に)
+//戻り値:ArgumentのId
 //request
 {
 	"jsonrpc":"2.0",
@@ -72,29 +84,10 @@
 	}
 }
 
-//--------CreateTopGoal-------------
-//request
-{
-	"jsonrpc":"2.0",
-	"version":"1.0",
-	"method":"CreateTopGoal",
-	"params":{
-		"Justification":"Sample Justification",
-		"Description" :"Sample Description",
-		"Commiter":"uchida",
-		"ProcessType" : 1 
-	}
-}
-//response
-{
-	"jsonrpc":"2.0",
-	"version":"1.0",
-	"result":{
-		"ArgumentId":26
-	}
-}
-
 //----------Commit-----------------------
+//Commitする
+//引数:commitオブジェクト
+//戻り値:空の{} //FIXME
 //request
 {
 	"jsonrpc":"2.0",
@@ -130,6 +123,9 @@
 }
 
 //--------getNode-------------
+//NodeIdから一つNodeを取ってくる
+//引数:NodeId
+//戻り値:Nodeの中身
 //request
 {
 	"jsonrpc":"2.0",
@@ -160,6 +156,9 @@
 }
 
 //-------------getNodeTree--------------------
+//ArgumentIdからArgumentの中身を取ってくる
+//引数:ArgumentId
+//戻り値:NodeList,TopGoalのId,snapshotId、ArgumentId
 //request
 {
 	"jsonrpc":"2.0",
@@ -197,6 +196,9 @@
 }
 
 //-------------getNodeTreeFromSnapshotId--------------------
+//ArgumentIdとSnapshotIdからArgumentのあるSnapshotの中身を取ってくる
+//引数:ArgumentId, SnapshotId
+//戻り値:NodeList,TopGoalのId,snapshotId、ArgumentId
 //request
 {
 	"jsonrpc":"2.0",
@@ -235,6 +237,9 @@
 }
 
 //-------------getNodeTreeBetween--------------------
+//ArgumentIdに属するSnapshotId2つからその間にあるSnapshotの中身の配列を取ってくる
+//引数:ArgumentId,SnapshotId(begin), SnapshotId(end)
+//戻り値:{NodeList,TopGoalのId,snapshotId、ArgumentId}の配列
 //request
 {
 	"jsonrpc":"2.0",
@@ -305,6 +310,7 @@
 }
 
 //-------------OpenProcessContext--------------------
+//ブランチを作る
 //request
 {
 	"jsonrpc":"2.0",
@@ -328,6 +334,7 @@
 }
 
 //-------------getProcessContextIds--------------------
+//ブランチの一覧を取得する
 //request
 {
 	"jsonrpc":"2.0",
@@ -347,13 +354,15 @@
 }
 
 //-------------getSnapshotList--------------------
+//ログの一覧を取得する
 //request
 {
 	"jsonrpc":"2.0",
 	"version":"1.0",
-	"method":"getProcessContextIds",
+	"method":"getSnapshotList",
 	"params":{
-		"BelongedArgumentId":26
+		"BelongedArgumentId":26,
+		"ProcessId":25
 	}
 }
 //response
@@ -364,3 +373,16 @@
 		"SnapshotIdList":[41,47,48,49,50,51,52]
 	}
 }
+
+
+//Usage
+//Argumentの一覧を取得->getArgumentList
+//Argumentの中身を取得->getNodeTree
+//タイムラインの作成↓
+//Argumentのブランチ一覧->getProcessContextIds
+//各プロセスに属するSnapshotの一覧->getSnapshotList
+//あるSnapshotの内容を取ってくる->getNodeTreeFromSnapshot
+
+//変更をDBに保存する->Commit
+//ブランチの作成->OpenProcessContext
+
