@@ -408,14 +408,14 @@ class DCaseModel {
 	}
 
 	void insertSnapshotNodeData(int snapshot_id, int argument_id) {
-		PreparedStatement p = this.db.newPreparedStatement("INSERT INTO `snapshot_has_node_data`(snapshot_id,node_data_id) SELECT ? AS snapshot_id,current_node_id FROM node_identity WHERE argument_id=?");
+		PreparedStatement p = this.db.newPreparedStatement("INSERT INTO `snapshot_has_node_data`(snapshot_id,node_data_id) SELECT ? AS snapshot_id,current_node_id FROM node_identity WHERE argument_id=? AND current_node_id!=0");
 		p.setInt("@a", snapshot_id);
 		p.setInt("@b", argument_id);
 		p.execute();
 	}
 
 	void insertSnapshotNodeLink(int snapshot_id, int argument_id) {
-		PreparedStatement p = this.db.newPreparedStatement("INSERT INTO `node_link_has_snapshot`(node_link_id,snapshot_id) SELECT current_node_link_id,? AS snapshot_id FROM link_identity WHERE argument_id=?");
+		PreparedStatement p = this.db.newPreparedStatement("INSERT INTO `node_link_has_snapshot`(node_link_id,snapshot_id) SELECT current_node_link_id,? AS snapshot_id FROM link_identity WHERE argument_id=? AND current_node_link_id!=0");
 		p.setInt("@a", snapshot_id);
 		p.setInt("@b", argument_id);
 		p.execute();
@@ -597,6 +597,37 @@ class DCaseModel {
 		}
 	}
 
+	void ClearLinkIdentityCurrent(int ArgumentId) {
+		PreparedStatement p = this.db.newPreparedStatement("UPDATE link_identity SET current_node_link_id=0 WHERE argument_id=?");
+		p.setInt("@a",ArgumentId);
+		p.execute();
+	}
+
+	void ClearNodeIdentityCurrent(int ArgumentId) {
+		PreparedStatement p = this.db.newPreparedStatement("UPDATE node_identity SET current_node_id=0 WHERE argument_id=?");
+		p.setInt("@a",ArgumentId);
+		p.execute();
+	}
+
+	void UpdateNodeIdentityCurrent(int snapshot_id) {
+		PreparedStatement p = this.db.newPreparedStatement("UPDATE snapshot_has_node_data INNER JOIN node_data ON snapshot_has_node_data.node_data_id=node_data.id INNER JOIN node_identity ON node_identity.id=node_data.node_identity_id SET node_identity.current_node_id=node_data.id WHERE snapshot_has_node_data.snapshot_id=?"); //FIXME
+		p.setInt("@a", snapshot_id);
+		p.execute();
+	}
+
+	void UpdateLinkIdentityCurrent(int snapshot_id) {
+		PreparedStatement p = this.db.newPreparedStatement("UPDATE node_link_has_snapshot INNER JOIN node_link ON node_link_has_snapshot.node_link_id=node_link.id INNER JOIN link_identity ON link_identity.id=node_link.link_identity_id SET link_identity.current_node_link_id=node_link.id WHERE node_link_has_snapshot.snapshot_id=?"); //FIXME
+		p.setInt("@a", snapshot_id);
+		p.execute();
+	}
+
+	void UpdateCurrentProcess(int ArgumentId,int ProcessId) {
+		PreparedStatement p = this.db.newPreparedStatement("UPDATE argument SET current_process_id=?  WHERE argument.id=?");
+		p.setInt("@a",ProcessId);
+		p.setInt("@b",ArgumentId);
+		p.execute();
+	}
+
 	void _Commit(int argument_id, int process_id, int top_goal_id, int snapshot_id, Json commit) {
 		Map[int] m = new Map[int];
 		int i = 0;
@@ -615,12 +646,17 @@ class DCaseModel {
 			i = i + 1;
 		}
 
-		this.insertSnapshotNodeData(snapshot_id,argument_id);
-		this.insertSnapshotNodeLink(snapshot_id,argument_id);
+		this.insertSnapshotNodeData(snapshot_id,argument_id); //FIXME
+		this.insertSnapshotNodeLink(snapshot_id,argument_id); //FIXME
 	}
 
 	@Public void Commit(int ArgumentId, int ProcessId, Json args) {
 		int prev_snapshot_id = this.getCurrentSnapshotFromProcessId(ProcessId);
+		this.ClearNodeIdentityCurrent(ArgumentId);
+		this.ClearLinkIdentityCurrent(ArgumentId);
+		this.UpdateNodeIdentityCurrent(prev_snapshot_id);
+		this.UpdateLinkIdentityCurrent(prev_snapshot_id);
+		this.UpdateCurrentProcess(ArgumentId,ProcessId);
 		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
 		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME
 		this.updateProcessContext(process_id,snapshot_id);

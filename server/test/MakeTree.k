@@ -6,7 +6,8 @@ void main() {
 	DCaseModel model = new DCaseModel("dcasedb","dcasedb");
 	int id = model.CreateTopGoal("description test",1,"this is the test justification","foo commiter");
 	Json nodeTree = model.GetNodeTree(id);
-	int top_id = nodeTree.getInt("top_goal_id");
+	System.p(nodeTree);
+	int top_id = nodeTree.getInt("TopGoalId");
 	System.p(model.GetNode(top_id));
 
 	Json json = new Json();
