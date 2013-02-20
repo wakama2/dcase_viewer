@@ -68,36 +68,60 @@ var DNodeView = function(viewer, node) {
 		if(self == viewer.getSelectedNode() && !editflag) {
 			editflag = true;
 			self.divText.text("");
-			$("<textarea></textarea>").css({
-				position: "absolute",
-				left: "0",
-				top: self.divText.attr("top"),
-				width: "100%",
-				height: "75%",
-				background: "#CCC",
-				borderStyle: "none",
-				resizable: false,
-				zIndex: 99,
-			})
-			.attr("value", node.text)
-			.appendTo(self.div)
-			.focus()
-			.mousedown(function(e) { e.stopPropagation(); })
-			.mouseup(function(e) { e.stopPropagation(); })
-			.mousemove(function(e) { e.stopPropagation(); })
-			.click(function(e) { e.stopPropagation(); })
-			.mousewheel(function(e) { e.stopPropagation(); })
-			.blur(function() {
-				node.text = $(this).attr("value");
-				self.divText.html(toHTML(node.text));
-				$(this).remove();
-				editflag = false;
-				setTimeout(function() {
-					var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
-					self.bounds.h = b.h;
-					viewer.repaintAll();
-				}, 100);
-			});
+			if(node.isDScript()) {
+				$("<textarea></textarea>").appendTo(self.div)
+				.attr("value", node.text)
+				.focus()
+				.attr("id", "script-editor");
+				var editor = CodeMirror.fromTextArea($("#script-editor")[0], {
+					lineNumbers: true,
+					matchBrackets: true,
+					mode: "shell"
+				});
+				editor.on("blur", function(i) {
+					node.text = i.getValue();
+					self.divText.html(toHTML(node.text));
+					$("#script-editor").remove();
+					$(".CodeMirror").remove();
+					editflag = false;
+					setTimeout(function() {
+						var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
+						self.bounds.h = b.h;
+						viewer.repaintAll();
+					}, 100);
+				});
+			} else {
+				$("<textarea></textarea>").css({
+					position: "absolute",
+					left: "0",
+					top: self.divText.attr("top"),
+					width: "400px",
+					height: "300px",
+					background: "#CCC",
+					borderStyle: "none",
+					resizable: false,
+					zIndex: 99,
+				})
+				.attr("value", node.text)
+				.appendTo(self.div)
+				.focus()
+				.mousedown(function(e) { e.stopPropagation(); })
+				.mouseup(function(e) { e.stopPropagation(); })
+				.mousemove(function(e) { e.stopPropagation(); })
+				.click(function(e) { e.stopPropagation(); })
+				.mousewheel(function(e) { e.stopPropagation(); })
+				.blur(function() {
+					node.text = $(this).attr("value");
+					self.divText.html(toHTML(node.text));
+					$(this).remove();
+					editflag = false;
+					setTimeout(function() {
+						var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
+						self.bounds.h = b.h;
+						viewer.repaintAll();
+					}, 100);
+				});
+			}
 		}
 		viewer.dragEnd(self);
 	}).bind("touchstart", function(e) {
@@ -216,7 +240,7 @@ DNodeView.prototype.initSvg = function(type) {
 			return { w: w*8/6, h: h*8/6 };
 		}
 		o.offset = { x: 0, y: 0 };
-	} else if(type == "DScript") {
+	} else if(type == "DScriptEvidence") {
 		var o1 = root.createSvg("ellipse");
 		var o2 = root.createSvg("polygon");
 		$(o2).attr({ stroke: "gray", fill:"gray" });
