@@ -197,6 +197,13 @@ DCaseViewer.prototype.showToolbox = function(node) {
 			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
 
 			$("#timeline").css("display", "block");
+
+			var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: 1 });
+			var l = r.SnapshotIdList;
+			for(var i=0; i<l.length; i++) {
+				var id = l[i];
+
+			}
 		} else {
 			$("#toolbar").css("display", "none");
 			$("#timeline").css("display", "none");
