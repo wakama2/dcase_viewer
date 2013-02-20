@@ -28,13 +28,14 @@ body {
 <script type="text/javascript" src="lib/jquery.svg.min.js"></script>
 <script type="text/javascript" src="lib/jquery.svganim.min.js"></script>
 <script type="text/javascript" src="lib/codemirror.js"></script>
+<script type="text/javascript" src="js/config.js"></script>
 <script type="text/javascript" src="js/dcaseviewer.js"></script>
 <script type="text/javascript" src="js/dnode.js"></script>
 <script type="text/javascript" src="js/dnodeview.js"></script>
 <script type="text/javascript" src="js/handler.js"></script>
 <script type="text/javascript" src="js/edit.js"></script>
-<script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript" src="js/animation.js"></script>
 <script type="text/javascript">
 
@@ -140,11 +141,15 @@ window.addEventListener("load",function() {
 		<input id="menu-export-png"  type="button" value="export png"></input>
 	</div>
 
-	<div id="menu-info-i" class="menu-i" style="left: 80px;">
-		<i class="icon-info-sign"></i>
+	<div id="menu-create-i" class="menu-i" style="left: 80px;">
+		<i class="icon-plus"></i>
 	</div>
-	<div id="menu-info" class="menu-box">
-		<table id="menu-info-table"></table>
+	<div id="menu-create" class="menu-box">
+		<p>committer name</p>
+		<input id="argument_committer"></input>
+		<p>descriptions</p>
+		<textarea id="argument_description" cols=20 rows=4>Enter new Argument descriptions.  </textarea>
+		<button id="menu-create-argument">Create</button>
 	</div>
 
 	<div id="menu-tool-i" class="menu-i" style="left: 120px;">

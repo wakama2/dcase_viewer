@@ -86,7 +86,7 @@ var SideMenu = function(root, viewer) {
 		var ids = [
 			"#menu-search",
 			"#menu-export",
-			"#menu-info",
+			"#menu-create",
 			"#menu-tool"
 		];
 		$.each(ids, function(i, id) {
@@ -178,30 +178,20 @@ var SideMenu = function(root, viewer) {
 	});
 
 	//--------------------------------------------------------
-	var $info = $("#menu-info-i")
+	var $create = $("#menu-create-i")
 			.click(function(e) {
-				self.show("#menu-info");
+				console.log('hello');
+				self.show("#menu-create");
 			})
 			.appendTo(root);
-	
-	(function() {
-		var types = DNode.getTypes();
-		var count = {};
-		for(var i=0; i<types.length; i++) {
-			count[types[i]] = 0;
-		}
-		viewer.traverseAll(function(node) {
-			count[node.type] += 1;
-		});
-		var $table = $("#menu-info-table");
-		for(var i=0; i<types.length; i++) {
-			var name = types[i];
-			$("<tr></tr>")
-				.append($("<td></td>").html(name))
-				.append($("<td></td>").html(count[name]))
-				.appendTo($table);
-		}
-	})();
+	$('#menu-create-argument').click(function(e) {
+		// create new Argument
+		var cmtr = $('#argument_committer').val();
+		var desc = $('#argument_description').val();
+		//var r = DCaseAPI.call("CreateTopGoal", {"Committer": cmtr, "ProcessType": 1, "Description": desc, "Justification": "first commit"});
+		//console.log(r);
+		//init_viewer(1);
+	});
 
 	//--------------------------------------------------------
 	var $tool = $("#menu-tool-i")
