@@ -1,4 +1,4 @@
-var DCaseAPI = (function() {
+var DCaseAPI = (function(url) {
     function DCaseAPI(url) {
         this.cgi = url;
     }
@@ -54,6 +54,4 @@ var DCaseAPI = (function() {
     };
 
     return DCaseAPI;
-})();
-
-var DCaseAPI = new DCaseAPI(CONFIG.cgi_url);
+})(CONFIG.cgi_url);
