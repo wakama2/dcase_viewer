@@ -159,9 +159,6 @@ var SideMenu = function(root, viewer) {
 		prev_isesarch = text;
 	}
 
-	// init search list
-	this.search("");
-
 	//--------------------------------------------------------
 	var $export = $("#menu-export-i")
 			.click(function(e) {
@@ -180,7 +177,6 @@ var SideMenu = function(root, viewer) {
 	//--------------------------------------------------------
 	var $create = $("#menu-create-i")
 			.click(function(e) {
-				console.log('hello');
 				self.show("#menu-create");
 			})
 			.appendTo(root);
@@ -188,9 +184,8 @@ var SideMenu = function(root, viewer) {
 		// create new Argument
 		var cmtr = $('#argument_committer').val();
 		var desc = $('#argument_description').val();
-		//var r = DCaseAPI.call("CreateTopGoal", {"Committer": cmtr, "ProcessType": 1, "Description": desc, "Justification": "first commit"});
-		//console.log(r);
-		//init_viewer(1);
+		var r = DCaseAPI.call("CreateTopGoal", {"Committer": cmtr, "ProcessType": 1, "Description": desc, "Justification": "first commit"});
+		initViewer(r.BelongedArgumentId);
 	});
 
 	//--------------------------------------------------------
@@ -203,7 +198,4 @@ var SideMenu = function(root, viewer) {
 	$("#menu-tool-commit").click(function() {
 		self.actCommit();
 	});
-
 }
-
-

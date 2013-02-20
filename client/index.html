@@ -40,25 +40,26 @@ body {
 <script type="text/javascript">
 
 function getNodeFromServer(id) {
-	var res1 = DCaseAPI.get(["Argument"]);
+	var res1 = DCaseAPI.call("getArgumentList");
 	//var id = res1[0].argument_id;
 	//var id = "0";//FIXME
 	console.log("get id=" + id);
-	var res2 = DCaseAPI.get([], id);
+	var res2 = DCaseAPI.call("getNodeTree", {BelongedArgumentId: id});
 	console.log(res2);
 	var node = createNodeFromJson(res2);
 	return node;
 }
 
 window.addEventListener("load",function() {
-	var node = createSampleNode();
-	var id = "1";
-	//var node = getNodeFromServer(id);
-	var opts = {
-		argument_id: id,
-	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
-	var menu = new SideMenu(document.body, viewer);
+	//var node = createSampleNode();
+	//var id = "1";
+	////var node = getNodeFromServer(id);
+	//var opts = {
+	//	argument_id: id,
+	//};
+	//var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
+	//var menu = new SideMenu(document.body, viewer);
+	var menu = new SideMenu(document.body, null);
 
 	$(".tool-new").click(function() {
 		menu.actInsertToSelectedNode();
