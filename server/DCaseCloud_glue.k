@@ -113,6 +113,7 @@ class DCaseModel {
 	Json CreateJsonNode(ResultSet r,int snapshot_id) {
 		Json json = new Json();
 		json.setInt("ThisNodeId", r.getInt("node_id"));
+		json.setInt("BelongedArgumentId", r.getInt("argument_id"));
 		json.setInt("NodeIdentityId", r.getInt("node_identity_id"));
 		json.setInt("PrevNodeId", r.getInt("node_prev_id"));
 		json.setInt("NextNodeId", r.getInt("node_next_id"));
@@ -128,6 +129,7 @@ class DCaseModel {
 	Json CreateJsonNode(ResultSet r) {
 		Json json = new Json();
 		json.setInt("ThisNodeId", r.getInt("node_id"));
+		json.setInt("BelongedArgumentId", r.getInt("argument_id"));
 		json.setInt("NodeIdentityId", r.getInt("node_identity_id"));
 		json.setInt("PrevNodeId", r.getInt("node_prev_id"));
 		json.setInt("NextNodeId", r.getInt("node_next_id"));
@@ -143,7 +145,7 @@ class DCaseModel {
 
 	//Return Node
 	@Public Json GetNode(int node_id) {
-		PreparedStatement q = this.db.newPreparedStatement("SELECT node_data.id AS node_id,node_identity_id, url, description, delete_flag,type_name,node_prev_id,node_next_id FROM node_identity INNER JOIN node_data ON current_node_id=node_data.id INNER JOIN node_type ON node_type_id=node_type.id WHERE node_data.id=?");
+		PreparedStatement q = this.db.newPreparedStatement("SELECT node_data.id AS node_id,node_identity_id, url, description, delete_flag,type_name,node_prev_id,node_next_id,argument_id FROM node_identity INNER JOIN node_data ON current_node_id=node_data.id INNER JOIN node_type ON node_type_id=node_type.id WHERE node_data.id=?");
 		q.setInt("@a",node_id);
 		ResultSet r = q.execute();
 		r.next();
