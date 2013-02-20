@@ -548,8 +548,8 @@ class DCaseModel {
 	}
 
 	int getCurrentSnapshotFromProcessId(int ProcessId) {
-		PreparedStatement p = this.db.newPreparedStatement("SELECT current_snapshot_id FROM argument INNER JOIN process_context ON current_process_id=process_context.id WHERE argument.id=?");
-		p.setInt("@a", argument_id);
+		PreparedStatement p = this.db.newPreparedStatement("SELECT current_snapshot_id FROM process_context WHERE id=?");
+		p.setInt("@a", ProcessId);
 		ResultSet r = p.execute();
 		r.next();
 		return r.getInt("current_snapshot_id");
@@ -618,7 +618,7 @@ class DCaseModel {
 	}
 
 	@Public void Commit(int ArgumentId, int ProcessId, Json args) {
-		int prev_snapshot_id = this.getCurrentSnapshotFromProcessId(ProcessId); //TODO
+		int prev_snapshot_id = this.getCurrentSnapshotFromProcessId(ProcessId);
 		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
 		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME
 		this.updateProcessContext(process_id,snapshot_id);
