@@ -127,7 +127,11 @@ void FindContextByAttribute (Json request) {
 void Commit (Json request) {
 	int BelongedArgumentId = request.getInt("BelongedArgumentId");
 	Json args = request.get("commit");
-	global.model.Commit(BelongedArgumentId,args);
+	if(request.hasKey("ProcessId")) {
+		global.model.Commit(BelongedArgumentId,request.getInt("ProcessId"), args);
+	} else {
+		global.model.Commit(BelongedArgumentId,args);
+	}
 	Json response = createMessage(new Json()); //FIXME Response is void
 	stdout.print(response);
 }

@@ -659,7 +659,7 @@ class DCaseModel {
 		this.UpdateCurrentProcess(ArgumentId,ProcessId);
 		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
 		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME
-		this.updateProcessContext(process_id,snapshot_id);
+		this.updateProcessContext(ProcessId,snapshot_id);
 		this._Commit(ArgumentId, ProcessId, top_goal_id, snapshot_id, args);
 	}
 
