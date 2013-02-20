@@ -486,13 +486,6 @@ class DCaseModel {
 		this.updateNodeIdentity(node_identity_id,node_data_id);
 	}
 
-	@Public void UpdateNode(int argument_id, Json json) {
-		int node_identity_id = json.getInt("NodeIdentityId");
-		int type_id = this.getNodeType(json.getString("NodeType"));
-		int node_data_id = this.updateNodeDataFromJson(type_id,node_identity_id,json);
-		this.updateNodeIdentity(node_identity_id,node_data_id);
-	}
-
 	@Public void DeleteNode(int argument_id, Json json) {
 		/* //TODO
 		   int node_id = json.getString("node_id").toint;
@@ -554,6 +547,14 @@ class DCaseModel {
 		this.updatelinkIdentity(link_id,l_id);
 	}
 
+	int getCurrentSnapshotFromProcessId(int ProcessId) {
+		PreparedStatement p = this.db.newPreparedStatement("SELECT current_snapshot_id FROM argument INNER JOIN process_context ON current_process_id=process_context.id WHERE argument.id=?");
+		p.setInt("@a", argument_id);
+		ResultSet r = p.execute();
+		r.next();
+		return r.getInt("current_snapshot_id");
+	}
+
 	int getCurrentSnapShot(int argument_id) {
 		PreparedStatement p = this.db.newPreparedStatement("SELECT current_snapshot_id FROM argument INNER JOIN process_context ON current_process_id=process_context.id WHERE argument.id=?");
 		p.setInt("@a", argument_id);
@@ -594,15 +595,7 @@ class DCaseModel {
 		}
 	}
 
-	@Public void Commit(int argument_id, Json args) {
-		int prev_snapshot_id = this.getCurrentSnapShot(argument_id);
-		int process_id  = this.getCurrentProcessContext(argument_id);
-		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
-		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME
-		this.updateProcessContext(process_id,snapshot_id);
-
-		Json commit = args;//.get("commit");
-
+	void _Commit(int argument_id, int process_id, int top_goal_id, int snapshot_id, Json commit) {
 		Map[int] m = new Map[int];
 		int i = 0;
 		while(i < commit.getSize()) {
@@ -622,6 +615,23 @@ class DCaseModel {
 
 		this.insertSnapshotNodeData(snapshot_id,argument_id);
 		this.insertSnapshotNodeLink(snapshot_id,argument_id);
+	}
+
+	@Public void Commit(int ArgumentId, int ProcessId, Json args) {
+		int prev_snapshot_id = this.getCurrentSnapshotFromProcessId(ProcessId); //TODO
+		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
+		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME
+		this.updateProcessContext(process_id,snapshot_id);
+		this._Commit(ArgumentId, ProcessId, top_goal_id, snapshot_id, args);
+	}
+
+	@Public void Commit(int argument_id, Json args) {
+		int prev_snapshot_id = this.getCurrentSnapShot(argument_id);
+		int process_id  = this.getCurrentProcessContext(argument_id);
+		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
+		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME
+		this.updateProcessContext(process_id,snapshot_id);
+		this._Commit(argument_id, process_id, top_goal_id, snapshot_id, args);
 	}
 
 	// ProcessContext
