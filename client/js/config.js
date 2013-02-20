@@ -6,23 +6,18 @@ var CONFIG = {
         Stroke : {
             Default : 'black',
             Argument : '#8080D0',
-            FocusedEntity  : 'red',
-            DScriptContext: 'pink',
-            DScriptEvidence: 'red',
-            UndevelopedEntity : 'pink'
+            FocusedEntity  : '#A17AA3',
+            DScriptContext: 'gray',
+            DScriptEvidence: 'gray',
+            UndevelopedEntity : 'black'
         },
         BackGround : {
             Default : '#dbf5f3',
-            Goal : '#dbf5f3',
-            DScriptContext: 'blue',
-            DScriptEvidence: 'gray',
+            Goal : '#7EC1C4',
+            DScriptContext: '#08bab5',
+            DScriptEvidence: '#6adbd8',
             Rebuttal : '#FF6D45',
-            Evidence : '#80FF80'
+            Evidence : '#b4d8df'
         }
     }
 };
-
-//#b4d8df
-//#ffffff
-//#08bab5
-//#6adbd8

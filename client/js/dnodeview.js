@@ -304,8 +304,10 @@ DNodeView.prototype.initSvg = function(type) {
 function getColorByState(node) {
     if (node.type == 'Rebuttal')
         return CONFIG.Color.BackGround.Rebuttal;
-    if (node.isEvidence)
+    if (node.type == 'Evidence')
         return CONFIG.Color.BackGround.Evidence;
+    if (node.type == 'Goal')
+        return CONFIG.Color.BackGround.Goal;
     return CONFIG.Color.BackGround.Default;
 }
 
