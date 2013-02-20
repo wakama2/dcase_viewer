@@ -228,22 +228,26 @@ void getContext (Json request) {
 	Json response = createMessage("FIXME");
 	stdout.print(response);
 }
+*/
 
 void Support (Json request) {
 	int EvidenceNodeId = request.getInt("EvidenceNodeId");
+	int ArgumentId = request.getInt("BelongedArgumentId");
 	int ProcessId = request.getInt("ProcessId");
-	Json response = createMessage("FIXME");
+	int res = global.model.Support(EvidenceNodeId, ArgumentId, ProcessId);
+	Json response = createMessage(Json.parse("{\"NodeId\":${res}}"));
 	stdout.print(response);
 }
 
 void Rebuttal (Json request) {
 	int EvidenceNodeId = request.getInt("EvidenceNodeId");
+	int ArgumentId = request.getInt("BelongedArgumentId");
 	int ProcessId = request.getInt("ProcessId");
 	String Diagnosis = request.getString("Diagnosis");
-	Json response = createMessage("FIXME");
+	int res = global.model.Support(EvidenceNodeId, ArgumentId, ProcessId, Diagnosis);
+	Json response = createMessage(Json.parse("{\"NodeId\":${res}}"));
 	stdout.print(response);
 }
-*/
 
 class JsonRPCServer {
 	Map[Func[void, Json]] functions;
@@ -278,7 +282,7 @@ class JsonRPCServer {
 		this.functions.set("getProcessContextIds" ,getProcessContextIds);
 		this.functions.set("getSnapshotList"      ,getSnapshotList);
 		//this.functions.set("getContext"           ,getContext);
-		//this.functions.set("Support"              ,Support);
-		//this.functions.set("Rebuttal"             ,Rebuttal);
+		this.functions.set("Support"              ,Support);
+		this.functions.set("Rebuttal"             ,Rebuttal);
 	}
 }
