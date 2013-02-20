@@ -39,29 +39,14 @@ DNode.prototype.isUndevelop = function() {
 
 DNode.getTypes = function() {
 	return [
-			"Goal", "Context", "Strategy", "Evidence", "Monitor", "DScript", "Rebuttal",
+			"Goal", "Context", "Strategy", "Evidence", "Monitor", "DScriptContext", "DScriptEvidence", "Rebuttal",
 	];
 }
 
 //-------------------------------------
-// FIXME?
-var DSCRIPT_PREF = "D-Script:";
-var DSCRIPT_PREF_CONTEXT = "D-Script.Name:";
+
 DNode.prototype.isDScript = function() {
-	return this.type == "DScript";
-	//return this.type === "Evidence" && this.text.indexOf(DSCRIPT_PREF) == 0;
-}
-
-DNode.prototype.getDScriptNameInEvidence = function() {
-	return this.text.substr(DSCRIPT_PREF.length);
-}
-
-DNode.prototype.getDScriptNameInContext = function() {
-	if(this.type == "Context" && this.text.indexOf(DSCRIPT_PREF_CONTEXT) == 0) {
-		return this.text.substr(DSCRIPT_PREF_CONTEXT.length);
-	} else {
-		return null;
-	}
+	return this.type == "DScriptEvidence";
 }
 
 //-------------------------------------
@@ -162,7 +147,7 @@ function createSampleNode() {
 				{ name: "SubGoal 3.1", type: "Goal", desc: "description" },
 				{ name: "SubGoal 3.2", type: "Goal", desc: "description", 
 					children: [ {
-						name: "D-Script", type: "DScript", desc: "shutdown -r now",
+						name: "reboot.ds", type: "DScriptEvidence", desc: "shutdown -r now",
 						children: [ { name: "R", type: "Rebuttal", desc: "error" } ],
 					} ] },
 				{ name: "SubGoal 3.3", type: "Goal", desc: "description" },
