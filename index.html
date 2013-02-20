@@ -57,6 +57,8 @@ window.addEventListener("load",function() {
 	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
 	var menu = new SideMenu(document.body, viewer);
 
+	viewer.showTimeline('timeline-embed');
+
 	$(".tool-new").click(function() {
 		menu.actInsertToSelectedNode();
 	});
@@ -86,47 +88,6 @@ window.addEventListener("load",function() {
 	$(".tool-play").click(function() {
 		var v = viewer.getSelectedNode();
 		viewer.showDScriptExecuteWindow(v.node.getDScriptNameInEvidence());
-	});
-
-	var timeline =  {
-		"headline":"The Main Timeline Headline Goes here",
-		"type":"default",
-		"text":"",
-		"asset": {
-			"credit":"Credit Name Goes Here",
-			"caption":"Caption text goes here"
-		},
-		"date": [
-			{
-				"startDate":"2011,12,10",
-				"endDate":"2011,12,11",
-				"headline":"Commit 2",
-				"text":"<p>Body text goes here, some HTML is OK</p>",
-				"asset": {
-					"credit":"Credit Name Goes Here",
-					"caption":"Caption text goes here"
-			}},
-			{
-				"startDate":"2011,10,10",
-				"endDate":"2011,10,11",
-				"headline":"Commit 1",
-				"text":"<p>Body text goes here, some HTML is OK</p>",
-				"asset": {
-					"credit":"Credit Name Goes Here",
-					"caption":"Caption text goes here"
-			}},
-		],
-	};
-
-	createStoryJS({
-		type    : "timeline",
-		width   : '95%',
-		height  : '240',
-		source  : { timeline: timeline},
-		embed_id: 'timeline-embed',
-		//lang    : 'ja',
-		css     : 'lib/timeline.css',
-		js      : 'lib/timeline-min.js'
 	});
 
 	// hide url bar for ipod touch

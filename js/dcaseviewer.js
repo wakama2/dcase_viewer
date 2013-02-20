@@ -195,21 +195,55 @@ DCaseViewer.prototype.showToolbox = function(node) {
 			$("#toolbar .tool-play").css("display", data.isDScript() ? "inline" : "none");
 			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
 			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
-
 			$("#timeline").css("display", "block");
-
-			var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: 1 });
-			var l = r.SnapshotIdList;
-			for(var i=0; i<l.length; i++) {
-				var id = l[i];
-
-			}
 		} else {
 			$("#toolbar").css("display", "none");
 			$("#timeline").css("display", "none");
 		}
 		this.toolboxNode = node;
 	}
+}
+
+DCaseViewer.prototype.showTimeline = function(dom_id) {
+	var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: 1 });
+	var l = r.SnapshotIdList;
+
+	var dates = [];
+	for(var i=0; i<l.length; i++) {
+		var id = l[i];
+		dates.push({
+			"startDate": "2012,1," + (i+1),
+			"endDate"  : "2012,1," + (i+2),
+			"headline" : "Commit " + id,
+			"text":"<p>Body text goes here, some HTML is OK</p>",
+			"asset": {
+				"credit":"Credit Name Goes Here",
+				"caption":"Caption text goes here"
+			}
+		});
+	}
+	
+	console.log(dates);
+	var timeline =  {
+		"headline":"The Main Timeline Headline Goes here",
+		"type":"default",
+		"text":"",
+		"asset": {
+			"credit":"Credit Name Goes Here",
+			"caption":"Caption text goes here"
+		},
+		"date": dates,
+	};
+
+	createStoryJS({
+		type    : "timeline",
+		width   : '95%',
+		height  : '240',
+		source  : { timeline: timeline },
+		embed_id: dom_id,
+		css     : 'lib/timeline.css',
+		js      : 'lib/timeline-min.js'
+	});
 }
 
 DCaseViewer.prototype.setDragLock = function(b) {
