@@ -60,13 +60,15 @@ var DNode = (function() {
         DNode.Subject,
         DNode.Strategy,
         DNode.Context,
-        DNode.Evidence
+        DNode.Evidence,
+        DNode.Solution
     ];
     DNode.Goal.children = [
         DNode.Strategy,
         DNode.Context,
         DNode.Goal,
-        DNode.Evidence
+        DNode.Evidence,
+        DNode.Solution
     ];
     DNode.Strategy.children = [
         DNode.Context,
