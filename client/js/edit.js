@@ -31,6 +31,16 @@ var DNodeEditWindow = (function() {
         $('#edit-cancel').click(function() {
             self.close();
         });
+
+        function CollectNodeDescript(list, node) {
+            list.add(node.text);
+            for (var i=0; i < node.children.length; i++) {
+                CollectNodeDescript(list, node.children[i]);
+            };
+        }
+        var desc_list = [];
+        CollectNodeDescript(desc_list, DCase_Viewer.rootview.node);
+        $desc.autocomplete({list : desc_list});
     }
 
     DNodeEditWindow.applyAndClose = function() {
