@@ -4,13 +4,12 @@ var DNodeEditWindow = (function() {
     var $desc;
     var onSuccess = function(node) {};
     var node = null;
-    self.called = 0;
 
     function init() {
         $select = $('#edit select');
         $desc = $('#edit textarea');
         $select.children().remove();
-        var children = DNode[parent.type].children;
+        var children = DNode[self.parent.type].children;
         for (var i=0; i < children.length; i++) {
             var type = children[i].name;
             $('<option></option>')

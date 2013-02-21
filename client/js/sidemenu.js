@@ -64,19 +64,24 @@ var SideMenu = (function(root, viewer) {
 
     function ExportTree(DumpType, NodeId) {
         var url = CONFIG.view_cgi + '?' + NodeId + '.' + DumpType;
-        window.open(url);
+        window.open(url, '_blank');
+    }
+
+    function GetArgumentId(viewer) {
+        /*FIXME(ide) get subtree's argument id*/
+        return viewer.opts.argument_id;
     }
 
     this.actExportJson = function() {
-        ExportTree('json', viewer.rootview.node.id);
+        ExportTree('json', GetArgumentId(viewer));
     };
 
     this.actExportPng = function() {
-        ExportTree(/*FIXME(ide)*/'dot', viewer.rootview.node.id);
+        ExportTree(/*FIXME(ide)*/'dot', GetArgumentId(viewer));
     };
 
     this.actExportDScript = function() {
-        ExportTree('dscript', viewer.rootview.node.id);
+        ExportTree('dscript', GetArgumentId(viewer));
     };
 
     this.actCommit = function() {
