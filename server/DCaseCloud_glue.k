@@ -677,9 +677,35 @@ class DCaseModel {
 		return ret;
 	}
 
-	@Public int[] GetSnapshotList(int argument_id) {
+	Json GetSnapshot(int[] ids) {
+		Json j = new Json([]);
+		int i = 0;
+		while(i < ids.getSize()) {
+			PreparedStatement p = this.db.newPreparedStatement("SELECT id,prev_snapshot_id,unix_time FROM snapshot WHERE id=?");
+			p.setInt("@a",ids[i]);
+			j.add(this._GetSnapshot(p.execute()));
+			i = i + 1;
+		}
+		return j;
+	}
+
+	Json _GetSnapshot(ResultSet r) {
+		Json json = new Json();
+		json.setInt("SnapshotId",r.getInt("id"));
+		json.setInt("PrevSnapshotId",r.getInt("prev_snapshot_id"));
+		json.setInt("UnixTime",r.getInt("unix_time"));
+		//json.setString("CommitMessage",r.getString("commit_message"));
+		return json;
+	}
+
+	@Public int[] GetSnapshotIds(int argument_id) {
 		int end_id = this.getCurrentSnapShot(argument_id);
 		return this._GetSnapshotList(0, end_id);
+	}
+
+	@Public Json GetSnapshotList(int argument_id) {
+		int[] arr =  this.GetSnapshotIds(argument_id);
+		return this.GetSnapshot(arr);
 	}
 
 	//### D-Script

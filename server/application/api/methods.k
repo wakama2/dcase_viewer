@@ -214,7 +214,16 @@ void getProcessContextIds (Json request) {
 
 void getSnapshotList (Json request) {
 	int BelongedArgumentId = request.getInt("BelongedArgumentId");
-	int[] res = global.model.getSnapshotList(BelongedArgumentId);
+	Json res = global.model.getSnapshotList(BelongedArgumentId);
+	Json res_json = new Json();
+	res_json.set("SnapshotList",res);
+	Json response = createMessage(res_json);
+	stdout.print(response);
+}
+
+void getSnapshotIds (Json request) {
+	int BelongedArgumentId = request.getInt("BelongedArgumentId");
+	int[] res = global.model.getSnapshotIds(BelongedArgumentId);
 	Json res_json = new Json();
 	res_json.set("SnapshotIdList",ConvertFromIntList(res));
 	Json response = createMessage(res_json);
@@ -281,6 +290,7 @@ class JsonRPCServer {
 		//this.functions.set("CloseProcessContext",CloseProcessContext);
 		this.functions.set("getProcessContextIds" ,getProcessContextIds);
 		this.functions.set("getSnapshotList"      ,getSnapshotList);
+		this.functions.set("getSnapshotIds"       ,getSnapshotIds);
 		//this.functions.set("getContext"           ,getContext);
 		this.functions.set("Support"              ,Support);
 		this.functions.set("Rebuttal"             ,Rebuttal);
