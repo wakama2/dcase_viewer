@@ -118,24 +118,6 @@ class DCaseModel {
 		return r.getInt("node_parent_id");
 	}
 
-	Json CreateJsonNode(ResultSet r,int snapshot_id) {
-		Json json = new Json();
-		int node_id = r.getInt("node_id");
-		json.setInt("ThisNodeId", node_id);
-		json.setInt("ParentNodeId", this.GetParent(node_id));
-		json.setInt("BelongedArgumentId", r.getInt("argument_id"));
-		json.setInt("NodeIdentityId", r.getInt("node_identity_id"));
-		json.setInt("PrevNodeId", r.getInt("node_prev_id"));
-		json.setInt("NextNodeId", r.getInt("node_next_id"));
-		json.setString("Url", r.getString("url"));
-		json.setString("Description", r.getString("description"));
-		json.setBoolean("DeleteFlag", r.getBoolean("delete_flag"));
-		json.setString("NodeType", r.getString("type_name"));
-		json.set("Children", this.GetChildLinkList(r.getInt("node_id"),snapshot_id));
-		json.set("Attributes", this.getAttribute(node_id));
-		return json;
-	}
-
 	Json CreateJsonNode(ResultSet r) {
 		Json json = new Json();
 		int node_id = r.getInt("node_id");
@@ -164,20 +146,8 @@ class DCaseModel {
 	}
 
 	Json GetChildLinkList(int node_id) {
-		PreparedStatement q = this.db.newPreparedStatement("SELECT node_child_id FROM node_link_has_snapshot INNER JOIN node_link ON node_link_id=node_link.id WHERE node_parent_id=?"); //FIXME snapshot_id
-		q.setInt("@b", node_id);
-		ResultSet r = q.execute();
-		Json json = new Json([]);
-		while(r.next()) {
-			json.add(r.getInt("node_child_id"));
-		}
-		return json;
-	}
-
-	Json GetChildLinkList(int node_id, int snapshot_id) {
-		PreparedStatement q = this.db.newPreparedStatement("SELECT node_child_id FROM node_link_has_snapshot INNER JOIN node_link ON node_link_id=node_link.id WHERE node_parent_id=? AND snapshot_id=?"); //FIXME snapshot_id
-		q.setInt("@b", node_id);
-		q.setInt("@a", snapshot_id);
+		PreparedStatement q = this.db.newPreparedStatement("SELECT node_child_id FROM node_link WHERE node_parent_id=?"); //FIXME snapshot_id
+		q.setInt("@a", node_id);
 		ResultSet r = q.execute();
 		Json json = new Json([]);
 		while(r.next()) {
@@ -207,7 +177,7 @@ class DCaseModel {
 		ResultSet r = q.execute();
 		Json json_array = new Json([]);
 		while(r.next()) {
-			Json json = this.CreateJsonNode(r,snapshot_id);
+			Json json = this.CreateJsonNode(r);
 			json_array.add(json);
 		}
 

@@ -288,6 +288,7 @@ var DCaseViewer = (function() {
 })();
 
 function ViewerInit(body, DCase_Viewer) {
+    DCase_Viewer.tmp_id = 0;
     var menu = new SideMenu(document.body, DCase_Viewer);
     $('.tool-new').click(function() {
         menu.actInsertToSelectedNode();

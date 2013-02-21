@@ -2,7 +2,6 @@ var SideMenu = (function(root, viewer) {
     var width = 200;
     var animeTime = 250;
     var self = this;
-    var tmp_id = -1;
 
     //--------------------------------------------------------
     this.actChangeLock = function() {
@@ -27,6 +26,7 @@ var SideMenu = (function(root, viewer) {
     };
 
     this.actInsertToSelectedNode = function() {
+        console.log(viewer.tmp_id);
         var view = viewer.getSelectedNode();
         if (view != null) {
             DNodeEditWindow.open(null, view.node, function(newNode) {
@@ -34,14 +34,14 @@ var SideMenu = (function(root, viewer) {
                 viewer.setModel(viewer.model);
                 DCaseAPI.insert({
                         NodeType: newNode.type,
-                        ThisNodeId: self.tmp_id,
+                        ThisNodeId: viewer.tmp_id,
                         Description: newNode.text,
                         BelongedArgumentId: viewer.opts.argument_id,
                         ParentNodeId: view.node.id,
                         Children: []
                 });
             });
-            self.tmp_id -= 1;
+            viewer.tmp_id -= 1;
         }
     };
 
@@ -78,7 +78,7 @@ var SideMenu = (function(root, viewer) {
         var msg = prompt('コミットメッセージを入力して下さい');
         if (msg != null) {
             console.log(viewer.model);
-            DCaseAPI.commit(msg,viewer.opts.argument_id,viewer.commit_queue);
+            DCaseAPI.commit(msg,viewer.opts.argument_id);
         }
     };
 
