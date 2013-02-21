@@ -280,7 +280,7 @@ function CreateCommonNode(Viewer, root) {
 
 DNodeView.prototype.initSvg = function(type) {
     var root = this.viewer;
-    if (type == 'Goal') {
+    if (type == 'Goal' || type == 'TopGoal') {
         return CreateGoal(this, root);
     } else if (type == 'Context') {
         return CreateContext(this, root);
@@ -302,7 +302,7 @@ function getClassNameByType(type) {
         return 'dnode dnode-rebuttal';
     if (type == 'Evidence')
         return 'dnode dnode-evidence';
-    if (type == 'Goal')
+    if (type == 'Goal' || type == 'TopGoal')
         return 'dnode dnode-goal';
     if (type == 'Context')
         return 'dnode dnode-context';

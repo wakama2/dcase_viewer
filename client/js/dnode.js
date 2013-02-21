@@ -48,13 +48,13 @@ var DNode = (function() {
         'Rebuttal',
     ];
 
-    function NodeTempate(name) {
+    function NodeTemplate(name) {
         this.name = name;
         this.children = [];
     }
     for (var i = 0; i < DNode.NODE_TYPES.length; i++) {
         var type = DNode.NODE_TYPES[i];
-        DNode[type] = new NodeTempate(type);
+        DNode[type] = new NodeTemplate(type);
     };
     DNode.TopGoal.children = [
         DNode.Subject,
