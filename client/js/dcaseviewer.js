@@ -300,23 +300,23 @@ function ViewerInit(body, DCase_Viewer) {
         menu.actRemoveSelectedNode();
     });
     $('.tool-left').click(function() {
-        viewer.prevVersion(viewer.getSelectedNode());
+        DCase_Viewer.prevVersion(DCase_Viewer.getSelectedNode());
     });
     $('.tool-right').click(function() {
-        viewer.nextVersion(viewer.getSelectedNode());
+        DCase_Viewer.nextVersion(DCase_Viewer.getSelectedNode());
     });
     $('.tool-up').click(function() {
-        viewer.actExpandBranch(viewer.getSelectedNode(), false);
+        DCase_Viewer.actExpandBranch(DCase_Viewer.getSelectedNode(), false);
         $('.tool-up').css('display', 'none');
         $('.tool-down').css('display', 'inline');
     });
     $('.tool-down').click(function() {
-        viewer.actExpandBranch(viewer.getSelectedNode(), true);
+        DCase_Viewer.actExpandBranch(DCase_Viewer.getSelectedNode(), true);
         $('.tool-up').css('display', 'inline');
         $('.tool-down').css('display', 'none');
     });
     $('.tool-play').click(function() {
-        var v = viewer.getSelectedNode();
-        viewer.showDScriptExecuteWindow(v.node.name);
+        var v = DCase_Viewer.getSelectedNode();
+        DCase_Viewer.showDScriptExecuteWindow(v.node.name);
     });
 }
