@@ -677,24 +677,26 @@ class DCaseModel {
 		return ret;
 	}
 
-	Json GetSnapshot(int[] ids) {
-		Json j = new Json([]);
-		int i = 0;
-		while(i < ids.getSize()) {
-			PreparedStatement p = this.db.newPreparedStatement("SELECT id,prev_snapshot_id,unix_time FROM snapshot WHERE id=?");
-			p.setInt("@a",ids[i]);
-			j.add(this._GetSnapshot(p.execute()));
-			i = i + 1;
-		}
-		return j;
-	}
-
 	Json _GetSnapshot(ResultSet r) {
 		Json json = new Json();
 		json.setInt("SnapshotId",r.getInt("id"));
 		json.setInt("PrevSnapshotId",r.getInt("prev_snapshot_id"));
 		json.setInt("UnixTime",r.getInt("unix_time"));
 		//json.setString("CommitMessage",r.getString("commit_message"));
+		return json;
+	}
+
+	Json GetSnapshot(int[] ids) {
+		Json json = new Json([]);
+		int i = 0;
+		while(i < ids.getSize()) {
+			PreparedStatement p = this.db.newPreparedStatement("SELECT id,prev_snapshot_id,unix_time FROM snapshot WHERE id=?");
+			p.setInt("@a",ids[i]);
+			ResultSet r = p.execute();
+			r.next();
+			json.add(this._GetSnapshot(r));
+			i = i + 1;
+		}
 		return json;
 	}
 
