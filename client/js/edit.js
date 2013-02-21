@@ -76,6 +76,23 @@ var DNodeEditWindow = (function() {
             $desc.attr('value', '');
         }
         $('edit-option-' + selectedType).attr('selected', true);
+
+        $("#edit").mousedown(function(e){
+            $("#edit")
+                .data("clickPointX" , e.pageX - $("#edit").offset().left)
+                .data("clickPointY" , e.pageY - $("#edit").offset().top);
+
+            $(document).mousemove(function(e){
+                $("#edit").css({
+                    top: e.pageY  - $("#edit").data("clickPointY")+"px",
+                    left: e.pageX - $("#edit").data("clickPointX")+"px"
+                })
+            })
+
+        }).mouseup(function(){
+            $(document).unbind("mousemove")
+        });
+
         $('#edit').show();
     };
     return DNodeEditWindow;
