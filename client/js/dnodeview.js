@@ -295,7 +295,7 @@ DNodeView.prototype.initSvg = function(type) {
         return CreateStrategy(this, root);
     } else if (type == 'Solution') {
         return CreateSolution(this, root);
-    } else if (type == 'Evidence' || type == 'Monitor' || type == 'Rebuttal') {
+    } else if (type == 'Evidence' || type == 'Rebuttal') {
         return CreateCommonNode(this, root);
     }
     /* unreachable */
