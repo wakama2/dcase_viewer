@@ -9,12 +9,18 @@ var DNodeEditWindow = (function() {
     function init() {
         $select = $('#edit select');
         $desc = $('#edit textarea');
-        $.each(DNode.NODE_TYPES, function(i, type) {
+        $select.children().remove();
+        var children = DNode[parent.type].children;
+            console.log(parent.type);
+        for (var i=0; i < children.length; i++) {
+            var type = children[i].name;
+            console.log(i);
+            console.log(children[i]);
             $('<option></option>')
                 .attr('id', 'edit-option-' + type)
                 .html(type)
                 .appendTo($select);
-        });
+        }
         $('#edit').css({
             left: ($(document).width() - $('#edit').width()) / 2,
             top: ($(document).height() - $('#edit').height()) / 2
@@ -47,9 +53,11 @@ var DNodeEditWindow = (function() {
         $('#edit').hide();
     };
 
-    this.open = function(node, success) {
+    this.open = function(node, parent, success) {
         self.success = success;
         self.node = node;
+        self.parent = parent;
+        init();
         if (node != null) {
             selectedType = node.type;
             $select.attr('disabled', true);
@@ -62,8 +70,6 @@ var DNodeEditWindow = (function() {
         $('edit-option-' + selectedType).attr('selected', true);
         $('#edit').show();
     };
-
-    $(function() {init() });
 
     return this;
 }());

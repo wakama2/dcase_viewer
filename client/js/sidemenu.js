@@ -15,7 +15,7 @@ var SideMenu = (function(root, viewer) {
     this.actEditSelectedNode = function() {
         var view = viewer.getSelectedNode();
         if (view != null) {
-            DNodeEditWindow.open(view.node, function(node) {
+            DNodeEditWindow.open(view.node, view.node, function(node) {
                 viewer.setModel(viewer.model);
                 var r = DCaseAPI.update({
                     argument_id: viewer.opts.argument_id,
@@ -29,7 +29,7 @@ var SideMenu = (function(root, viewer) {
     this.actInsertToSelectedNode = function() {
         var view = viewer.getSelectedNode();
         if (view != null) {
-            DNodeEditWindow.open(null, function(newNode) {
+            DNodeEditWindow.open(null, view.node, function(newNode) {
                 view.node.addChild(newNode);
                 viewer.setModel(viewer.model);
                 DCaseAPI.insert({
@@ -63,13 +63,15 @@ var SideMenu = (function(root, viewer) {
     };
 
     this.actExportJson = function() {
-        //TODO
-        alert('TODO');
+        DumpTree('json');
     };
 
     this.actExportPng = function() {
-        //TODO
-        alert('TODO');
+        DumpTree('png');
+    };
+
+    this.actExportScript = function() {
+        DumpTree('dscript');
     };
 
     this.actCommit = function() {

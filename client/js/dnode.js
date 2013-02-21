@@ -42,6 +42,45 @@ var DNode = (function() {
         'DScriptContext', 'DScriptEvidence', 'Rebuttal'
     ];
 
+    function NodeTempate(name) {
+        this.name = name;
+        this.children = [];
+    }
+    DNode.Goal     = new NodeTempate('Goal');
+    DNode.TopGoal  = new NodeTempate('TopGoal'); /* TopGoal <: Goal */
+    DNode.Strategy = new NodeTempate('Strategy');
+    DNode.Context  = new NodeTempate('Context');
+    DNode.Evidence = new NodeTempate('Evidence');
+    DNode.Subject  = new NodeTempate('DScriptContext');
+    DNode.Solution = new NodeTempate('DScriptEvidence');
+    DNode.Rebuttal = new NodeTempate('Rebuttal');
+    /* FIXME DScriptContext => Subject */
+    /* FIXME DScriptEvidence => Solution */
+    DNode.DScriptEvidence = DNode.Subject;
+    DNode.DScriptContext = DNode.Solution;
+
+    DNode.TopGoal.children = [
+        DNode.Subject,
+        DNode.Strategy,
+        DNode.Context,
+        DNode.Evidence
+    ];
+    DNode.Goal.children = [
+        DNode.Strategy,
+        DNode.Context,
+        DNode.Goal,
+        DNode.Evidence
+    ];
+    DNode.Strategy.children = [
+        DNode.Context,
+        DNode.Goal
+    ];
+    DNode.Evidence.children = [
+        DNode.Rebuttal
+    ];
+    DNode.DScriptEvidence.children = [
+        DNode.Rebuttal
+    ];
     //-------------------------------------
     DNode.prototype.isDScript = function() {
         return this.type == 'DScriptEvidence';
