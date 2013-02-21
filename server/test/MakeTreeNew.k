@@ -44,6 +44,9 @@ void GenerateTree1(DCaseModel model) {
 	Json e2 = SetNode("Evidence", -4, -6, id, "telnet @{IP} @{PORT}");
 	commitObj1_nodelist.add(e2);
 
+	Json e3 = SetNode("Evidence", -5, -7, id, "telnet @{IP} @{PORT}");
+	commitObj1_nodelist.add(e3);
+
 	commitObj1.set("NodeList", commitObj1_nodelist);
 	commit.add(commitObj1);
 	json.set("commit", commit);
