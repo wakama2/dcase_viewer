@@ -17,6 +17,5 @@ INSERT INTO `node_type` (`type_name`) VALUES
 ('Evidence'),
 ('Support'),
 ('Rebuttal'),
-('Monitor'),
 ('Subject'),
 ('Solution');
