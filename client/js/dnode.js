@@ -39,7 +39,7 @@ var DNode = (function() {
 
     DNode.NODE_TYPES = [
         'Goal', 'Context', 'Strategy', 'Evidence', 'Monitor',
-        'Subject', 'DScriptEvidence', 'Rebuttal'
+        'Subject', 'Solution', 'Rebuttal'
     ];
 
     function NodeTempate(name) {
@@ -52,10 +52,8 @@ var DNode = (function() {
     DNode.Context  = new NodeTempate('Context');
     DNode.Evidence = new NodeTempate('Evidence');
     DNode.Subject  = new NodeTempate('Subject');
-    DNode.Solution = new NodeTempate('DScriptEvidence');
+    DNode.Solution = new NodeTempate('Solution');
     DNode.Rebuttal = new NodeTempate('Rebuttal');
-    /* FIXME DScriptEvidence => Solution */
-    DNode.DScriptEvidence = DNode.Subject;
 
     DNode.TopGoal.children = [
         DNode.Subject,
@@ -76,12 +74,12 @@ var DNode = (function() {
     DNode.Evidence.children = [
         DNode.Rebuttal
     ];
-    DNode.DScriptEvidence.children = [
+    DNode.Solution.children = [
         DNode.Rebuttal
     ];
     //-------------------------------------
     DNode.prototype.isDScript = function() {
-        return this.type == 'DScriptEvidence';
+        return this.type == 'Solution';
     };
     return DNode;
 })();

@@ -234,12 +234,12 @@ function CreateSubject(Viewer, root) {
     o.offset = { x: 1, y: 1 };
     return o;
 }
-function CreateDScriptEvidence(Viewer, root) {
+function CreateSolution(Viewer, root) {
     var o1 = root.createSvg('ellipse');
     var o2 = root.createSvg('polygon');
     $(o2).attr({
-        stroke: CONFIG.Color.Stroke.DScriptEvidence,
-        fill: CONFIG.Color.BackGround.DScriptEvidence });
+        stroke: CONFIG.Color.Stroke.Solution,
+        fill: CONFIG.Color.BackGround.Solution });
     var o = root.createSvg('g');
     o.appendChild(o1);
     o.appendChild(o2);
@@ -293,8 +293,8 @@ DNodeView.prototype.initSvg = function(type) {
         return CreateSubject(this, root);
     } else if (type == 'Strategy') {
         return CreateStrategy(this, root);
-    } else if (type == 'DScriptEvidence') {
-        return CreateDScriptEvidence(this, root);
+    } else if (type == 'Solution') {
+        return CreateSolution(this, root);
     } else if (type == 'Evidence' || type == 'Monitor' || type == 'Rebuttal') {
         return CreateCommonNode(this, root);
     }
