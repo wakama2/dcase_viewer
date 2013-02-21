@@ -88,7 +88,8 @@ var SideMenu = (function(root, viewer) {
             '#menu-search',
             '#menu-export',
             '#menu-create',
-            '#menu-tool'
+            '#menu-tool',
+            '#menu-color'
         ];
         $.each(ids, function(i, id) {
             if (m == id) $(id).toggle();
@@ -229,5 +230,26 @@ var SideMenu = (function(root, viewer) {
 
     $('#menu-tool-commit').click(function() {
         self.actCommit();
+    });
+
+    //--------------------------------------------------------
+    var $color = $('#menu-color-i').click(function() {
+        self.show('#menu-color');
+    }).appendTo(root);
+    $('.colorpicker').colorPicker();
+    $('#color-goal').change(function() {
+        $($('.dnode-goal'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
+    });
+    $('#color-strategy').change(function() {
+        $($('.dnode-strategy'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
+    });
+    $('#color-context').change(function() {
+        $($('.dnode-context'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
     });
 });

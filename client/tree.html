@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>D-CASE VIEWER</title>
 <link rel="stylesheet" type="text/css" href="lib/codemirror.css"/>
-<link rel="stylesheet" type="text/css" href="lib/jquery.svg.css"/>
 <link rel="stylesheet" type="text/css" href="lib/bootstrap.icons.css"/>
+<link rel="stylesheet" type="text/css" href="lib/colorPicker.css"/>
 <link rel="stylesheet" type="text/css" href="css/dcase-node.css"/>
 <link rel="stylesheet" type="text/css" href="css/viewer.css"/>
 <link rel="stylesheet" type="text/css" href="css/sidemenu.css"/>
@@ -27,6 +27,7 @@ body {
 <script type="text/javascript" src="lib/jquery.mousewheel.min.js"></script>
 <script type="text/javascript" src="lib/jquery.svg.min.js"></script>
 <script type="text/javascript" src="lib/jquery.svganim.min.js"></script>
+<script type="text/javascript" src="lib/jquery.colorPicker.min.js"></script>
 <script type="text/javascript" src="lib/codemirror.js"></script>
 <script type="text/javascript" src="js/config.js"></script>
 <script type="text/javascript" src="js/dcaseviewer.js"></script>
@@ -245,6 +246,24 @@ window.addEventListener("load",function() {
 
 	<div id="menu-tool-i" class="menu-i" style="left: 160px;">
 		<i class="icon-print"></i>
+	</div>
+	<div id="menu-color-i" class="menu-i" style="left: 200px;">
+		<i class="icon-wrench"></i>
+	</div>
+	<div id="menu-color" class="menu-box">
+		<form action="#" method="post">
+			<fieldset>
+				<div class="controlset">
+					<label for="color-goal">Goal</label>
+					<input class="colorpicker" id="color-goal" type="text" name="color-goal" value="#333399" /></div>
+				<div class="controlset">
+					<label for="color-strategy">Strategy</label>
+					<input class="colorpicker" id="color-strategy" type="text" name="color-strategy" value="#FF0000" /></div>
+				<div class="controlset">
+					<label for="color-context">Context</label>
+					<input class="colorpicker" id="color-context" type="text" name="color-context" value="#99cc00" /></div>
+			</fieldset>
+		</form>
 	</div>
 </div>
 

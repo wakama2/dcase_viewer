@@ -3,15 +3,18 @@
 	font-size: 12px;
 	word-wrap: break-word;
 }
+
 .node-name {
 	font-weight: bold;
 	font-size: 120%;
 	text-align: left;
 }
+
 .node-text {
 	font-size: 100%;
 	text-align: left;
 }
+
 .node-closednodes {
 	background: #A0F0A0;
 	position: absolute;
@@ -34,4 +37,62 @@
 	border-style: solid;
 	border-color: #808080;
 	z-index: 10;
+}
+
+// -------------
+// dnode style
+
+.dnode {
+	fill: #b4d8df;
+}
+
+.dnode-context {
+	fill: #dbf5f3;
+}
+
+.dnode-argument {
+	fill: none;
+	stroke: #8080D0;
+}
+
+.dnode-strategy {
+	fill: #dbf5f3;
+}
+
+.dnode-rebuttal {
+	fill: #CCC;
+}
+
+.dnode-evidence {
+	fill: #b4d8df;
+}
+
+.dnode-goal {
+	fill: #b4d8df;
+}
+
+.dnode-undevelop {
+	fill: none;
+	stroke: black;
+}
+
+.dnode-subject {
+	fill: #dbf5f3;
+}
+
+polygon.dnode-subject {
+	fill: #b4d8df;
+}
+
+polygon.dnode-solution {
+	fill: #b4d8df;
+}
+
+.dnode-focused {
+	stroke: #A17AA3;
+}
+
+.dnode-line {
+	fill: none;
+	stroke: black;
 }
