@@ -42,8 +42,6 @@ body {
 
 function getNodeFromServer(id) {
 	var res1 = DCaseAPI.call("getArgumentList");
-	//var id = res1[0].argument_id;
-	//var id = "0";//FIXME
 	console.log("get id=" + id);
 	var res2 = DCaseAPI.call("getNodeTree", {BelongedArgumentId: id});
 	console.log(res2);
