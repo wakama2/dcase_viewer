@@ -16,6 +16,7 @@ session_start();
 <link rel="stylesheet" type="text/css" href="css/viewer.css"/>
 <link rel="stylesheet" type="text/css" href="css/sidemenu.css"/>
 <link rel="stylesheet" type="text/css" href="css/edit.css"/>
+<link rel="stylesheet" type="text/css" href="lib/jquery.ui.autocomplete.css"/>
 <style>
 body {
 	min-height: 480px;
@@ -30,6 +31,7 @@ body {
 </style>
 <script type="text/javascript" src="lib/jquery.min.js"></script>
 <script type="text/javascript" src="lib/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" src="lib/jquery.ui.autocomplete.js"></script>
 <script type="text/javascript" src="lib/jquery.svg.min.js"></script>
 <script type="text/javascript" src="lib/jquery.svganim.min.js"></script>
 <script type="text/javascript" src="lib/jquery.colorPicker.min.js"></script>

@@ -33,7 +33,7 @@ var DNodeEditWindow = (function() {
         });
 
         function CollectNodeDescript(list, node) {
-            list.add(node.text);
+            list.push(node.text);
             for (var i=0; i < node.children.length; i++) {
                 CollectNodeDescript(list, node.children[i]);
             };
