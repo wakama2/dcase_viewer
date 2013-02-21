@@ -42,14 +42,13 @@ body {
 <script type="text/javascript">
 
 window.addEventListener("load",function() {
-	//var node = createSampleNode();
-	var args = DCaseAPI.call("getArgumentList", {});
-	var tree = DCaseAPI.call("getNodeTree", { BelongedArgumentId: args.id[0]});
-	var node = DCaseAPI.createNode(tree.Tree);
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node);
+	//var args = DCaseAPI.call("getArgumentList", {});
+	//var tree = DCaseAPI.call("getNodeTree", { BelongedArgumentId: args.id[0]});
+	//var node = DCaseAPI.createNode(tree.Tree);
+	var viewer = new DCaseViewer(document.getElementById("viewer"), null);
 	var menu = new SideMenu(document.body, viewer);
 
-	viewer.showTimeline('timeline-embed');
+	viewer.createTimeline('timeline-embed');
 
 	$(".tool-new").click(function() {
 		menu.actInsertToSelectedNode();
@@ -141,16 +140,20 @@ window.addEventListener("load",function() {
 	</div>
 
 	<div id="menu-tool-i" class="menu-i" style="left: 120px;">
-		<i class="icon-list"></i>
+		<i class="icon-print"></i>
 	</div>
 	<div id="menu-tool" class="menu-box">
-		<input id="menu-tool-commit" type="button" value="commit"></input>
-		<input id="menu-tool-undo" type="button" value="undo"></input>
-		<input id="menu-tool-redo" type="button" value="redo"></input>
 	</div>
 
-	<div id="menu-tool-i" class="menu-i" style="left: 160px;">
-		<i class="icon-print"></i>
+	<div id="menu-proc-i" class="menu-i" style="left: 160px;">
+		<i class="icon-plus"></i>
+	</div>
+	<div id="menu-proc" class="menu-box">
+		<input id="menu-proc-commit" type="button" value="commit"></input>
+		<input id="menu-proc-undo" type="button" value="undo"></input>
+		<input id="menu-proc-redo" type="button" value="redo"></input>
+		Arguments:<br>
+		<ul style="list-style-type: none; overflow: auto;"></ul>
 	</div>
 </div>
 

@@ -9,6 +9,7 @@ DCaseViewer.prototype.setDragHandler = function() {
 		if(flag) {
 			this.dragCancel();
 		}
+		if(self.rootview == null) return;
 		x0 = x;
 		y0 = y;
 		flag = true;

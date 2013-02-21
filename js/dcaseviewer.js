@@ -17,6 +17,7 @@ var DCaseViewer = function(root, model, opts) {
 	});
 	this.root = root;
 	this.opts = opts;
+	this.argId = 1;//TODO
 	this.moving = false;
 	this.shiftX = 0;
 	this.shiftY = 0;
@@ -35,11 +36,25 @@ var DCaseViewer = function(root, model, opts) {
 	this.setTextSelectable(false);
 }
 
+DCaseViewer.prototype.setArgument = function(node) {
+	this.setModel(node);
+};
+
 DCaseViewer.prototype.setModel = function(model) {
 	$(this.svgroot).empty();
 	$(this.root)
 		.empty()
 		.append(this.svgroot);
+	if(model == null) {
+		//$("<div></div>")
+		//	.html("Argumentを選択して下さい")
+		//	.css({
+		//		"text-align": "center",
+		//		"background": "#CCC",
+		//		"border-radius": "4px",
+		//	}).appendTo(this.root);
+		return;
+	}
 
 	var self = this;
 	function create(node) {
@@ -72,6 +87,7 @@ DCaseViewer.prototype.setModel = function(model) {
 }
 
 DCaseViewer.prototype.centerize = function(view, ms) {
+	if(this.rootview == null) return;
 	this.selectedNode = view;
 	this.rootview.updateLocation(0, 0);
 	var b = view.bounds;
@@ -112,6 +128,7 @@ DCaseViewer.prototype.redo = function() {
 }
 
 DCaseViewer.prototype.repaintAll = function(ms) {
+	if(this.rootview == null) return;
 	var self = this;
 	var rootview = self.rootview;
 	rootview.updateLocation(
@@ -204,17 +221,31 @@ DCaseViewer.prototype.showToolbox = function(node) {
 	}
 }
 
-DCaseViewer.prototype.showTimeline = function(dom_id) {
-	var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: 1 });
+var global_viewer = null;
+
+DCaseViewer.prototype.setSnapshot = function(id) {
+	var ss = this.snapshotList[id]
+	var node = DCaseAPI.call("getNodeTreeFromSnapshotId", {
+		BelongedArgumentId: this.argId, 
+		SnapshotId: ss.id
+	}).Tree;
+	this.setModel(DCaseAPI.createNode(node));
+}
+
+DCaseViewer.prototype.createTimeline = function(dom_id) {
+	var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: this.argId });
 	var l = r.SnapshotIdList;
+	this.snapshotList = l;
+	global_viewer = this;
 
 	var dates = [];
 	for(var i=0; i<l.length; i++) {
-		var id = l[i];
+		var id = l[i].id;
+		var time = l[i].time;
 		dates.push({
-			"startDate": "2012,1," + (i+1),
-			"endDate"  : "2012,1," + (i+2),
-			"headline" : "Commit " + id,
+			"startDate": new Date(time*1000),
+			"endDate"  : new Date(time*1000),
+			"headline" : "Snapshot " + id,
 			"text":"<p>Body text goes here, some HTML is OK</p>",
 			"asset": {
 				"credit":"Credit Name Goes Here",
@@ -242,7 +273,7 @@ DCaseViewer.prototype.showTimeline = function(dom_id) {
 		source  : { timeline: timeline },
 		embed_id: dom_id,
 		css     : 'lib/timeline.css',
-		js      : 'lib/timeline-min.js'
+		js      : 'lib/timeline.js'
 	});
 }
 
@@ -287,6 +318,7 @@ DCaseViewer.prototype.setTextSelectable = function(b) {
 }
 
 DCaseViewer.prototype.fit = function(ms) {
+	if(this.rootview == null) return;
 	var size = this.rootview.updateLocation(0, 0);
 	this.scale = Math.min(
 		$(this.root).width()  * 0.98 / size.x,

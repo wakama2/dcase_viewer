@@ -63,7 +63,8 @@ var SideMenu = function(root, viewer) {
 			"#menu-search",
 			"#menu-export",
 			"#menu-info",
-			"#menu-tool"
+			"#menu-tool",
+			"#menu-proc"
 		];
 		$.each(ids, function(i, id) {
 			if(m == id) $(id).toggle();
@@ -122,7 +123,7 @@ var SideMenu = function(root, viewer) {
 	}
 
 	// init search list
-	this.search("");
+	//this.search("");
 
 	//--------------------------------------------------------
 	var $export = $("#menu-export-i")
@@ -146,24 +147,31 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 	
-	(function() {
-		var types = DNode.TYPES;
-		var count = {};
-		for(var i=0; i<types.length; i++) {
-			count[types[i]] = 0;
-		}
-		viewer.traverseAll(function(node) {
-			count[node.type] += 1;
-		});
-		var $table = $("#menu-info-table");
-		for(var i=0; i<types.length; i++) {
-			var name = types[i];
-			$("<tr></tr>")
-				.append($("<td></td>").html(name))
-				.append($("<td></td>").html(count[name]))
-				.appendTo($table);
-		}
-	})();
+	//(function() {
+	//	var types = DNode.TYPES;
+	//	var count = {};
+	//	for(var i=0; i<types.length; i++) {
+	//		count[types[i]] = 0;
+	//	}
+	//	viewer.traverseAll(function(node) {
+	//		count[node.type] += 1;
+	//	});
+	//	var $table = $("#menu-info-table");
+	//	for(var i=0; i<types.length; i++) {
+	//		var name = types[i];
+	//		$("<tr></tr>")
+	//			.append($("<td></td>").html(name))
+	//			.append($("<td></td>").html(count[name]))
+	//			.appendTo($table);
+	//	}
+	//})();
+
+	//--------------------------------------------------------
+	var $proc = $("#menu-proc-i")
+			.click(function(e) {
+				self.show("#menu-proc");
+			})
+			.appendTo(root);
 
 	//--------------------------------------------------------
 	var $tool = $("#menu-tool-i")
