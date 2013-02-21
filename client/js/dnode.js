@@ -38,23 +38,24 @@ var DNode = (function() {
     };
 
     DNode.NODE_TYPES = [
-        'Goal', 'Context', 'Strategy', 'Evidence', 'Monitor',
-        'Subject', 'Solution', 'Rebuttal'
+        'Goal',
+        'TopGoal', /* TopGoal <: Goal */
+        'Strategy',
+        'Context',
+        'Evidence',
+        'Subject',
+        'Solution',
+        'Rebuttal',
     ];
 
     function NodeTempate(name) {
         this.name = name;
         this.children = [];
     }
-    DNode.Goal     = new NodeTempate('Goal');
-    DNode.TopGoal  = new NodeTempate('TopGoal'); /* TopGoal <: Goal */
-    DNode.Strategy = new NodeTempate('Strategy');
-    DNode.Context  = new NodeTempate('Context');
-    DNode.Evidence = new NodeTempate('Evidence');
-    DNode.Subject  = new NodeTempate('Subject');
-    DNode.Solution = new NodeTempate('Solution');
-    DNode.Rebuttal = new NodeTempate('Rebuttal');
-
+    for (var i = 0; i < DNode.NODE_TYPES.length; i++) {
+        var type = DNode.NODE_TYPES[i];
+        DNode[type] = new NodeTempate(type);
+    };
     DNode.TopGoal.children = [
         DNode.Subject,
         DNode.Strategy,
