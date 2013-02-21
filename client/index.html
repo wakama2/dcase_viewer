@@ -54,40 +54,8 @@ function getNodeFromServer(id) {
 var DCase_Viewer;
 
 window.addEventListener("load",function() {
-	DCase_Viewer = new DCaseViewer(document.getElementById("viewer"), null, {});
-	var menu = new SideMenu(document.body, DCase_Viewer);
-
-	$(".tool-new").click(function() {
-		menu.actInsertToSelectedNode();
-	});
-	$(".tool-edit").click(function() {
-		menu.actEditSelectedNode();
-	});
-	$(".tool-remove").click(function() {
-		menu.actRemoveSelectedNode();
-	});
-	$(".tool-left").click(function() {
-		viewer.prevVersion(viewer.getSelectedNode());
-	});
-	$(".tool-right").click(function() {
-		viewer.nextVersion(viewer.getSelectedNode());
-	});
-	$(".tool-up").click(function() {
-		viewer.actExpandBranch(viewer.getSelectedNode(), false);
-		$(".tool-up").css("display", "none");
-		$(".tool-down").css("display", "inline");
-	});
-	$(".tool-down").click(function() {
-		viewer.actExpandBranch(viewer.getSelectedNode(), true);
-		$(".tool-up").css("display", "inline");
-		$(".tool-down").css("display", "none");
-	});
-
-	$(".tool-play").click(function() {
-		var v = viewer.getSelectedNode();
-		viewer.showDScriptExecuteWindow(v.node.name);
-	});
-
+	DCase_Viewer = new DCaseViewer(document.getElementById('viewer'), null, {});
+	ViewerInit(document.body, DCase_Viewer);
 	// hide url bar for ipod touch
 	setTimeout(function(){
 		window.scrollTo(0, 0);

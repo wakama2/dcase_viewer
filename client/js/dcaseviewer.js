@@ -286,3 +286,36 @@ var DCaseViewer = (function() {
     };
     return DCaseViewer;
 })();
+
+function ViewerInit(body, DCase_Viewer) {
+    var menu = new SideMenu(document.body, DCase_Viewer);
+    $('.tool-new').click(function() {
+        menu.actInsertToSelectedNode();
+    });
+    $('.tool-edit').click(function() {
+        menu.actEditSelectedNode();
+    });
+    $('.tool-remove').click(function() {
+        menu.actRemoveSelectedNode();
+    });
+    $('.tool-left').click(function() {
+        viewer.prevVersion(viewer.getSelectedNode());
+    });
+    $('.tool-right').click(function() {
+        viewer.nextVersion(viewer.getSelectedNode());
+    });
+    $('.tool-up').click(function() {
+        viewer.actExpandBranch(viewer.getSelectedNode(), false);
+        $('.tool-up').css('display', 'none');
+        $('.tool-down').css('display', 'inline');
+    });
+    $('.tool-down').click(function() {
+        viewer.actExpandBranch(viewer.getSelectedNode(), true);
+        $('.tool-up').css('display', 'inline');
+        $('.tool-down').css('display', 'none');
+    });
+    $('.tool-play').click(function() {
+        var v = viewer.getSelectedNode();
+        viewer.showDScriptExecuteWindow(v.node.name);
+    });
+}
