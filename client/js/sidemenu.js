@@ -64,8 +64,7 @@ var SideMenu = (function(root, viewer) {
 
     function ExportTree(DumpType, NodeId) {
         var url = CONFIG.view_cgi + '?' + NodeId + '.' + DumpType;
-        $("body").append(
-                "<iframe src='" + url + "' style='display: none;' ></iframe>");
+        window.open(url);
     }
 
     this.actExportJson = function() {
