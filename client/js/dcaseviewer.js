@@ -173,8 +173,8 @@ var DCaseViewer = (function() {
             var id = l[i].SnapshotId;
             var time = l[i].UnixTime;
             dates.push({
-                "startDate": new Date(time*1000),
-                "endDate"  : new Date(time*1000),
+                "startDate": new Date(time),
+                "endDate"  : new Date(time),
                 "headline" : "Snapshot " + id,
                 "text":"<p>Body text goes here, some HTML is OK</p>",
                 "asset": {
