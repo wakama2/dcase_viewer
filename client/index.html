@@ -60,16 +60,21 @@ function getURLParameter(name) {
 var DCase_Viewer;
 
 window.addEventListener("load",function() {
-	DCase_Viewer = new DCaseViewer(document.getElementById('viewer'), null, {});
+	var id = parseInt(getURLParameter('id'));
+	var opts = {};
+	var node = null;
+	if(id > 0) {
+		opts = {
+			'argument_id': id
+		};
+		node = getNodeFromServer(id);
+	}
+	DCase_Viewer = new DCaseViewer(document.getElementById('viewer'), node, opts);
 	ViewerInit(document.body, DCase_Viewer);
 	// hide url bar for ipod touch
 	setTimeout(function(){
 		window.scrollTo(0, 0);
 	}, 0);
-	var id = parseInt(getURLParameter('id'));
-	if(id > 0) {
-		initViewer(id);
-	}
 });
 </script>
 </head>
@@ -88,6 +93,7 @@ window.addEventListener("load",function() {
 </svg>
 
 <div id="viewer"></div>
+<div id="timeline"></div>
 
 <div id="toolbar" style="display: none;">
 	<a href="#" class="tool-new"><i class="icon-plus"></i></a>

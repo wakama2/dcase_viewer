@@ -37,17 +37,9 @@ var DCaseViewer = (function() {
         $(this.svgroot).empty();
         $(this.root)
             .empty()
-            .append(this.svgroot)
-            .append("<div id=\"timeline\"></div>");
+            .append(this.svgroot);
         this.model = model;
         if (model == null) return;
-
-        $('#timeline').css({
-            position: 'absolute',
-            bottom: '0px',
-            margin: '0px'
-        });
-        this.createTimeline('timeline');
 
         var self = this;
         function create(node) {
@@ -193,7 +185,6 @@ var DCaseViewer = (function() {
             },
             "date": dates,
         };
-        $('#' + dom_id).empty();
         createStoryJS({
             type    : "timeline",
             width   : '95%',
@@ -377,4 +368,10 @@ function ViewerInit(body, DCase_Viewer) {
         var v = DCase_Viewer.getSelectedNode();
         DCase_Viewer.showDScriptExecuteWindow(v.node.name);
     });
+    $('#timeline').css({
+        position: 'absolute',
+        bottom: '0px',
+        margin: '0px'
+    });
+    DCase_Viewer.createTimeline('timeline');
 }

@@ -144,6 +144,11 @@ function createBinNode(n) {
 var id_count = 1; // ?
 
 function initViewer(id) {
+    $('#timeline').empty();
+    $(DCase_Viewer.root)
+        .empty()
+        .append(DCase_Viewer.svgroot)
+        .append('<div id="timeline"></div>');
     var node = getNodeFromServer(id);
     var opts = {
         argument_id: id
@@ -151,5 +156,6 @@ function initViewer(id) {
     console.log(node);
     DCase_Viewer.opts = opts;
     DCase_Viewer.setModel(node);
+    DCase_Viewer.createTimeline('timeline');
     console.log(DCase_Viewer.rootview);
 }
