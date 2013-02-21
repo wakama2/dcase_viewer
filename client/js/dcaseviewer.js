@@ -257,7 +257,7 @@ var DCaseViewer = (function() {
             }
         }
         if (nn.context != null) {
-            nn.context.type = 'DScriptContext';
+            nn.context.type = 'Subject';
         }
         var t = $('<div></div>')
             .addClass('dscript-exe-window')

@@ -202,13 +202,13 @@ function CreateStrategy(Viewer, root) {
     o.offset = { x: 25, y: 10 };
     return o;
 }
-function CreateDScriptContext(Viewer, root) {
+function CreateSubject(Viewer, root) {
     var o = root.createSvg('g');
     var o1 = root.createSvg('rect');
     var o2 = root.createSvg('polygon');
     $(o2).attr({
-        stroke: CONFIG.Color.Stroke.DScriptContext,
-        fill: CONFIG.Color.BackGround.DScriptContext });
+        stroke: CONFIG.Color.Stroke.Subject,
+        fill: CONFIG.Color.BackGround.Subject });
     o.appendChild(o1);
     o.appendChild(o2);
     o.setBounds = function(a, x, y, w, h) {
@@ -289,8 +289,8 @@ DNodeView.prototype.initSvg = function(type) {
         return CreateGoal(this, root);
     } else if (type == 'Context') {
         return CreateContext(this, root);
-    } else if (type == 'DScriptContext') {
-        return CreateDScriptContext(this, root);
+    } else if (type == 'Subject') {
+        return CreateSubject(this, root);
     } else if (type == 'Strategy') {
         return CreateStrategy(this, root);
     } else if (type == 'DScriptEvidence') {
@@ -345,7 +345,7 @@ DNodeView.prototype.addChild = function(view) {
     switch (view.node.type) {
     case 'Context':
     case 'Rebuttal':
-    case 'DScriptContext':
+    case 'Subject':
         var l = this.viewer.createSvg('line');
         $(l).attr({
             fill: 'none',

@@ -39,7 +39,7 @@ var DNode = (function() {
 
     DNode.NODE_TYPES = [
         'Goal', 'Context', 'Strategy', 'Evidence', 'Monitor',
-        'DScriptContext', 'DScriptEvidence', 'Rebuttal'
+        'Subject', 'DScriptEvidence', 'Rebuttal'
     ];
 
     function NodeTempate(name) {
@@ -51,13 +51,11 @@ var DNode = (function() {
     DNode.Strategy = new NodeTempate('Strategy');
     DNode.Context  = new NodeTempate('Context');
     DNode.Evidence = new NodeTempate('Evidence');
-    DNode.Subject  = new NodeTempate('DScriptContext');
+    DNode.Subject  = new NodeTempate('Subject');
     DNode.Solution = new NodeTempate('DScriptEvidence');
     DNode.Rebuttal = new NodeTempate('Rebuttal');
-    /* FIXME DScriptContext => Subject */
     /* FIXME DScriptEvidence => Solution */
     DNode.DScriptEvidence = DNode.Subject;
-    DNode.DScriptContext = DNode.Solution;
 
     DNode.TopGoal.children = [
         DNode.Subject,
