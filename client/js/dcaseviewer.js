@@ -42,7 +42,12 @@ var DCaseViewer = (function() {
         this.model = model;
         if (model == null) return;
 
-        this.createTimeline(this.opts.argument_id);
+        $('#timeline').css({
+            position: 'absolute',
+            bottom: '0px',
+            margin: '0px'
+        });
+        this.createTimeline('timeline');
 
         var self = this;
         function create(node) {
@@ -161,12 +166,12 @@ var DCaseViewer = (function() {
 
     DCaseViewer.prototype.createTimeline = function(dom_id) {
         var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: this.opts.argument_id });
-        var l = r.SnapshotIdList;
+        var l = r.SnapshotList;
         this.snapshotList = l;
         var dates = [];
         for(var i=0; i<l.length; i++) {
-            var id = l[i].id;
-            var time = l[i].time;
+            var id = l[i].SnapshotId;
+            var time = l[i].UnixTime;
             dates.push({
                 "startDate": new Date(time*1000),
                 "endDate"  : new Date(time*1000),
@@ -188,7 +193,7 @@ var DCaseViewer = (function() {
             },
             "date": dates,
         };
-        $(dom_id).empty();
+        $('#' + dom_id).empty();
         createStoryJS({
             type    : "timeline",
             width   : '95%',
