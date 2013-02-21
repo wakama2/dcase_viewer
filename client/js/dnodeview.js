@@ -277,7 +277,8 @@ function CreateSolution(Viewer, root) {
     $(o2).attr('class', 'dnode dnode-solution');
     return o;
 }
-function CreateCommonNode(Viewer, root) {
+
+function CreateEvidence(Viewer, root) {
     var o = root.createSvg('ellipse');
     o.setBounds = function(a, x, y, w, h) {
         a.moves(this, {
@@ -292,7 +293,26 @@ function CreateCommonNode(Viewer, root) {
         return { w: w * 8 / 6, h: h * 8 / 6 };
     };
     o.offset = { x: 0, y: 0 };
-    $(o).attr('class', 'dnode');
+    $(o).attr('class', 'dnode dnode-evidence');
+    return o;
+}
+
+function CreateRebuttal(Viewer, root) {
+    var o = root.createSvg('ellipse');
+    o.setBounds = function(a, x, y, w, h) {
+        a.moves(this, {
+            cx: x + w / 2,
+            cy: y + h / 2,
+            rx: w / 2,
+            ry: h / 2
+        });
+        o.offset = { x: w / 6 / root.scale, y: h / 6 / root.scale };
+    };
+    Viewer.getOuterSize = function(w, h) {
+        return { w: w * 8 / 6, h: h * 8 / 6 };
+    };
+    o.offset = { x: 0, y: 0 };
+    $(o).attr('class', 'dnode dnode-rebuttal');
     return o;
 }
 
@@ -300,39 +320,22 @@ DNodeView.prototype.initSvg = function(type) {
     var root = this.viewer;
     if (type == 'Goal' || type == 'TopGoal') {
         return CreateGoal(this, root);
-    } else if (type == 'Context') {
-        return CreateContext(this, root);
-    } else if (type == 'Subject') {
-        return CreateSubject(this, root);
     } else if (type == 'Strategy') {
         return CreateStrategy(this, root);
+    } else if (type == 'Context') {
+        return CreateContext(this, root);
+    } else if (type == 'Evidence') {
+        return CreateEvidence(this, root);
+    } else if (type == 'Subject') {
+        return CreateSubject(this, root);
     } else if (type == 'Solution') {
         return CreateSolution(this, root);
-    } else if (type == 'Evidence' || type == 'Rebuttal') {
-        return CreateCommonNode(this, root);
+    } else if (type == 'Rebuttal') {
+        return CreateRebuttal(this, root);
     }
     /* unreachable */
     throw type + ' is not GSN type';
 };
-
-function getClassNameByType(type) {
-    if (type == 'Rebuttal')
-        return 'dnode dnode-rebuttal';
-    if (type == 'Evidence')
-        return 'dnode dnode-evidence';
-    if (type == 'Goal' || type == 'TopGoal')
-        return 'dnode dnode-goal';
-    if (type == 'Context')
-        return 'dnode dnode-context';
-    if (type == 'Strategy')
-        return 'dnode dnode-strategy';
-    if (type == 'Rebuttal')
-        return 'dnode dnode-rebuttal';
-    if (type == 'Subject')
-        return 'dnode dnode-subject';
-    console.log(type);
-    return 'dnode';
-}
 
 DNodeView.prototype.forEachNode = function(f) {
     if (this.context != null) {
@@ -501,9 +504,11 @@ DNodeView.prototype.animeStart = function(a) {
         fontSize: Math.floor(FONT_SIZE * scale)
     });
 
-    this.svg.setAttribute('class', getClassNameByType(this.node.type));
     if (this.viewer.selectedNode == this) {
-        this.svg.setAttribute('class', this.svg.getAttribute('class') + ' dnode-focused');
+        $(this.svg).attr('class', $(this.svg).attr('class') + ' dnode-focused');
+    }
+    else {
+        $(this.svg).attr('class', $(this.svg).attr('class').replace(' dnode-focused', ''));
     }
     if (scale < MIN_DISP_SCALE) {
         a.show(this.divText, false);

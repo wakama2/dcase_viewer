@@ -46,34 +46,20 @@
 	fill: #b4d8df;
 }
 
-.dnode-context {
-	fill: #dbf5f3;
-}
-
-.dnode-argument {
-	fill: none;
-	stroke: #8080D0;
+.dnode-goal {
+	fill: #b4d8df;
 }
 
 .dnode-strategy {
 	fill: #dbf5f3;
 }
 
-.dnode-rebuttal {
-	fill: #CCC;
+.dnode-context {
+	fill: #dbf5f3;
 }
 
 .dnode-evidence {
 	fill: #b4d8df;
-}
-
-.dnode-goal {
-	fill: #b4d8df;
-}
-
-.dnode-undevelop {
-	fill: none;
-	stroke: black;
 }
 
 .dnode-subject {
@@ -84,8 +70,26 @@ polygon.dnode-subject {
 	fill: #b4d8df;
 }
 
+.dnode-solution {
+	fill: #b4d8df;
+}
+
 polygon.dnode-solution {
 	fill: #b4d8df;
+}
+
+.dnode-rebuttal {
+	fill: #CCC;
+}
+
+.dnode-argument {
+	fill: none;
+	stroke: #8080D0;
+}
+
+.dnode-undevelop {
+	fill: none;
+	stroke: black;
 }
 
 .dnode-focused {

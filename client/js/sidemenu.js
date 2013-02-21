@@ -261,4 +261,24 @@ var SideMenu = (function(root, viewer) {
             fill: $(this).val()
         });
     });
+    $('#color-evidence').change(function() {
+        $($('.dnode-evidence'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
+    });
+    $('#color-subject').change(function() {
+        $($('.dnode-subject'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
+    });
+    $('#color-solution').change(function() {
+        $($('.dnode-solution'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
+    });
+    $('#color-rebuttal').change(function() {
+        $($('.dnode-rebuttal'), viewer.svgroot).css({
+            fill: $(this).val()
+        });
+    });
 });

@@ -12,7 +12,7 @@ var DNode = (function() {
         this.nextVersion = null;
     }
     DNode.prototype.addChild = function(node) {
-        if (node.type != 'Context') {
+        if (node.type != 'Context' && node.type != 'Subject') {
             this.children.push(node);
         } else {
             this.context = node;
@@ -30,11 +30,11 @@ var DNode = (function() {
     };
 
     DNode.prototype.isArgument = function() {
-        return this.context != null && this.type == 'Goal';
+        return this.context != null && (this.type == 'Goal' || this.type == 'TopGoal');
     };
 
     DNode.prototype.isUndevelop = function() {
-        return this.children.length == 0 && this.type == 'Goal';
+        return this.children.length == 0 && (this.type == 'Goal' || this.type == 'TopGoal');
     };
 
     DNode.NODE_TYPES = [

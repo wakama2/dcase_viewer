@@ -29,6 +29,7 @@ body {
 <script type="text/javascript" src="lib/jquery.svganim.min.js"></script>
 <script type="text/javascript" src="lib/jquery.colorPicker.min.js"></script>
 <script type="text/javascript" src="lib/codemirror.js"></script>
+<script type="text/javascript" src="lib/storyjs-embed.js"></script>
 <script type="text/javascript" src="js/config.js"></script>
 <script type="text/javascript" src="js/dcaseviewer.js"></script>
 <script type="text/javascript" src="js/dnode.js"></script>
@@ -48,7 +49,7 @@ function getNodeFromServer(id) {
 		"Tree":{
 			"NodeList":[
 				{
-					"NodeType":"Goal",
+					"NodeType":"TopGoal",
 					"Description":"description test",
 					"ThisNodeId":1,
 					"NodeIdentityId":1,
@@ -72,7 +73,7 @@ function getNodeFromServer(id) {
 					"Url":""
 				},
 				{
-					"NodeType":"Context",
+					"NodeType":"Subject",
 					"Description":"description test2",
 					"ThisNodeId":3,
 					"NodeIdentityId":3,
@@ -84,7 +85,7 @@ function getNodeFromServer(id) {
 					"Url":""
 				},
 				{
-					"NodeType":"Subject",
+					"NodeType":"Context",
 					"Description":"description test2",
 					"ThisNodeId":4,
 					"NodeIdentityId":4,
@@ -113,7 +114,7 @@ function getNodeFromServer(id) {
 					"ThisNodeId":6,
 					"NodeIdentityId":6,
 					"PrevNodeId":0,
-					"Children":[5, 10],
+					"Children":[5, 10, 9],
 					"DeleteFlag":false,
 					"Attributes":{},
 					"NextNodeId":0,
@@ -167,11 +168,27 @@ function getNodeFromServer(id) {
 	return node;
 }
 
+
+function getURLParameter(name) {
+	return decodeURI(
+		(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+	);
+}
+
 // sorry matz.
 var DCase_Viewer;
 
 window.addEventListener("load",function() {
-	DCase_Viewer = new DCaseViewer(document.getElementById('viewer'), null, {});
+	var id = parseInt(getURLParameter('id'));
+	var opts = {};
+	var node = null;
+	if(id > 0) {
+		opts = {
+			'argument_id': id
+		};
+		node = getNodeFromServer(id);
+	}
+	DCase_Viewer = new DCaseViewer(document.getElementById('viewer'), node, opts);
 	ViewerInit(document.body, DCase_Viewer);
 	initViewer(0);
 	// hide url bar for ipod touch
@@ -196,15 +213,16 @@ window.addEventListener("load",function() {
 </svg>
 
 <div id="viewer"></div>
+<div id="timeline"></div>
 
 <div id="toolbar" style="display: none;">
 	<a href="#" class="tool-new"><i class="icon-plus"></i></a>
-	<a href="#" class="tool-remove"><i class="icon-remove"></i></a>
 	<a href="#" class="tool-left"><i class="icon-arrow-left"></i></a>
 	<a href="#" class="tool-right"><i class="icon-arrow-right"></i></a>
 	<a href="#" class="tool-play"><i class="icon-play"></i></a>
 	<a href="#" class="tool-up"><i class="icon-circle-arrow-up"></i></a>
 	<a href="#" class="tool-down"><i class="icon-circle-arrow-down"></i></a>
+	<a href="#" class="tool-remove"><i class="icon-remove"></i></a>
 </div>
 
 <div id="menu">
@@ -223,7 +241,7 @@ window.addEventListener("load",function() {
 	<div id="menu-export" class="menu-box">
 		<input id="menu-export-json" type="button" value="export json"></input>
 		<input id="menu-export-png"  type="button" value="export png"></input>
-		<input id="menu-export-dscript"  type="button" value="export script"></input>
+		<input id="menu-export-dscript"  type="button" value="export dscript"></input>
 	</div>
 
 	<div id="menu-create-i" class="menu-i" style="left: 80px;">
@@ -252,17 +270,25 @@ window.addEventListener("load",function() {
 	</div>
 	<div id="menu-color" class="menu-box">
 		<form action="#" method="post">
-			<fieldset>
-				<div class="controlset">
-					<label for="color-goal">Goal</label>
-					<input class="colorpicker" id="color-goal" type="text" name="color-goal" value="#333399" /></div>
-				<div class="controlset">
-					<label for="color-strategy">Strategy</label>
-					<input class="colorpicker" id="color-strategy" type="text" name="color-strategy" value="#FF0000" /></div>
-				<div class="controlset">
-					<label for="color-context">Context</label>
-					<input class="colorpicker" id="color-context" type="text" name="color-context" value="#99cc00" /></div>
-			</fieldset>
+			<div class="controlset">
+				<fieldset>
+					<legend>Default</legend>
+					<input class="colorpicker" id="color-goal" type="text"
+					name="color-goal" value="#000000" />
+					<input class="colorpicker" id="color-strategy" type="text"
+					name="color-strategy" value="#222222" />
+					<input class="colorpicker" id="color-context" type="text"
+					name="color-context" value="#444444" />
+					<input class="colorpicker" id="color-evidence" type="text"
+					name="color-evidence" value="#666666" />
+					<input class="colorpicker" id="color-subject" type="text"
+					name="color-subject" value="#888888" />
+					<input class="colorpicker" id="color-solution" type="text"
+					name="color-solution" value="#AAAAAA" />
+					<input class="colorpicker" id="color-rebuttal" type="text"
+					name="color-rebuttal" value="#CCCCCC" />
+				</fieldset>
+			</div>
 		</form>
 	</div>
 </div>
