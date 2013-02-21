@@ -26,15 +26,13 @@ var DNodeView = function(viewer, node) {
 
     if (node.isUndevelop()) {
         this.svgUndevel = $(document.createElementNS(SVG_NS, 'polygon')).attr({
-            fill: 'none', stroke: CONFIG.Color.Stroke.UndevelopedEntity
+            class: 'dnode dnode-undevelop'
         }).appendTo(viewer.svgroot);
     }
     this.argumentBorder = null;
     if (node.isArgument()) {
         this.argumentBorder = $(document.createElementNS(SVG_NS, 'rect')).attr({
-            stroke: CONFIG.Color.Stroke.Argument,
-            fill: 'none',
-            'stroke-dasharray': 3
+            class: 'dnode dnode-argument', 'stroke-dasharray': 3
         }).appendTo(viewer.svgroot);
     }
     this.argumentBounds = {};
@@ -93,16 +91,9 @@ var DNodeView = function(viewer, node) {
                 });
             } else {
                 $('<textarea></textarea>').css({
-                    position: 'absolute',
-                    left: '0',
-                    top: self.divText.attr('top'),
-                    width: '400px',
-                    height: '300px',
-                    background: CONFIG.Color.TextArea,
-                    borderStyle: 'none',
-                    resizable: false,
-                    zIndex: 99
+                    top: self.divText.attr('top')
                 })
+                .addClass('editor')
                 .attr('value', node.text)
                 .appendTo(self.div)
                 .focus()
@@ -163,6 +154,7 @@ function CreateGoal(Viewer, root) {
         return { w: w + n * 2, h: h + n * 2 };
     };
     o.offset = { x: n, y: n };
+    $(o).attr('class', 'dnode dnode-goal');
     return o;
 }
 function CreateContext(Viewer, root) {
@@ -183,6 +175,7 @@ function CreateContext(Viewer, root) {
     };
     o.offset = { x: n / 2, y: n / 2 };
 
+    $(o).attr('class', 'dnode dnode-context');
     return o;
 }
 function CreateStrategy(Viewer, root) {
@@ -200,15 +193,13 @@ function CreateStrategy(Viewer, root) {
         return { w: w + 20 * 2, h: h + 10 * 2 };
     };
     o.offset = { x: 25, y: 10 };
+    $(o).attr('class', 'dnode dnode-strategy');
     return o;
 }
 function CreateSubject(Viewer, root) {
     var o = root.createSvg('g');
     var o1 = root.createSvg('rect');
     var o2 = root.createSvg('polygon');
-    $(o2).attr({
-        stroke: CONFIG.Color.Stroke.Subject,
-        fill: CONFIG.Color.BackGround.Subject });
     o.appendChild(o1);
     o.appendChild(o2);
     o.setBounds = function(a, x, y, w, h) {
@@ -232,14 +223,14 @@ function CreateSubject(Viewer, root) {
         return { w: w + 20, h: h + 20 };
     };
     o.offset = { x: 1, y: 1 };
+    $(o).attr('class', 'dnode dnode-subject');
+    $(o1).attr('class', 'dnode dnode-subject');
+    $(o2).attr('class', 'dnode dnode-subject');
     return o;
 }
 function CreateSolution(Viewer, root) {
     var o1 = root.createSvg('ellipse');
     var o2 = root.createSvg('polygon');
-    $(o2).attr({
-        stroke: CONFIG.Color.Stroke.Solution,
-        fill: CONFIG.Color.BackGround.Solution });
     var o = root.createSvg('g');
     o.appendChild(o1);
     o.appendChild(o2);
@@ -263,6 +254,9 @@ function CreateSolution(Viewer, root) {
     };
     o.offset = { x: 200 / 6, y: 200 / 6 };
 
+    $(o).attr('class', 'dnode dnode-solution');
+    $(o1).attr('class', 'dnode dnode-solution');
+    $(o2).attr('class', 'dnode dnode-solution');
     return o;
 }
 function CreateCommonNode(Viewer, root) {
@@ -280,6 +274,7 @@ function CreateCommonNode(Viewer, root) {
         return { w: w * 8 / 6, h: h * 8 / 6 };
     };
     o.offset = { x: 0, y: 0 };
+    $(o).attr('class', 'dnode');
     return o;
 }
 
@@ -302,14 +297,23 @@ DNodeView.prototype.initSvg = function(type) {
     throw type + ' is not GSN type';
 };
 
-function getColorByState(node) {
-    if (node.type == 'Rebuttal')
-        return CONFIG.Color.BackGround.Rebuttal;
-    if (node.type == 'Evidence')
-        return CONFIG.Color.BackGround.Evidence;
-    if (node.type == 'Goal')
-        return CONFIG.Color.BackGround.Goal;
-    return CONFIG.Color.BackGround.Default;
+function getClassNameByType(type) {
+    if (type == 'Rebuttal')
+        return 'dnode dnode-rebuttal';
+    if (type == 'Evidence')
+        return 'dnode dnode-evidence';
+    if (type == 'Goal')
+        return 'dnode dnode-goal';
+    if (type == 'Context')
+        return 'dnode dnode-context';
+    if (type == 'Strategy')
+        return 'dnode dnode-strategy';
+    if (type == 'Rebuttal')
+        return 'dnode dnode-rebuttal';
+    if (type == 'Subject')
+        return 'dnode dnode-subject';
+    console.log(type);
+    return 'dnode';
 }
 
 DNodeView.prototype.forEachNode = function(f) {
@@ -348,9 +352,8 @@ DNodeView.prototype.addChild = function(view) {
     case 'Subject':
         var l = this.viewer.createSvg('line');
         $(l).attr({
-            fill: 'none',
-            stroke: CONFIG.Color.Stroke.Default,
             x1: 0, y1: 0, x2: 0, y2: 0,
+            class: 'dnode-line',
             'marker-end': 'url(#Triangle-black)'
         });
 
@@ -361,8 +364,7 @@ DNodeView.prototype.addChild = function(view) {
         var l = this.viewer.createSvg('path');
         $(l).attr({
             d: 'M0,0 C0,0 0,0 0,0',
-            fill: 'none',
-            stroke: CONFIG.Color.Stroke.Default,
+            class: 'dnode-line',
             'marker-end': 'url(#Triangle-black)'
         });
 
@@ -481,11 +483,9 @@ DNodeView.prototype.animeStart = function(a) {
         fontSize: Math.floor(FONT_SIZE * scale)
     });
 
-    this.svg.setAttribute('fill', getColorByState(this.node));
+    this.svg.setAttribute('class', getClassNameByType(this.node.type));
     if (this.viewer.selectedNode == this) {
-        this.svg.setAttribute('stroke', CONFIG.Color.Stroke.FocusedEntity);
-    } else {
-        this.svg.setAttribute('stroke', 'none');
+        this.svg.setAttribute('class', this.svg.getAttribute('class') + ' dnode-focused');
     }
     if (scale < MIN_DISP_SCALE) {
         a.show(this.divText, false);
