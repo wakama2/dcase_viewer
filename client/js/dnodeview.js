@@ -104,6 +104,24 @@ var DNodeView = function(viewer, node) {
                 .mousewheel(function(e) { e.stopPropagation(); })
                 .blur(function() {
                     node.text = $(this).attr('value');
+                    var parent_node_id = (node.parents.length==0)?0:node.parents[0].id; //FIXME
+                    var child_node_ids = node.children.map(function(it){return it.id});
+                    if(node.context != null) {
+                      child_node_ids.push(node.context.id);
+                    }
+                    DCaseAPI.update({
+                      NodeType: node.type,
+                      BelongedArgumentId: viewer.opts.argument_id,
+                      ThisNodeId: viewer.tmp_id,
+                      PrevNodeId: node.id,
+                      //ThisNodeId: node.id,
+                      Description: node.text,
+                      ParentNodeId: parent_node_id,
+                      Children: child_node_ids
+                    });
+                    node.id = viewer.tmp_id;
+                    //viewer.tmp_id -= 1;
+                    console.log(node);
                     self.divText.html(toHTML(node.text));
                     $(this).remove();
                     editflag = false;

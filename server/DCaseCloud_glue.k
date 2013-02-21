@@ -136,6 +136,24 @@ class DCaseModel {
 		return json;
 	}
 
+	Json CreateJsonNode(ResultSet r, int snapshot_id ) {
+		Json json = new Json();
+		int node_id = r.getInt("node_id");
+		json.setInt("ThisNodeId", node_id);
+		json.setInt("ParentNodeId", this.GetParent(node_id));
+		json.setInt("BelongedArgumentId", r.getInt("argument_id"));
+		json.setInt("NodeIdentityId", r.getInt("node_identity_id"));
+		json.setInt("PrevNodeId", r.getInt("node_prev_id"));
+		json.setInt("NextNodeId", r.getInt("node_next_id"));
+		json.setString("Url", r.getString("url"));
+		json.setString("Description", r.getString("description"));
+		json.setBoolean("DeleteFlag", r.getBoolean("delete_flag"));
+		json.setString("NodeType", r.getString("type_name"));
+		json.set("Children", this.GetChildLinkList(r.getInt("node_id"),snapshot_id));
+		json.set("Attributes", this.getAttribute(node_id));
+		return json;
+	}
+
 	//Return Node
 	@Public Json GetNode(int node_id) {
 		PreparedStatement q = this.db.newPreparedStatement("SELECT node_data.id AS node_id,node_identity_id, url, description, delete_flag,type_name,node_prev_id,node_next_id,argument_id FROM node_identity INNER JOIN node_data ON current_node_id=node_data.id INNER JOIN node_type ON node_type_id=node_type.id WHERE node_data.id=?");
@@ -146,8 +164,20 @@ class DCaseModel {
 	}
 
 	Json GetChildLinkList(int node_id) {
-		PreparedStatement q = this.db.newPreparedStatement("SELECT node_child_id FROM node_link WHERE node_parent_id=?"); //FIXME snapshot_id
+		PreparedStatement p = this.db.newPreparedStatement("SELECT node_child_id FROM node_link WHERE node_parent_id=?");
+		p.setInt("@a",node_id);
+		ResultSet r = p.execute();
+		Json json = new Json([]);
+		while(r.next()) {
+			json.add(r.getInt("node_child_id"));
+		}
+		return json;
+	}
+
+	Json GetChildLinkList(int node_id, int snapshot_id) {
+		PreparedStatement q = this.db.newPreparedStatement("SELECT node_child_id FROM node_link INNER JOIN node_link_has_snapshot ON node_link.id=node_link_id WHERE node_parent_id=? AND node_link_has_snapshot.snapshot_id=?"); //FIXME snapshot_id
 		q.setInt("@a", node_id);
+		q.setInt("@b", snapshot_id);
 		ResultSet r = q.execute();
 		Json json = new Json([]);
 		while(r.next()) {
@@ -177,7 +207,7 @@ class DCaseModel {
 		ResultSet r = q.execute();
 		Json json_array = new Json([]);
 		while(r.next()) {
-			Json json = this.CreateJsonNode(r);
+			Json json = this.CreateJsonNode(r,snapshot_id);
 			json_array.add(json);
 		}
 
@@ -334,6 +364,13 @@ class DCaseModel {
 		if(parent_node_id != 0) {
 			this.CreateLink(argument_id, parent_node_id, node_id);
 		}
+		Json children = json.get("Children");
+		int i = 0;
+		while(i < children.getSize()) {
+			int c_id = children.getInt(i);
+			this.CreateLink(argument_id, node_id, c_id);
+			i = i + 1;
+		}
 		Json attr = json.get("Attributes");
 		this.createAttributes(node_id, attr);
 		return node_id;
@@ -344,7 +381,7 @@ class DCaseModel {
 		int argument_id    = json.getInt("BelongedArgumentId");
 		String description = json.getString("Description");
 		String url         = json.getString("Url");
-		int prev_node_id   = json.getInt("ThisNodeId");
+		int prev_node_id   = json.getInt("PrevNodeId");
 		//int next_node_id = json.getInt("NextNodeId");
 		PreparedStatement p = this.db.newPreparedStatement("INSERT INTO `node_data`(`node_type_id`,`node_identity_id`,`description`, `url`, `node_prev_id`) VALUES(?,?,?,?,?)");
 		p.setInt("@a", type_id);
@@ -356,6 +393,13 @@ class DCaseModel {
 		int node_id = p.getInsertId();
 		if(parent_node_id != 0) {
 			this.CreateLink(argument_id,parent_node_id, node_id);
+		}
+		Json children = json.get("Children");
+		int i = 0;
+		while(i < children.getSize()) {
+			int c_id = children.getInt(i);
+			this.CreateLink(argument_id, node_id, c_id);
+			i = i + 1;
 		}
 		PreparedStatement p1 = this.db.newPreparedStatement("UPDATE `node_data` SET `node_next_id`=? WHERE `id`=?");
 		p1.setInt("@a", node_id);
@@ -450,7 +494,14 @@ class DCaseModel {
 
 	@Public int CreateNode(int argument_id, Json json, Map[int] m) {
 		if(m.has(json.getInt("ParentNodeId").toString())) {
-			json.setInt("ParentNodeId",m.get(json.getInt("ParentNodeId").toString()));
+			json.setInt("ParentNodeId", m.get(json.getInt("ParentNodeId").toString()));
+		}else {
+			Json n = this.GetNode(json.getInt("ParentNodeId"));
+			System.p(n);
+			int n_id = n.getInt("NextNodeId");
+			if(n_id != 0) {
+				json.setInt("ParentNodeId",n_id);
+			}
 		}
 		int node_identity_id = this.initNode_identity(argument_id);
 		int type_id = this.getNodeType(json.getString("NodeType"))
@@ -462,10 +513,33 @@ class DCaseModel {
 		return node_data_id;
 	}
 
-	@Public void UpdateNode(int argument_id, Json json) {
+	int getNodeIdentityId(int node_id) {
+		PreparedStatement p = this.db.newPreparedStatement("SELECT node_identity_id FROM node_data WHERE id=?");
+		p.setInt("@a",node_id);
+		ResultSet r = p.execute();
+		r.next();
+		return r.getInt("node_identity_id");
+	}
+
+	void ClearLinkByPrevNodeId(int node_id) {
+		PreparedStatement p = this.db.newPreparedStatement("UPDATE link_identity INNER JOIN node_link ON link_identity.id=node_link.link_identity_id SET current_node_link_id=0 WHERE node_link.node_parent_id=? OR node_link.node_child_id=?");
+		p.setInt("@a",node_id);
+		p.setInt("@b",node_id);
+		p.execute();
+	}
+
+	@Public void UpdateNode(int argument_id, Json json, Map[int] m) {
 		int node_identity_id = json.getInt("NodeIdentityId");
+		int prev_node_id = json.getInt("PrevNodeId");
+		if(node_identity_id == 0) {
+			node_identity_id = this.getNodeIdentityId(prev_node_id);
+		}
+		this.ClearLinkByPrevNodeId(prev_node_id);
 		int type_id = this.getNodeType(json.getString("NodeType"));
 		int node_data_id = this.updateNodeDataFromJson(type_id,node_identity_id,json);
+		if(json.getInt("ThisNodeId")<0) {
+			m.set(json.getInt("ThisNodeId").toString(),node_data_id);
+		}
 		this.updateNodeIdentity(node_identity_id,node_data_id);
 	}
 
@@ -562,10 +636,10 @@ class DCaseModel {
 		}
 	}
 
-	void replaceNodeList(int argument_id, Json node_list) {
+	void replaceNodeList(int argument_id, Json node_list, Map[int] m) {
 		int i = 0;
 		while(i < node_list.getSize()) {
-			this.UpdateNode(argument_id,node_list[i]);
+			this.UpdateNode(argument_id,node_list[i], m);
 			i = i + 1;
 		}
 	}
@@ -618,7 +692,7 @@ class DCaseModel {
 			if(command == "insert") {
 				this.createNodeList(argument_id,node_list,m);
 			} else if(command == "replace") {
-				this.replaceNodeList(argument_id,node_list);
+				this.replaceNodeList(argument_id,node_list,m);
 			} else if(command == "delete") {
 				this.deleteNodeList(argument_id,node_list);
 			} else { //FIXME Error Handling
@@ -636,7 +710,7 @@ class DCaseModel {
 		this.ClearNodeIdentityCurrent(ArgumentId);
 		this.ClearLinkIdentityCurrent(ArgumentId);
 		this.UpdateNodeIdentityCurrent(prev_snapshot_id);
-		this.UpdateLinkIdentityCurrent(prev_snapshot_id);
+		//this.UpdateLinkIdentityCurrent(prev_snapshot_id);
 		this.UpdateCurrentProcess(ArgumentId,ProcessId);
 		int top_goal_id = this.getTopGoalId(prev_snapshot_id);
 		int snapshot_id = this.initSnapshot(prev_snapshot_id,top_goal_id); //FIXME

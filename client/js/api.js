@@ -54,8 +54,12 @@ var DCaseAPIModule = (function() {
 
     DCaseAPI.prototype.commit = function(msg, argument_id) {
         console.log(argument_id);
-        var commitObj = [this.insert_queue,this.replace_queue,this.delete_queue];
-        return this.call('Commit', { message: msg, BelongedArgumentId: argument_id, commit: commitObj }); //TODO ProcessId
+        var commitObj = [this.replace_queue, this.insert_queue,this.delete_queue];
+        var r = this.call('Commit', { message: msg, BelongedArgumentId: argument_id, commit: commitObj }); //TODO ProcessId
+        this.insert_queue = {command: "insert", NodeList: []};
+        this.replace_queue = {command: "replace", NodeList: []};
+        this.delete_queue = {command: "delete", NodeList: []};
+        return r;
     };
 
     DCaseAPI.prototype.search = function(args) {
