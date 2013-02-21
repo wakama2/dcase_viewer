@@ -1,16 +1,17 @@
 var DNodeEditWindow = (function() {
-    var self = this;
-    var $select;
-    var $desc;
-    var onSuccess = function(node) {};
-    var node = null;
+    function DNodeEditWindow() {
+        this.onSuccess = function(node) {};
+        this.node = null;
+        this.parent = null;
+        this.self = this;
+    }
 
     function init() {
-        $select = $('#edit select');
-        $desc = $('#edit textarea');
+        var $select = $('#edit select');
+        var $desc = $('#edit textarea');
         $select.children().remove();
         var children = DNode[self.parent.type].children;
-        for (var i=0; i < children.length; i++) {
+        for (var i = 0; i < children.length; i++) {
             var type = children[i].name;
             $('<option></option>')
                 .attr('id', 'edit-option-' + type)
@@ -33,8 +34,9 @@ var DNodeEditWindow = (function() {
         });
     }
 
-    this.applyAndClose = function() {
+    DNodeEditWindow.prototype.applyAndClose = function() {
         var node = self.node;
+        var $desc = $('#edit textarea');
         if (node != null) {
             node.text = $desc.attr('value');
         } else {
@@ -45,16 +47,18 @@ var DNodeEditWindow = (function() {
         self.onSuccess(node);
     };
 
-    this.close = function() {
+    DNodeEditWindow.prototype.close = function() {
         $('#edit').hide();
     };
 
-    this.open = function(node, parent, onSuccess) {
+    DNodeEditWindow.prototype.open = function(node, parent, onSuccess) {
         self.onSuccess = onSuccess;
         self.node = node;
         self.parent = parent;
         init();
         var selectedType = DNode.NODE_TYPES[0];
+        var $select = $('#edit select');
+        var $desc = $('#edit textarea');
         if (node != null) {
             selectedType = node.type;
             $select.attr('disabled', true);
@@ -66,6 +70,5 @@ var DNodeEditWindow = (function() {
         $('edit-option-' + selectedType).attr('selected', true);
         $('#edit').show();
     };
-
-    return this;
+    return DNodeEditWindow;
 }());
