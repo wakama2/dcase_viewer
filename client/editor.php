@@ -135,7 +135,6 @@ window.addEventListener("load",function() {
 	<div id="menu-create" class="menu-box">
 <?php
 	if (empty($_SESSION['user'])) {
-		echo ('<a href="redirect.php"><img src="css/sign-in-with-twitter.png" alt="Sign in with Twitter"/></a>');
 		echo('<p>committer name</p>');
 		echo('<input id="argument_committer"></input>');
 	} else {
