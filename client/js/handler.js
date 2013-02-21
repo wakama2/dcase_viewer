@@ -25,7 +25,8 @@ DCaseViewer.prototype.setDragHandler = function() {
         self.repaintAll(0);
     };
     this.drag = function(x, y, scale) {
-        if (typeof scale == 'undefined') scale = 1.0;
+        if (typeof scale == 'undefined')
+            scale = 1.0;
         if (flag) {
             var dx = (x - x0) * scale;
             var dy = (y - y0) * scale;
