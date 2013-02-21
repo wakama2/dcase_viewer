@@ -62,17 +62,22 @@ var SideMenu = (function(root, viewer) {
         }
     };
 
+    function ExportTree(DumpType, Node) {
+        var url = CONFIG.view_cgi + '?' + Node.id + '.' + DumpType;
+        $("body").append(
+                "<iframe src='" + url + "' style='display: none;' ></iframe>");
+    }
+
     this.actExportJson = function() {
-        var view = viewer.getSelectedNode();
-        console.log(view);
+        ExportTree('json', viewer.rootview.node.id);
     };
 
     this.actExportPng = function() {
-        DumpTree('png');
+        ExportTree('png', viewer.rootview.node.id);
     };
 
     this.actExportScript = function() {
-        DumpTree('dscript');
+        ExportTree('dscript', viewer.rootview.node.id);
     };
 
     this.actCommit = function() {
