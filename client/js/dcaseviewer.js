@@ -37,9 +37,12 @@ var DCaseViewer = (function() {
         $(this.svgroot).empty();
         $(this.root)
             .empty()
-            .append(this.svgroot);
+            .append(this.svgroot)
+            .append("<div id=\"timeline\"></div>");
         this.model = model;
         if (model == null) return;
+
+        this.createTimeline(this.opts.argument_id);
 
         var self = this;
         function create(node) {
@@ -145,6 +148,47 @@ var DCaseViewer = (function() {
                 }
             }
         }
+    };
+
+    DCaseViewer.prototype.createTimeline = function(dom_id) {
+        var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: this.opts.argument_id });
+        var l = r.SnapshotIdList;
+        this.snapshotList = l;
+        var dates = [];
+        for(var i=0; i<l.length; i++) {
+            var id = l[i].id;
+            var time = l[i].time;
+            dates.push({
+                "startDate": new Date(time*1000),
+                "endDate"  : new Date(time*1000),
+                "headline" : "Snapshot " + id,
+                "text":"<p>Body text goes here, some HTML is OK</p>",
+                "asset": {
+                    "credit":"Credit Name Goes Here",
+                    "caption":"Caption text goes here"
+                }
+            });
+        }
+        var timeline =  {
+            "headline": "The Main Timeline Headline Goes here",
+            "type": "default",
+            "text": "",
+            "asset": {
+                "credit":"Credit Name Goes Here",
+                "caption":"Caption text goes here"
+            },
+            "date": dates,
+        };
+        $(dom_id).empty();
+        createStoryJS({
+            type    : "timeline",
+            width   : '95%',
+            height  : '240',
+            source  : { timeline: timeline },
+            embed_id: dom_id,
+            css     : 'lib/timeline.css',
+            js      : 'lib/timeline.js'
+        });
     };
 
     DCaseViewer.prototype.showToolbox = function(node) {
