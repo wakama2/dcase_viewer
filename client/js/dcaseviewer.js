@@ -150,6 +150,15 @@ var DCaseViewer = (function() {
         }
     };
 
+    DCaseViewer.prototype.setSnapshot = function(n) {
+            var ss = this.snapshotList[n];
+            var node = DCaseAPI.call("getNodeTreeFromSnapshotId", {
+                BelongedArgumentId: this.opts.argument_id,
+                SnapshotId: ss.SnapshotId
+            });
+            this.setModel(createNodeFromJson(node));
+        };
+
     DCaseViewer.prototype.createTimeline = function(dom_id) {
         var r = DCaseAPI.call("getSnapshotList", { BelongedArgumentId: this.opts.argument_id });
         var l = r.SnapshotIdList;

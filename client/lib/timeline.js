@@ -7796,10 +7796,7 @@ if(typeof VMM.Timeline != 'undefined' && typeof VMM.Timeline.TimeNav == 'undefin
 			$dragslide.cancelSlide();
 			goToMarker(e.data.number);
 			upDate();
-			//console.log("click ");
-			//console.log(e.data.number);
-			//console.log(markers[e.data.number]);
-			global_viewer.setSnapshot(e.data.number);
+			DCase_Viewer.setSnapshot(e.data.number);
 		};
 		
 		function onMarkerHover(e) {
