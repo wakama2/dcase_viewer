@@ -18,5 +18,5 @@ INSERT INTO `node_type` (`type_name`) VALUES
 ('Support'),
 ('Rebuttal'),
 ('Monitor'),
-('DScriptContext'),
-('DScriptEvidence');
+('Subject'),
+('Solution');
