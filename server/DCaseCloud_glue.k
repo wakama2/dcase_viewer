@@ -110,9 +110,19 @@ class DCaseModel {
 		return json;
 	}
 
+	int GetParent(int node_id) {
+		PreparedStatement q = this.db.newPreparedStatement("SELECT node_parent_id FROM node_link WHERE node_child_id=?"); //FIXME snapshot_id
+		q.setInt("@a", node_id);
+		ResultSet r = q.execute();
+		r.next();
+		return r.getInt("node_parent_id");
+	}
+
 	Json CreateJsonNode(ResultSet r,int snapshot_id) {
 		Json json = new Json();
-		json.setInt("ThisNodeId", r.getInt("node_id"));
+		int node_id = r.getInt("node_id");
+		json.setInt("ThisNodeId", node_id);
+		json.setInt("ParentNodeId", this.GetParent(node_id));
 		json.setInt("BelongedArgumentId", r.getInt("argument_id"));
 		json.setInt("NodeIdentityId", r.getInt("node_identity_id"));
 		json.setInt("PrevNodeId", r.getInt("node_prev_id"));
@@ -122,13 +132,15 @@ class DCaseModel {
 		json.setBoolean("DeleteFlag", r.getBoolean("delete_flag"));
 		json.setString("NodeType", r.getString("type_name"));
 		json.set("Children", this.GetChildLinkList(r.getInt("node_id"),snapshot_id));
-		int node_id = r.getInt("node_id");
 		json.set("Attributes", this.getAttribute(node_id));
 		return json;
 	}
+
 	Json CreateJsonNode(ResultSet r) {
 		Json json = new Json();
-		json.setInt("ThisNodeId", r.getInt("node_id"));
+		int node_id = r.getInt("node_id");
+		json.setInt("ThisNodeId", node_id);
+		json.setInt("ParentNodeId", this.GetParent(node_id));
 		json.setInt("BelongedArgumentId", r.getInt("argument_id"));
 		json.setInt("NodeIdentityId", r.getInt("node_identity_id"));
 		json.setInt("PrevNodeId", r.getInt("node_prev_id"));
@@ -138,7 +150,6 @@ class DCaseModel {
 		json.setBoolean("DeleteFlag", r.getBoolean("delete_flag"));
 		json.setString("NodeType", r.getString("type_name"));
 		json.set("Children", this.GetChildLinkList(r.getInt("node_id")));
-		int node_id = r.getInt("node_id");
 		json.set("Attributes", this.getAttribute(node_id));
 		return json;
 	}
