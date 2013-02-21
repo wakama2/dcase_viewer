@@ -8,9 +8,7 @@ Import("Type.File");
 Import("Type.Json");
 Import("Java.String");
 Import("JavaScript.Array");
-Import("Lib.Curl");
 Import("posix.process");
-
 Load("Http.k");
 
 class Exporter {
@@ -132,10 +130,99 @@ class DotExporter extends Exporter {
     }
 }
 
+class DScriptExporter extends Exporter {
+    String string;
+    DScriptExporter() {
+        stdout.print("Content-Type: text/plain; charset=utf-8\n\n");
+        string = "";
+    }
+    @Virtual void emit() {
+        stdout.println(this.string);
+    }
+    void println(String string) {
+        this.string = this.string + string + "\n";
+    }
+
+    String EmitIndent(int level) {
+        int i = 0;
+        String indent = "";
+        for (i=0; i < level; i = i + 1) {
+            indent = indent + "    ";
+        }
+        return indent;
+    }
+
+    boolean IsGoal(Json node) {
+        return  node.getString("NodeType") == "Goal";
+    }
+
+    boolean IsStrategy(Json node) {
+        return node.getString("NodeType") == "Strategy";
+    }
+
+    boolean IsContext(Json node) {
+        return node.getString("NodeType") == "Context";
+    }
+
+    boolean IsEvidence(Json node) {
+        return node.getString("NodeType") == "Evidence";
+    }
+
+    void GenerateGoalCode(Json NodeList, int node_id, int level) {
+        Json root = FindById(NodeList, node_id);
+        Json children = root.get("Children");
+        int childrenNum = children.getSize();
+        String indent = "";
+
+        if(IsEvidence(root)) {
+            String evidence = root.getString("Description");
+            indent = EmitIndent(level);
+            stdout.print(indent + evidence + "\n");
+            return;
+        }
+        else if(IsGoal(root)) {
+            indent = EmitIndent(level);
+            stdout.print(indent + "assure " + root.get("Description") + " {\n");
+        }
+        else if(IsStrategy(root)) {
+            indent = EmitIndent(level);
+            stdout.print(indent + "strategy " + root.get("Description") + " {\n");
+        }
+        else if(IsContext(root)) {
+            return;
+        }
+        int i = 0;
+        for (i=0; i < childrenNum; i = i + 1) {
+            int childId = children.getInt(i);
+            GenerateGoalCode(NodeList, childId, level + 1);
+        }
+        stdout.print(indent + "}\n");
+    }
+
+    @Override void export(Json json) {
+        Json tree = json.get("result").get("Tree");
+        int RootId = tree.getInt("TopGoalId");
+        Json NodeList= tree.get("NodeList");
+        println("digraph AssuranceScript {");
+        int i, j, len = NodeList.getSize();
+
+        String indent = EmitIndent(0);
+        Json RootNode = FindById(NodeList,RootId);
+        stdout.print("argue " + RootNode.getString("Description") + " {\n");
+        Json child = RootNode.get("Children");
+        len = child.getSize();
+        for (i=0; i < len; i = i + 1) {
+            int childId = child.getInt(i);
+            GenerateGoalCode(NodeList, childId, 1);
+        }
+        stdout.print("}\n");
+    }
+}
+
 void main () {
     String file = System.getenv("QUERY_STRING");
     if(file == "") {
-        file = "17.dot";
+        file = "32.json";
     }
     String[] a = file.split(".");
     String ext = a.pop();
@@ -148,13 +235,15 @@ void main () {
     param.setInt("BelongedArgumentId", id);
     json.set("params", param);
 
-    HttpClient client = new CurlHttpClient("http://localhost/dcase_viewer/cgi/api.cgi");
+    HttpClient client = new CurlHttpClient("http://www.ubicg.ynu.ac.jp/dcase_viewer/cgi/api.cgi");
     Json ret = Json.parse(client.post(json.toString()));
     Exporter export = null;
     if (ext == "dot") {
         export = new DotExporter();
     } else if (ext == "json") {
         export = new JsonExporter();
+    } else if (ext == "dscript") {
+        export = new DScriptExporter();
     }
     if (export == null) {
         export = new JsonExporter();
