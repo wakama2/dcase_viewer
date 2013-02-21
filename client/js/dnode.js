@@ -87,7 +87,7 @@ function createNodeFromJson(json) {
         }
     }
     var n = nodes[String(json.Tree.TopGoalId)];
-    var topNode = new DNode(0, 'TopGoal', n.NodeType, n.Description);
+    var topNode = new DNode(json.Tree.TopGoalId, 'TopGoal', n.NodeType, n.Description);
     createChildren(topNode, n);
     return topNode;
 }
@@ -111,6 +111,7 @@ function initViewer(id) {
         argument_id: id
     };
     console.log(node);
+    DCase_Viewer.opts = opts;
     DCase_Viewer.setModel(node);
     console.log(DCase_Viewer.rootview);
 }

@@ -2,6 +2,7 @@ var SideMenu = (function(root, viewer) {
     var width = 200;
     var animeTime = 250;
     var self = this;
+    var tmp_id = -1;
 
     //--------------------------------------------------------
     this.actChangeLock = function() {
@@ -31,19 +32,16 @@ var SideMenu = (function(root, viewer) {
             DNodeEditWindow.open(null, function(newNode) {
                 view.node.addChild(newNode);
                 viewer.setModel(viewer.model);
-                var r = DCaseAPI.insert({
-                    new: {
-                        type: newNode.type,
-                        description: newNode.text
-                    },
-                    argument_id: viewer.opts.argument_id,
-                    parent: {
-                        argument_id: viewer.opts.argument_id,
-                        node_id: view.node.id
-                    }
+                DCaseAPI.insert({
+                        NodeType: newNode.type,
+                        ThisNodeId: self.tmp_id,
+                        Description: newNode.text,
+                        BelongedArgumentId: viewer.opts.argument_id,
+                        ParentNodeId: view.node.id,
+                        Children: []
                 });
-                newNode.id = r.node_id;
             });
+            self.tmp_id -= 1;
         }
     };
 
@@ -55,9 +53,9 @@ var SideMenu = (function(root, viewer) {
                 if (parent.length > 0) {
                     parent[0].removeChild(view.node);
                     viewer.setModel(viewer.model);
-                    var r = DCaseAPI.del({
-                        argument_id: viewer.opts.argument_id,
-                        node_id: view.node.id
+                    DCaseAPI.del({
+                        BelongedArgumentId: viewer.opts.argument_id,
+                        NodeId: view.node.id
                     });
                 }
             }
@@ -77,7 +75,8 @@ var SideMenu = (function(root, viewer) {
     this.actCommit = function() {
         var msg = prompt('コミットメッセージを入力して下さい');
         if (msg != null) {
-            DCaseAPI.commit(msg);
+            console.log(viewer.model);
+            DCaseAPI.commit(msg,viewer.opts.argument_id,viewer.commit_queue);
         }
     };
 

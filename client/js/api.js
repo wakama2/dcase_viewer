@@ -2,6 +2,10 @@ var DCaseAPIModule = (function() {
     function DCaseAPI(url) {
         this.cgi = url;
     }
+    DCaseAPI.prototype.insert_queue = {command: "insert", NodeList: []};
+    DCaseAPI.prototype.replace_queue = {command: "replace", NodeList: []};
+    DCaseAPI.prototype.delete_queue = {command: "delete", NodeList: []};
+
     DCaseAPI.prototype.call = function(method, params) {
         var cmd = {
             jsonrpc: '2.0',
@@ -33,20 +37,25 @@ var DCaseAPIModule = (function() {
         return this.call('get', { filter: filter, argument_id: id });
     };
 
-    DCaseAPI.prototype.update = function(args) {
-        return this.call('update', args);
+    DCaseAPI.prototype.update = function(node) {
+        this.replace_queue.NodeList.push(node);
+        //return this.call('update', args);
     };
 
-    DCaseAPI.prototype.insert = function(args) {
-        return this.call('insert', args);
+    DCaseAPI.prototype.insert = function(node) {
+        this.insert_queue.NodeList.push(node);
+        //return this.call('insert', args);
     };
 
-    DCaseAPI.prototype.del = function(args) {
-        return this.call('delete', args);
+    DCaseAPI.prototype.del = function(node) {
+        this.delete_queue.NodeList.push(node);
+        //return this.call('delete', args);
     };
 
-    DCaseAPI.prototype.commit = function(msg) {
-        return this.call('commit', { message: msg });
+    DCaseAPI.prototype.commit = function(msg, argument_id) {
+        console.log(argument_id);
+        var commitObj = [this.insert_queue,this.replace_queue,this.delete_queue];
+        return this.call('Commit', { message: msg, BelongedArgumentId: argument_id, commit: commitObj }); //TODO ProcessId
     };
 
     DCaseAPI.prototype.search = function(args) {

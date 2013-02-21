@@ -16,6 +16,7 @@ var DEF_WIDTH = 200;
 var DNodeView = function(viewer, node) {
     var self = this;
     this.viewer = viewer;
+    this.firstNode = node;
     this.node = node;
     this.svg = this.initSvg(node.type);
     this.div = $('<div></div>')
