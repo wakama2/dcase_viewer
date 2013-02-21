@@ -34,7 +34,7 @@ var DNodeEditWindow = (function() {
         });
     }
 
-    DNodeEditWindow.prototype.applyAndClose = function() {
+    DNodeEditWindow.applyAndClose = function() {
         var node = self.node;
         var $desc = $('#edit textarea');
         if (node != null) {
@@ -47,11 +47,11 @@ var DNodeEditWindow = (function() {
         self.onSuccess(node);
     };
 
-    DNodeEditWindow.prototype.close = function() {
+    DNodeEditWindow.close = function() {
         $('#edit').hide();
     };
 
-    DNodeEditWindow.prototype.open = function(node, parent, onSuccess) {
+    DNodeEditWindow.open = function(node, parent, onSuccess) {
         self.onSuccess = onSuccess;
         self.node = node;
         self.parent = parent;
