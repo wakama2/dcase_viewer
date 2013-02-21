@@ -105,10 +105,10 @@ function contextParams(params) {
 }
 
 function createNodeFromJson(json) {
-    var nodes = new Object();
+    var nodes = {};
     for (var i = 0; i < json.Tree.NodeList.length; i++) {
         var c = json.Tree.NodeList[i];
-        nodes[String(c.ThisNodeId)] = c;
+        nodes[c.ThisNodeId] = c;
     }
     function createChildren(node, l) {
         var childs = l.Children;
@@ -122,7 +122,7 @@ function createNodeFromJson(json) {
             createChildren(newNode, n);
         }
     }
-    var n = nodes[String(json.Tree.TopGoalId)];
+    var n = nodes[json.Tree.TopGoalId];
     var topNode = new DNode(json.Tree.TopGoalId, 'TopGoal', n.NodeType, n.Description);
     createChildren(topNode, n);
     return topNode;

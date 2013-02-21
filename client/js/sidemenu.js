@@ -63,7 +63,8 @@ var SideMenu = (function(root, viewer) {
     };
 
     this.actExportJson = function() {
-        DumpTree('json');
+        var view = viewer.getSelectedNode();
+        console.log(view);
     };
 
     this.actExportPng = function() {
@@ -193,6 +194,11 @@ var SideMenu = (function(root, viewer) {
     $('#menu-export-png').click(function() {
         self.actExportPng();
     });
+
+    $('#menu-export-dscript').click(function() {
+        self.actExportDScript();
+    });
+
 
     //--------------------------------------------------------
     var $create = $('#menu-create-i')
