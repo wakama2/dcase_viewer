@@ -23,7 +23,7 @@
 	display: none;
 	left: 0px;
 	top: 40px;
-	width: 192px;
+	width: 232px;
 	bottom: 0px;
 	background: #EEE;
 	padding: 4px;
@@ -48,4 +48,31 @@
 ul.sidemenu-result li ul {
 	margin: 0 0 0 0.3em;
 	padding 0;
+}
+
+p.legend {
+	margin-bottom: 1em;
+}
+
+p.legend em {
+	color: #C00;
+	font-style: normal;
+}
+
+div#menu-color div.controlset {
+	display: block;
+	float: left;
+	width: 100%;
+	padding: 0.25em 0;
+}
+
+div#menu-color div.controlset label,
+div#menu-color div.controlset input,
+div#menu-color div.controlset div {
+	display: inline;
+	float: left;
+}
+
+div#menu-color div.controlset label {
+	width: 100px;
 }
