@@ -49,6 +49,12 @@ function getNodeFromServer(id) {
 	return node;
 }
 
+function getURLParameter(name) {
+	return decodeURI(
+		(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+	);
+}
+
 // sorry matz.
 var DCase_Viewer;
 
@@ -59,6 +65,10 @@ window.addEventListener("load",function() {
 	setTimeout(function(){
 		window.scrollTo(0, 0);
 	}, 0);
+	var id = parseInt(getURLParameter('id'));
+	if(id > 0) {
+		initViewer(id);
+	}
 });
 </script>
 </head>
