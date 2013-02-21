@@ -18,6 +18,7 @@ void GenerateTree1(DCaseModel model) {
 	int id = model.CreateTopGoal("D-Script must work", 1, "TopGoal justification.", "sample commiter");
 	Json nodeTree = model.GetNodeTree(id);
 	int top_id = nodeTree.getInt("TopGoalId");
+	System.p(top_id);
 
 	Json json = new Json();
 	Json commit = new Json([]);
@@ -28,10 +29,10 @@ void GenerateTree1(DCaseModel model) {
 
 	commitObj1_nodelist.add(nodeTree);
 
-	Json c2 = SetNode("Context", id, -2, id, "sudo reboot -h now");
+	Json c2 = SetNode("Context", top_id, -2, id, "sudo reboot -h now");
 	commitObj1_nodelist.add(c2);
 
-	Json s1 = SetNode("Strategy", id, -3, id, "Argument by precondition/postcondition");
+	Json s1 = SetNode("Strategy", top_id, -3, id, "Argument by precondition/postcondition");
 	commitObj1_nodelist.add(s1);
 
 	Json g3 = SetNode("Goal", -3, -4, id, "web server must be alive before the fact");
