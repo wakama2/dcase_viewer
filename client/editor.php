@@ -133,8 +133,18 @@ window.addEventListener("load",function() {
 		<i class="icon-plus"></i>
 	</div>
 	<div id="menu-create" class="menu-box">
-		<p>committer name</p>
-		<input id="argument_committer"></input>
+<?php
+	if (empty($_SESSION['user'])) {
+		echo ('<a href="redirect.php"><img src="css/sign-in-with-twitter.png" alt="Sign in with Twitter"/></a>');
+		echo('<p>committer name</p>');
+		echo('<input id="argument_committer"></input>');
+	} else {
+		$img  = h($_SESSION['user']['twitter_profile_image_url']);
+		$name = h($_SESSION['user']['twitter_screen_name']);
+		echo ('<p><img width="16" height="16" src="'.$img.'" />'.$name.'</p>');
+		echo('<input id="argument_committer" type="hidden" value="'.$name.'"></input>');
+	}
+?>
 		<p>descriptions</p>
 		<textarea id="argument_description" cols=20 rows=4>Enter new Argument descriptions.  </textarea>
 		<button id="menu-create-argument">Create</button>

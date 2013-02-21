@@ -12,10 +12,6 @@ $accessToken = $oauth->getAccessToken($_GET['oauth_verifier']);
 
 $me = $oauth->get('account/verify_credentials');
 
-if (empty($user)) {
-    $user = mysql_fetch_assoc($rs);
-}
-
 session_regenerate_id(true);
 $_SESSION['user'] = array(
         'twitter_screen_name' => ($me->screen_name),
