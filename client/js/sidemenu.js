@@ -62,8 +62,8 @@ var SideMenu = (function(root, viewer) {
         }
     };
 
-    function ExportTree(DumpType, Node) {
-        var url = CONFIG.view_cgi + '?' + Node.id + '.' + DumpType;
+    function ExportTree(DumpType, NodeId) {
+        var url = CONFIG.view_cgi + '?' + Node + '.' + DumpType;
         $("body").append(
                 "<iframe src='" + url + "' style='display: none;' ></iframe>");
     }
@@ -73,10 +73,10 @@ var SideMenu = (function(root, viewer) {
     };
 
     this.actExportPng = function() {
-        ExportTree('png', viewer.rootview.node.id);
+        ExportTree(/*FIXME(ide)*/'dot', viewer.rootview.node.id);
     };
 
-    this.actExportScript = function() {
+    this.actExportDScript = function() {
         ExportTree('dscript', viewer.rootview.node.id);
     };
 
