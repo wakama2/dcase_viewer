@@ -2,15 +2,14 @@ var DNodeEditWindow = (function() {
     function DNodeEditWindow() {
         this.onSuccess = function(node) {};
         this.node = null;
-        this.parent = null;
-        this.self = this;
     }
 
-    function init() {
+    DNodeEditWindow.init = function(parent) {
         var $select = $('#edit select');
         var $desc = $('#edit textarea');
+        var self = this;
         $select.children().remove();
-        var children = DNode[self.parent.type].children;
+        var children = DNode[parent.type].children;
         for (var i = 0; i < children.length; i++) {
             var type = children[i].name;
             $('<option></option>')
@@ -35,7 +34,7 @@ var DNodeEditWindow = (function() {
     }
 
     DNodeEditWindow.applyAndClose = function() {
-        var node = self.node;
+        var node = this.node;
         var $desc = $('#edit textarea');
         if (node != null) {
             node.text = $desc.attr('value');
@@ -43,8 +42,8 @@ var DNodeEditWindow = (function() {
             var selected = $('#edit select option:selected').text();
             node = new DNode(-1, 'NewNode', selected, $desc.attr('value'));
         }
-        self.close();
-        self.onSuccess(node);
+        this.close();
+        this.onSuccess(node);
     };
 
     DNodeEditWindow.close = function() {
@@ -52,10 +51,9 @@ var DNodeEditWindow = (function() {
     };
 
     DNodeEditWindow.open = function(node, parent, onSuccess) {
-        self.onSuccess = onSuccess;
-        self.node = node;
-        self.parent = parent;
-        init();
+        this.onSuccess = onSuccess;
+        this.node = node;
+        this.init(parent);
         var selectedType = DNode.NODE_TYPES[0];
         var $select = $('#edit select');
         var $desc = $('#edit textarea');
