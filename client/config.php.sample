@@ -1,0 +1,10 @@
+<?php
+
+define('PROJECT_NAME', 'DCase');
+define('HOME_URL', 'http://www.ubicg.ynu.ac.jp/ASE/');
+error_reporting(E_ALL & ~E_NOTICE);
+session_set_cookie_params(0, '/');
+define('CONSUMER_KEY',    'xxxxxxxxxxxxxxxxxxxxx');
+define('CONSUMER_SECRET', 'xxxxxxxxxxxxxxxxxxxxx');
+
+?>

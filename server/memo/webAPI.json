@@ -1,0 +1,388 @@
+//--------getArgumentList-------------
+//ArgumentのId一覧を取ってくる
+//引数:なし
+//戻り値:ArgumentIdのリスト
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getArgumentList",
+	"params":{}
+}
+//response
+{
+	"jsonrpc":"2.0","version":"1.0",
+	"result":{
+		"ArgumentIdList":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+	}
+}
+
+//--------FindNodeByDescription-------------
+//Descriptionの内容からNodeIdを検索する
+//引数:検索したい文字列
+//戻り値:NodeIdのリスト
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"FindNodeByDescription",
+	"params":{
+		"SearchText":"hoge"
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"NodeIdList":[1,2,3,4,5,6,7,8,9,10,11]
+	}
+}
+
+//--------FindContextByAttribute-------------
+//Contextの内容(key,value両方)からNodeIdを検索する
+//引数:検索したい文字列
+//戻り値:NodeIdのリスト
+//request
+{
+	"method":"FindContextByAttribute",
+	"params":{
+		"SearchText":"hoge"
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"NodeIdList":[68]
+	}
+}
+
+//--------CreateTopGoal-------------
+//ArgumentIdの新規作成
+//引数:コミットログ的なJustification、TopGoalのDescription、コミット名Commiter,プロセスタイプ(現状数値なので、適当に)
+//戻り値:ArgumentのId
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"CreateTopGoal",
+	"params":{
+		"Justification":"Sample Justification",
+		"Description" :"Sample Description",
+		"Commiter":"uchida",
+		"ProcessType" : 1 
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"BelongedArgumentId":24
+	}
+}
+
+//----------Commit-----------------------
+//Commitする
+//引数:commitオブジェクト
+//戻り値:空の{} //FIXME
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"Commit",
+	"params": {
+		"commit":[
+			{
+				"BelongedArgumentId":26,
+				"command":"insert", //insert,replace,delete
+				"NodeList":[
+					{
+						"ParentNodeId":71,
+						"NodeType":"Context",
+						"Description":"test description",
+						"ThisNodeId":0,
+						"PrevNodeId":0,
+						"BelongedArgumentId":26,
+						"Children":[],
+						"Attributes":{"hoge":"hogehjoh"},
+						"NextNodeId":0
+					}
+				]
+			}
+		]
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{}
+}
+
+//--------getNode-------------
+//NodeIdから一つNodeを取ってくる
+//引数:NodeId
+//戻り値:Nodeの中身
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNode",
+	"params":{
+		"NodeId": 1 
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Node":{
+			"NodeType":"Goal",
+			"Description":"description test",
+			"ThisNodeId":1,
+			"NodeIdentityId":1,
+			"PrevNodeId":0,
+			"Children":[],
+			"DeleteFlag":false,
+			"Attributes":{},
+			"NextNodeId":0,
+			"Url":""
+		}
+	}
+}
+
+//-------------getNodeTree--------------------
+//ArgumentIdからArgumentの中身を取ってくる
+//引数:ArgumentId
+//戻り値:NodeList,TopGoalのId,snapshotId、ArgumentId
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNodeTree",
+	"params":{
+		"BelongedArgumentId":1
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":{
+			"NodeList":[
+				{
+					"NodeType":"Goal",
+					"Description":"description test",
+					"ThisNodeId":1,
+					"NodeIdentityId":1,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				}
+			],
+			"TopGoalId":1,
+			"BelongedArgumentId":1,
+			"SnapshotId":1
+		}
+	}
+}
+
+//-------------getNodeTreeFromSnapshotId--------------------
+//ArgumentIdとSnapshotIdからArgumentのあるSnapshotの中身を取ってくる
+//引数:ArgumentId, SnapshotId
+//戻り値:NodeList,TopGoalのId,snapshotId、ArgumentId
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNodeTreeFromSnapshotId",
+	"params":{
+		"BelongedArgumentId": 1,
+		"SnapshotId" : 1
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":{
+			"NodeList":[
+				{
+					"NodeType":"Goal",
+					"Description":"description test",
+					"ThisNodeId":1,
+					"NodeIdentityId":1,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				}
+			],
+			"TopGoalId":1,
+			"BelongedArgumentId":1,
+			"SnapshotId":1
+		}
+	}
+}
+
+//-------------getNodeTreeBetween--------------------
+//ArgumentIdに属するSnapshotId2つからその間にあるSnapshotの中身の配列を取ってくる
+//引数:ArgumentId,SnapshotId(begin), SnapshotId(end)
+//戻り値:{NodeList,TopGoalのId,snapshotId、ArgumentId}の配列
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getNodeTreeBetween",
+	"params":{
+		"BelongedArgumentId": 25,
+		"StartId" : 35,
+		"EndId" : 36
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":[
+			{
+				"NodeList":[
+					{
+						"NodeType":"Goal",
+						"Description":"description test",
+						"ThisNodeId":71,
+						"NodeIdentityId":74,
+						"PrevNodeId":0,
+						"Children":[],
+						"DeleteFlag":false,
+						"Attributes":{},
+						"NextNodeId":0,
+						"Url":""
+					}
+				],
+				"TopGoalId":71,
+				"BelongedArgumentId":25,
+				"SnapshotId":35
+			},{
+				"NodeList":[
+					{
+						"NodeType":"Goal",
+						"Description":"description test",
+						"ThisNodeId":71,
+						"NodeIdentityId":74,
+						"PrevNodeId":0,
+						"Children":[72],
+						"DeleteFlag":false,
+						"Attributes":{},
+						"NextNodeId":0,
+						"Url":""
+					},{
+						"NodeType":"Context",
+						"Description":"test description",
+						"ThisNodeId":72,
+						"NodeIdentityId":75,
+						"PrevNodeId":0,
+						"Children":[],
+						"DeleteFlag":false,
+						"Attributes":{},
+						"NextNodeId":0,
+						"Url":""
+					}
+				],
+				"TopGoalId":71,
+				"BelongedArgumentId":25,
+				"SnapshotId":36
+			}
+		]
+	}
+}
+
+//-------------OpenProcessContext--------------------
+//ブランチを作る
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method" :"OpenProcessContext",
+	"params" :{
+		"Justification" : "Sample Justification",
+		"ProcessType"    : 2,
+		"BelongedArgumentId" : 25,
+		"Commiter" : "uchida"
+	}
+}
+
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"ProcessId":30
+	}
+}
+
+//-------------getProcessContextIds--------------------
+//ブランチの一覧を取得する
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getProcessContextIds",
+	"params":{
+		"BelongedArgumentId":26
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"ProcessIdList":[26,37]
+	}
+}
+
+//-------------getSnapshotList--------------------
+//ログの一覧を取得する
+//request
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"method":"getSnapshotList",
+	"params":{
+		"BelongedArgumentId":26,
+		"ProcessId":25
+	}
+}
+//response
+{
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"SnapshotIdList":[41,47,48,49,50,51,52]
+	}
+}
+
+
+//Usage
+//Argumentの一覧を取得->getArgumentList
+//Argumentの中身を取得->getNodeTree
+//タイムラインの作成↓
+//Argumentのブランチ一覧->getProcessContextIds
+//各プロセスに属するSnapshotの一覧->getSnapshotList
+//あるSnapshotの内容を取ってくる->getNodeTreeFromSnapshot
+
+//変更をDBに保存する->Commit
+//ブランチの作成->OpenProcessContext
+

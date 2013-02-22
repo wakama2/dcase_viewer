@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D-CASE VIEWER</title>
+<link rel="stylesheet" type="text/css" href="lib/codemirror.css"/>
+<link rel="stylesheet" type="text/css" href="lib/bootstrap.icons.css"/>
+<link rel="stylesheet" type="text/css" href="lib/colorPicker.css"/>
+<link rel="stylesheet" type="text/css" href="css/dcase-node.css"/>
+<link rel="stylesheet" type="text/css" href="css/viewer.css"/>
+<link rel="stylesheet" type="text/css" href="css/sidemenu.css"/>
+<link rel="stylesheet" type="text/css" href="css/edit.css"/>
+<style>
+body {
+	min-height: 480px;
+	margin: 0px;
+}
+#viewer {
+	left: 0px;
+	top : 0px;
+	width : 100%;
+	height: 100%;
+}
+</style>
+<script type="text/javascript" src="lib/jquery.min.js"></script>
+<script type="text/javascript" src="lib/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" src="lib/jquery.svg.min.js"></script>
+<script type="text/javascript" src="lib/jquery.svganim.min.js"></script>
+<script type="text/javascript" src="lib/jquery.colorPicker.min.js"></script>
+<script type="text/javascript" src="lib/codemirror.js"></script>
+<script type="text/javascript" src="lib/storyjs-embed.js"></script>
+<script type="text/javascript" src="js/config.js"></script>
+<script type="text/javascript" src="js/dcaseviewer.js"></script>
+<script type="text/javascript" src="js/dnode.js"></script>
+<script type="text/javascript" src="js/dnodeview.js"></script>
+<script type="text/javascript" src="js/handler.js"></script>
+<script type="text/javascript" src="js/edit.js"></script>
+<script type="text/javascript" src="js/api.js"></script>
+<script type="text/javascript" src="js/sidemenu.js"></script>
+<script type="text/javascript" src="js/animation.js"></script>
+<script type="text/javascript">
+
+function getNodeFromServer(id) {
+	var res2 = {
+	"jsonrpc":"2.0",
+	"version":"1.0",
+	"result":{
+		"Tree":{
+			"NodeList":[
+				{
+					"NodeType":"TopGoal",
+					"Description":"description test",
+					"ThisNodeId":1,
+					"NodeIdentityId":1,
+					"PrevNodeId":0,
+					"Children":[2, 3],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Goal",
+					"Description":"description test2",
+					"ThisNodeId":2,
+					"NodeIdentityId":2,
+					"PrevNodeId":0,
+					"Children":[4, 6],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Subject",
+					"Description":"description test2",
+					"ThisNodeId":3,
+					"NodeIdentityId":3,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Context",
+					"Description":"description test2",
+					"ThisNodeId":4,
+					"NodeIdentityId":4,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Evidence",
+					"Description":"description test2",
+					"ThisNodeId":5,
+					"NodeIdentityId":5,
+					"PrevNodeId":0,
+					"Children":[7],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Strategy",
+					"Description":"description test2",
+					"ThisNodeId":6,
+					"NodeIdentityId":6,
+					"PrevNodeId":0,
+					"Children":[5, 10, 9],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Rebuttal",
+					"Description":"description test2",
+					"ThisNodeId":7,
+					"NodeIdentityId":7,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Solution",
+					"Description":"description test2",
+					"ThisNodeId":9,
+					"NodeIdentityId":9,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+				{
+					"NodeType":"Goal",
+					"Description":"description test2",
+					"ThisNodeId":10,
+					"NodeIdentityId":0,
+					"PrevNodeId":0,
+					"Children":[],
+					"DeleteFlag":false,
+					"Attributes":{},
+					"NextNodeId":0,
+					"Url":""
+				},
+
+			],
+			"TopGoalId":1,
+			"BelongedArgumentId":1,
+			"SnapshotId":1
+		}
+	}
+}
+	var node = createNodeFromJson(res2.result);
+	return node;
+}
+
+
+function getURLParameter(name) {
+	return decodeURI(
+		(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+	);
+}
+
+// sorry matz.
+var DCase_Viewer;
+
+window.addEventListener("load",function() {
+	var id = parseInt(getURLParameter('id'));
+	var opts = {};
+	var node = null;
+	if(id > 0) {
+		opts = {
+			'argument_id': id
+		};
+		node = getNodeFromServer(id);
+	}
+	DCase_Viewer = new DCaseViewer(document.getElementById('viewer'), node, opts);
+	ViewerInit(document.body, DCase_Viewer);
+	initViewer(0);
+	// hide url bar for ipod touch
+	setTimeout(function(){
+		window.scrollTo(0, 0);
+	}, 0);
+});
+</script>
+</head>
+<body>
+<svg width="0" height="0">
+<defs>
+	<marker id="Triangle-black" viewBox="0 0 10 10" refX="10" refY="5"
+		markerUnits="strokeWidth" markerWidth="15" markerHeight="9" orient="auto">
+		<path d="M 0 0 L 10 5 L 0 10 z" fill="gray" stroke="gray"/>
+	</marker>
+	<marker id="Triangle-white" viewBox="0 0 10 10" refX="10" refY="5"
+		markerUnits="strokeWidth" markerWidth="15" markerHeight="9" orient="auto">
+		<path d="M 0 0 L 10 5 L 0 10 z" fill="white" stroke="gray"/>
+	</marker>
+</defs>
+</svg>
+
+<div id="viewer"></div>
+<div id="timeline"></div>
+
+<div id="toolbar" style="display: none;">
+	<a href="#" class="tool-new"><i class="icon-plus"></i></a>
+	<a href="#" class="tool-left"><i class="icon-arrow-left"></i></a>
+	<a href="#" class="tool-right"><i class="icon-arrow-right"></i></a>
+	<a href="#" class="tool-play"><i class="icon-play"></i></a>
+	<a href="#" class="tool-up"><i class="icon-circle-arrow-up"></i></a>
+	<a href="#" class="tool-down"><i class="icon-circle-arrow-down"></i></a>
+	<a href="#" class="tool-remove"><i class="icon-remove"></i></a>
+</div>
+
+<div id="menu">
+	<div id="menu-search-i" class="menu-i" style="left: 0px;">
+		<i class="icon-search"></i>
+	</div>
+	<div id="menu-search" class="menu-box">
+		<p>search query</p>
+		<input type="text"></input>
+		<ul style="list-style-type: none; overflow: auto;"></ul>
+	</div>
+
+	<div id="menu-export-i" class="menu-i" style="left: 40px;">
+		<i class="icon-download"></i>
+	</div>
+	<div id="menu-export" class="menu-box">
+		<input id="menu-export-json" type="button" value="export json"></input>
+		<input id="menu-export-png"  type="button" value="export png"></input>
+		<input id="menu-export-dscript"  type="button" value="export dscript"></input>
+	</div>
+
+	<div id="menu-create-i" class="menu-i" style="left: 80px;">
+		<i class="icon-plus"></i>
+	</div>
+	<div id="menu-create" class="menu-box">
+		<p>committer name</p>
+		<input id="argument_committer"></input>
+		<p>descriptions</p>
+		<textarea id="argument_description" cols=20 rows=4>Enter new Argument descriptions.  </textarea>
+		<button id="menu-create-argument">Create</button>
+	</div>
+
+	<div id="menu-tool-i" class="menu-i" style="left: 120px;">
+		<i class="icon-list"></i>
+	</div>
+	<div id="menu-tool" class="menu-box">
+		<input id="menu-tool-commit" type="button" value="commit"></input>
+	</div>
+
+	<div id="menu-tool-i" class="menu-i" style="left: 160px;">
+		<i class="icon-print"></i>
+	</div>
+	<div id="menu-color-i" class="menu-i" style="left: 200px;">
+		<i class="icon-wrench"></i>
+	</div>
+	<div id="menu-color" class="menu-box">
+		<form action="#" method="post">
+			<div class="controlset">
+				<fieldset>
+					<legend>Default</legend>
+					<input class="colorpicker" id="color-goal" type="text"
+					name="color-goal" value="#000000" />
+					<input class="colorpicker" id="color-strategy" type="text"
+					name="color-strategy" value="#222222" />
+					<input class="colorpicker" id="color-context" type="text"
+					name="color-context" value="#444444" />
+					<input class="colorpicker" id="color-evidence" type="text"
+					name="color-evidence" value="#666666" />
+					<input class="colorpicker" id="color-subject" type="text"
+					name="color-subject" value="#888888" />
+					<input class="colorpicker" id="color-solution" type="text"
+					name="color-solution" value="#AAAAAA" />
+					<input class="colorpicker" id="color-rebuttal" type="text"
+					name="color-rebuttal" value="#CCCCCC" />
+				</fieldset>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div id="edit">
+	<h1>Type</h1>
+	<select></select>
+	<h1>Description</h1>
+	<textarea rows=4 cols=40></textarea><br>
+	<input id="edit-ok" type="button" value="OK"></input>
+	<input id="edit-cancel"type="button" value="Cancel"></input>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+#ase_logo {
+	padding-top: 5px;
+}
+
+.menu-i {
+	position: absolute;
+	left: 24px;
+	top : 60px;
+	width : 40px;
+	height: 40px;
+	background: #CCC;
+	opacity: 0.8;
+	border-radius: 4px;
+	text-align: center;
+}
+
+#menu-search input {
+	margin-left: 15px;
+}
+
+.menu-i:hover {
+	background: #EEE;
+}
+
+.menu-box {
+	position: absolute;
+	display: none;
+	left: 0px;
+	top: 100px;
+	width: 232px;
+	bottom: 0px;
+	background: #EEE;
+	padding: 4px;
+	overflow: auto;
+}
+
+.sidemenu-search-result {
+	overflow: scroll;
+}
+
+.sidemenu-result {
+	list-style-type: none;
+	margin-left: -3em;
+	height: 0.8cm;
+	position: relative;
+}
+
+.sidemenu-result:hover {
+	color: #FFA0A0;
+}
+
+ul.sidemenu-result li ul {
+	margin: 0 0 0 0.3em;
+	padding 0;
+}
+
+p.legend {
+	margin-bottom: 1em;
+}
+
+p.legend em {
+	color: #C00;
+	font-style: normal;
+}
+
+div#menu-color div.controlset {
+	display: block;
+	float: left;
+	width: 100%;
+	padding: 0.25em 0;
+}
+
+div#menu-color div.controlset label,
+div#menu-color div.controlset input,
+div#menu-color div.controlset div {
+	display: inline;
+	float: left;
+}
+
+div#menu-color div.controlset label {
+	width: 100px;
+}
