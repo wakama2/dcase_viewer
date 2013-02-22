@@ -187,7 +187,7 @@ var DCaseViewer = (function() {
         };
         createStoryJS({
             type    : "timeline",
-            width   : '95%',
+            width   : '100%',
             height  : '240',
             source  : { timeline: timeline },
             embed_id: dom_id,
