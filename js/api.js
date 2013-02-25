@@ -39,9 +39,9 @@ DCaseAPI.getBranchList = function(arg) {
 	return this.call("getBranchList", { argumentId: arg }).commitIdList;
 };
 
-DCaseAPI.getArgument = function(commitId) {
+DCaseAPI.getArgument = function(argId, commitId) {
 	var r = this.call("getNodeTree", { commitId: commitId });
-	return new Argument(this.createNode(r.tree), commitId);
+	return new Argument(this.createNode(r.tree), argId, commitId);
 };
 
 DCaseAPI.createArgument = function(newNode) {
@@ -56,7 +56,7 @@ DCaseAPI.createArgument = function(newNode) {
 			TopGoalId: newNode.id,
 		}
 	});
-	return new Argument(newNode, r.commitId);
+	return new Argument(newNode, r.argmentId, r.commitId);
 };
 
 function contextParams(params) {

@@ -126,9 +126,10 @@ DNode.SELECTABLE_TYPES = {
 
 //-----------------------------------------------------------------------------
 
-var Argument = function(topGoal, commitId) {
+var Argument = function(topGoal, argId, commitId) {
 	this.node = topGoal;
 	this.commitId = commitId;
+	this.argId = argId;
 	this.opQueue = [];
 	this.undoCount = 0;
 };

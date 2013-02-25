@@ -11,6 +11,8 @@ var TimeLine = function(root, viewer) {
 		position: "absolute", left: 0, top: 0,
 	}).appendTo($timeline);
 
+	this.argument = viewer.getArgument();
+
 	//--------------------------------------------------------
 
 	var scroll = 0;
@@ -37,61 +39,70 @@ var TimeLine = function(root, viewer) {
 
 	//--------------------------------------------------------
 
+	var selected = null;
+	var graphWidth = 0;
+	var MX = 20;
+	var MY = 20;
+
 	this.drag = function() {
 		$container.css("left", scroll + dragX);
 		$canvas.attr("left", scroll + dragX);
 		$canvas.css("left", scroll + dragX);
 	};
 
-	function put(x, y, commitId) {
-		$("<div></div>").css({
-			left: x, top: y,
+	function addCommitMark(x, y, commitId) {
+		var d = $("<div></div>").css({
+			left: x, top: y, width: MX, height: MY,
 		}).addClass("timeline-commit").click(function() {
-			console.log("arguemnt " + commitId);
-			var arg = DCaseAPI.getArgument(commitId);
+			var argId = self.argument.argId;
+			var arg = DCaseAPI.getArgument(argId, commitId);
 			viewer.setArgument(arg);
+			if(selected != null) {
+				selected.css("border-color", "");
+				selected = d;
+				d.css("border-color", "orange");
+			}
+			console.log("arguemnt " + commitId);
 		}).appendTo($container)
+		console.log(commitId + ", " + self.argument.commitId);
+		if(commitId == self.argument.commitId) {
+			d.css("border-color", "orange");
+			selected = d;
+		}
 	}
 
-	var wid = 0;
-
-	function puts(ctx, mm, x, y, id) {
-		put(x, y, id);
-		wid = Math.max(wid, x);
+	function put(ctx, mm, x, y, id) {
+		addCommitMark(x, y, id);
+		graphWidth = Math.max(graphWidth, x);
 		var c = mm[id];
 		if(c != null) {
+			var N = 50;
 			var y0 = y;
-			y = puts(ctx, mm, x+50, y, c[0]);
+			y = put(ctx, mm, x+N, y, c[0]);
 			ctx.beginPath();
-			ctx.moveTo(x+12, y0+12);
-			ctx.lineTo(x+62, y0+12);
+			ctx.moveTo(x+MX/2, y0+MY/2);
+			ctx.lineTo(x+MX/2+N, y0+MY/2);
 			ctx.stroke();
 			for(var i=1; i<c.length; i++) {
-				y = puts(ctx, mm, x+50, y+30, c[1]);
+				y = put(ctx, mm, x+N, y+30, c[i]);
 				ctx.beginPath();
-				ctx.moveTo(x+12, y0+12);
-				ctx.lineTo(x+12, y+12);
-				ctx.lineTo(x+62, y+12);
+				ctx.moveTo(x+MX/2, y0+MY/2);
+				ctx.lineTo(x+MX/2, y +MY/2);
+				ctx.lineTo(x+MX/2+N, y+MY/2);
 				ctx.stroke();
 			}
 		}
 		return y;
 	}
 
-	var argId0 = null;
-
-	this.repaint = function(argId, brId) {
+	this.repaint = function() {
 		var arg = viewer.getArgument();
-		if(arg == null) return;
-		if(argId == null) argId = argId0;
-		if(argId == null) return;
-		argId0 = argId;
-		if(brId == null) brId = arg.commitId;
-
+		self.argument = arg;
 		$container.empty();
 
-		var mm = {};
+		if(arg == null) return;
 
+		var mm = {};
 		var l = arg.getCommitList();
 		for(var i=0; i<l.length-1; i++) {
 			var x = mm[l[i]];
@@ -100,8 +111,8 @@ var TimeLine = function(root, viewer) {
 			mm[l[i]] = x;
 		}
 
-		$.each(DCaseAPI.getBranchList(argId), function(i, br) {
-			if(br != brId) {
+		$.each(DCaseAPI.getBranchList(arg.argId), function(i, br) {
+			if(br != arg.commitId) {
 				var l = DCaseAPI.call("getCommitList", { commitId: br }).commitIdList;
 				for(var i=0; i<l.length-1; i++) {
 					var x = mm[l[i]];
@@ -111,21 +122,18 @@ var TimeLine = function(root, viewer) {
 				}
 			}
 		});
+		graphWidth = 0;
+		selected = null;
 
-		wid = 0;
 		var ctx = $canvas[0].getContext("2d");
 		ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
-		var y = puts(ctx, mm, 0, 0, l[0]);
-		console.log(y);
+		var y = put(ctx, mm, 0, 0, l[0]);
 		$timeline.height(y + 30);
-		wid += 24;
+		graphWidth += 24;
 
-		scroll = ($timeline.width() - wid) / 2;
-		console.log(scroll);
+		scroll = ($timeline.width() - graphWidth) / 2;
 		self.drag();
 	};
-
-	this.repaint();
 };
 
 var SideMenu = function(root, viewer) {
@@ -315,8 +323,8 @@ var SideMenu = function(root, viewer) {
 					.addClass("sidemenu-result")
 					.html(br)
 					.click(function() {
-						viewer.setArgument(DCaseAPI.getArgument(br));
-						timeline.repaint(arg, br);
+						viewer.setArgument(DCaseAPI.getArgument(arg, br));
+						timeline.repaint();
 					})
 					.appendTo($res);
 			});
@@ -336,13 +344,15 @@ var SideMenu = function(root, viewer) {
 	});
 
 	$("#menu-proc-undo").click(function() {
-		viewer.getArgument().undo();
-		viewer.structureUpdated();
+		if(viewer.getArgument().undo()) {
+			viewer.structureUpdated();
+		}
 	});
 
 	$("#menu-proc-redo").click(function() {
-		viewer.getArgument().redo();
-		viewer.structureUpdated();
+		if(viewer.getArgument().redo()) {
+			viewer.structureUpdated();
+		}
 	});
 
 	$("#menu-proc-newarg").click(function() {
