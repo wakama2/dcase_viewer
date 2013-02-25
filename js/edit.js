@@ -18,6 +18,7 @@ var DNodeEditWindow = (function() {
 		$("#edit-cancel").click(function() {
 			DNodeEditWindow.close();
 		});
+		$select = $("#edit select");
 		$select.change(function() {
 			$("select option:selected").each(function() {
 				selectedType = this.text;
@@ -29,7 +30,6 @@ var DNodeEditWindow = (function() {
 		self.success = success;
 		self.node = node;
 
-		$select = $("#edit select");
 		if(node != null) {
 			selectedType = node.type;
 			$select.attr("disabled", true);
