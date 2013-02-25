@@ -105,14 +105,34 @@ DCaseViewer.prototype.applyOperation = function(op) {
 }
 
 DCaseViewer.prototype.commit = function(msg) {
+	var tl = [];
+	var id = 1;
+	var node = this.model;
+	node.traverse(function(node) {
+		node.id = id++;
+	});
+	node.traverse(function(node) {
+		var c = [];
+		node.eachNode(function(node) {
+			c.push(node.id);
+		});
+		tl.push({
+			type: node.type,
+			name: node.name,
+			description: node.desc,
+			children: c,
+		});
+	});
+
 	var r = DCaseAPI.call("commit", {
-		tree: this.model.toJson(),
+		tree: tl,
 		message: msg,
 		commitId: this.commitId,
 	});
 	this.commitId = r.commitId;
 	this.undoCount = 0;
 	this.opQueue = [];
+	return true;
 }
 
 DCaseViewer.prototype.undo = function() {

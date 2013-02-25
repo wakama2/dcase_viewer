@@ -183,7 +183,9 @@ var SideMenu = function(root, viewer) {
 	$("#menu-proc-commit").click(function() {
 		var msg = prompt("コミットメッセージを入力して下さい");
 		if(msg != null) {
-			viewer.commit(msg);
+			if(viewer.commit(msg)) {
+				alert("コミットしました");
+			}
 		}
 	});
 
