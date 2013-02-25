@@ -9,7 +9,7 @@ var DNodeEditWindow = (function() {
 	function init() {
 		$select = $("#edit select");
 		$desc = $("#edit textarea");
-		$.each(DNode.getTypes(), function(i, type) {
+		$.each(DNode.TYPES, function(i, type) {
 			$("<option></option>")
 				.attr("id", "edit-option-" + type)
 				.html(type)
@@ -55,7 +55,7 @@ var DNodeEditWindow = (function() {
 			$select.attr("disabled", true);
 			$desc.attr("value", node.text);
 		} else {
-			selectedType = DNode.getTypes()[0];
+			selectedType = DNode.TYPES[0];
 			$select.attr("disabled", false);
 			$desc.attr("value", "");
 		}

@@ -1,15 +1,5 @@
 var FONT_SIZE = 13;
 var MIN_DISP_SCALE = 4 / FONT_SIZE;
-function toHTML(txt) {
-	if(txt == "") {
-		return "<font color=gray>(no description)</font>";
-	}
-	var x = txt
-	.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-	.replace(/\n/g, "<br>");
-	return x;
-}
-
 var DEF_WIDTH = 200;
 
 /* class DNodeView */
@@ -21,31 +11,34 @@ var DNodeView = function(viewer, node) {
 	this.div = $("<div></div>")
 			.addClass("node-container")
 			.width(DEF_WIDTH)
-			.appendTo(viewer.root);
+			.appendTo(viewer.$dom);
 
-	if(node.isUndevelop()) {
+	if(node.isUndeveloped) {
 		this.svgUndevel = $(document.createElementNS(SVG_NS, "polygon")).attr({
 			fill: "none", stroke: "gray"
-		}).appendTo(viewer.svgroot);
+		}).appendTo(viewer.$svg);
 	}
 	this.argumentBorder = null;
-	if(node.isArgument()) {
+	if(node.isArgument) {
 		this.argumentBorder = $(document.createElementNS(SVG_NS, "rect")).attr({
 			stroke: "#8080D0",
 			fill: "none",
 			"stroke-dasharray": 3,
-		}).appendTo(viewer.svgroot);
+		}).appendTo(viewer.$svg);
 	}
 	this.argumentBounds = {};
 
-	this.divName = $("<div></div>").addClass("node-name").html(node.name);
-	this.div.append(this.divName);
-
-	this.divText = $("<div></div>").addClass("node-text").html(toHTML(node.text));
-	this.div.append(this.divText);
-
-	this.divNodes = $("<div></div>").addClass("node-closednodes");
-	this.div.append(this.divNodes);
+	this.divName = $("<div></div>")
+		.addClass("node-name")
+		.html(node.name)
+		.appendTo(this.div);
+	this.divText = $("<div></div>")
+		.addClass("node-text")
+		.html(node.getHtmlDescription())
+		.appendTo(this.div);
+	this.divNodes = $("<div></div>")
+		.addClass("node-closednodes")
+		.appendTo(this.div);
 
 	this.divNodesText = "";
 	this.divNodesVisible = false;
@@ -63,41 +56,11 @@ var DNodeView = function(viewer, node) {
 	this.childVisible = true;
 
 	var touchinfo = {};
-	var editflag = false;
+	this.editflag = false;
 	this.div.mouseup(function(e) {
-		if(self == viewer.getSelectedNode() && !editflag) {
-			editflag = true;
-			self.divText.text("");
-			$("<textarea></textarea>").css({
-				position: "absolute",
-				left: "0",
-				top: self.divText.attr("top"),
-				width: "100%",
-				height: "75%",
-				background: "#CCC",
-				borderStyle: "none",
-				resizable: false,
-				zIndex: 99,
-			})
-			.attr("value", node.text)
-			.appendTo(self.div)
-			.focus()
-			.mousedown(function(e) { e.stopPropagation(); })
-			.mouseup(function(e) { e.stopPropagation(); })
-			.mousemove(function(e) { e.stopPropagation(); })
-			.click(function(e) { e.stopPropagation(); })
-			.mousewheel(function(e) { e.stopPropagation(); })
-			.blur(function() {
-				node.text = $(this).attr("value");
-				self.divText.html(toHTML(node.text));
-				$(this).remove();
-				editflag = false;
-				setTimeout(function() {
-					var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
-					self.bounds.h = b.h;
-					viewer.repaintAll();
-				}, 100);
-			});
+		if(self == viewer.getSelectedNode() && !self.editflag) {
+			self.editflag = true;
+			self.showInplace();
 		}
 		viewer.dragEnd(self);
 	}).bind("touchstart", function(e) {
@@ -121,7 +84,41 @@ var DNodeView = function(viewer, node) {
 	//}, function() {
 	//	viewer.showToolbox(null);
 	//});
-}
+};
+
+DNodeView.prototype.showInplace = function() {
+	var self = this;
+	self.divText.text("");
+	$("<textarea></textarea>")
+		.addClass("node-inplace")
+		.css("top", self.divText.attr("top"))
+		.attr("value", self.node.desc)
+		.appendTo(self.div)
+		.focus()
+		.mousedown(function(e) { e.stopPropagation(); })
+		.mouseup(function(e) { e.stopPropagation(); })
+		.mousemove(function(e) { e.stopPropagation(); })
+		.click(function(e) { e.stopPropagation(); })
+		.mousewheel(function(e) { e.stopPropagation(); })
+		.blur(function() {
+			var newDesc = $(this).attr("value");
+			console.log(newDesc);
+			var op = new EditOperation(self.node, self.node.desc, newDesc);
+			self.viewer.applyOperation(op);
+			self.divText.html(self.node.getHtmlDescription());
+			$(this).remove();
+			self.editflag = false;
+			setTimeout(function() {
+				var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
+				self.bounds.h = b.h;
+				self.viewer.repaintAll();
+			}, 100);
+		});
+};
+
+DNodeView.prototype.getTreeBounds = function() {
+	return this.argumentBounds;
+};
 
 DNodeView.prototype.initSvg = function(type) {
 	var o = null;
@@ -201,7 +198,7 @@ DNodeView.prototype.initSvg = function(type) {
 			return { w: w + 20*2, h: h + 10*2 };
 		}
 		o.offset = { x: 25, y: 10 };
-	} else if(type == "Evidence" || type == "Monitor" || type == "Rebuttal") {
+	} else if(type == "Evidence" || type == "DScriptEvidence" || type == "Rebuttal") {
 		o = root.createSvg("ellipse");
 		o.setBounds = function(a, x, y, w, h) {
 			a.moves(this, {
@@ -317,7 +314,7 @@ DNodeView.prototype.addChild = function(view) {
 }
 
 DNodeView.prototype.updateLocation = function(x, y) {
-	var ARG_MARGIN = this.node.isArgument() ? 5 : 0;
+	var ARG_MARGIN = this.node.isArgument ? 5 : 0;
 	x += ARG_MARGIN;
 	y += ARG_MARGIN;
 	var x0 = x;
@@ -329,10 +326,10 @@ DNodeView.prototype.updateLocation = function(x, y) {
 			e.updateLocation(x, y);
 		});
 		this.bounds = { x: x, y: y, w: w, h: h };
-		if(this.visible && this.node.isUndevelop()) {
+		if(this.visible && this.node.isUndeveloped) {
 			h += 40;
 		}
-		if(this.node.isArgument()) {
+		if(this.node.isArgument) {
 			this.argumentBounds = {
 				x: x0 - ARG_MARGIN,
 				y: y0 - ARG_MARGIN,
@@ -385,7 +382,7 @@ DNodeView.prototype.updateLocation = function(x, y) {
 		var p = this.context.updateLocation(x, y);
 		maxWidth = Math.max(maxWidth, p.x - x0);
 	}
-	if(this.node.isUndevelop()) {
+	if(this.node.isUndeveloped) {
 		maxHeight += 40;
 	}
 	this.argumentBounds = {

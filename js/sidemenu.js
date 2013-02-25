@@ -11,38 +11,12 @@ var SideMenu = function(root, viewer) {
 		viewer.setTextSelectable(!flag);
 	}
 
-	this.actEditSelectedNode = function() {
-		var view = viewer.getSelectedNode();
-		if(view != null) {
-			DNodeEditWindow.open(view.node, function(node) {
-				viewer.setModel(viewer.model);
-				var r = DCaseAPI.update({
-					argument_id: viewer.opts.argument_id,
-					node_id: node.id,
-					description: node.text
-				});
-			});
-		}
-	}
-
 	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {
-				view.node.addChild(newNode);
-				viewer.setModel(viewer.model);
-				var r = DCaseAPI.insert({
-					new: {
-						type: newNode.type,
-						description: newNode.text,
-					},
-					argument_id: viewer.opts.argument_id,
-					parent: {
-						argument_id: viewer.opts.argument_id,
-						node_id: view.node.id,
-					}
-				});
-				newNode.id = r.node_id;
+				var op = new InsertOperation(view.node, newNode);
+				viewer.applyOperation(op);
 			});
 		}
 	}
@@ -50,15 +24,11 @@ var SideMenu = function(root, viewer) {
 	this.actRemoveSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			if(confirm("ノードを削除しますか？")) {
-				var parent = view.node.parents;
-				if(parent.length > 0) {
-					parent[0].removeChild(view.node);
-					viewer.setModel(viewer.model);
-					var r = DCaseAPI.del({
-						argument_id: viewer.opts.argument_id,
-						node_id: view.node.id,
-					});
+			var parent = view.node.parents;
+			if(parent.length > 0) {
+				if(confirm("ノードを削除しますか？")) {
+					var op = new RemoveOperation(parent, view.node);
+					viewer.applyOperation(op);
 				}
 			}
 		}
@@ -74,19 +44,13 @@ var SideMenu = function(root, viewer) {
 		alert("TODO");
 	}
 
-	this.actCommit = function() {
-		var msg = prompt("コミットメッセージを入力して下さい");
-		if(msg != null) {
-			DCaseAPI.commit(msg);
-		}
-	}
-
 	this.show = function(m) {
 		var ids = [
 			"#menu-search",
 			"#menu-export",
 			"#menu-info",
-			"#menu-tool"
+			"#menu-tool",
+			"#menu-proc"
 		];
 		$.each(ids, function(i, id) {
 			if(m == id) $(id).toggle();
@@ -145,7 +109,7 @@ var SideMenu = function(root, viewer) {
 	}
 
 	// init search list
-	this.search("");
+	//this.search("");
 
 	//--------------------------------------------------------
 	var $export = $("#menu-export-i")
@@ -169,24 +133,31 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 	
-	(function() {
-		var types = DNode.getTypes();
-		var count = {};
-		for(var i=0; i<types.length; i++) {
-			count[types[i]] = 0;
-		}
-		viewer.traverseAll(function(node) {
-			count[node.type] += 1;
-		});
-		var $table = $("#menu-info-table");
-		for(var i=0; i<types.length; i++) {
-			var name = types[i];
-			$("<tr></tr>")
-				.append($("<td></td>").html(name))
-				.append($("<td></td>").html(count[name]))
-				.appendTo($table);
-		}
-	})();
+	//(function() {
+	//	var types = DNode.TYPES;
+	//	var count = {};
+	//	for(var i=0; i<types.length; i++) {
+	//		count[types[i]] = 0;
+	//	}
+	//	viewer.traverseAll(function(node) {
+	//		count[node.type] += 1;
+	//	});
+	//	var $table = $("#menu-info-table");
+	//	for(var i=0; i<types.length; i++) {
+	//		var name = types[i];
+	//		$("<tr></tr>")
+	//			.append($("<td></td>").html(name))
+	//			.append($("<td></td>").html(count[name]))
+	//			.appendTo($table);
+	//	}
+	//})();
+
+	//--------------------------------------------------------
+	var $proc = $("#menu-proc-i")
+			.click(function(e) {
+				self.show("#menu-proc");
+			})
+			.appendTo(root);
 
 	//--------------------------------------------------------
 	var $tool = $("#menu-tool-i")
@@ -196,8 +167,19 @@ var SideMenu = function(root, viewer) {
 			.appendTo(root);
 
 	$("#menu-tool-commit").click(function() {
-		self.actCommit();
+		var msg = prompt("コミットメッセージを入力して下さい");
+		if(msg != null) {
+			//DCaseAPI.commit(msg);
+			viewer.commit(msg);
+		}
 	});
 
+	$("#menu-tool-undo").click(function() {
+		viewer.undo();
+	});
+
+	$("#menu-tool-redo").click(function() {
+		viewer.redo();
+	});
 }
 

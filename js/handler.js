@@ -9,15 +9,16 @@ DCaseViewer.prototype.setDragHandler = function() {
 		if(flag) {
 			this.dragCancel();
 		}
+		if(self.rootview == null) return;
 		x0 = x;
 		y0 = y;
 		flag = true;
 		var size = self.rootview.updateLocation(0, 0);
 		bounds = {
 			l : 20 - size.x * self.scale - self.shiftX,
-			r : $(self.root).width() - 20 - self.shiftX,
+			r : self.$root.width() - 20 - self.shiftX,
 			t : 20 - size.y * self.scale - self.shiftY,
-			b : $(self.root).height() - 20 - self.shiftY
+			b : self.$root.height() - 20 - self.shiftY
 		};
 		self.repaintAll(0);
 	}
@@ -62,7 +63,7 @@ DCaseViewer.prototype.setDragHandler = function() {
 
 DCaseViewer.prototype.setMouseDragHandler = function() {
 	var self = this;
-	var root = this.root;
+	var root = this.$root;
 	$(root).mousedown(function(e) {
 		if(e.originalEvent.detail == 2) return ;
 		if(self.moving || !self.drag_flag) return ;
@@ -83,7 +84,7 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 		var b = 1.0 + delta * 0.04;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {
-			var r = root.getBoundingClientRect();
+			var r = root.context.getBoundingClientRect();
 			var x1 = self.drag_flag ? e.pageX - r.left : $(root).width()/2;
 			var y1 = self.drag_flag ? e.pageY - r.top  : $(root).height()/2;
 			self.shiftX = x1 - (x1 - self.shiftX) * b;
@@ -95,7 +96,7 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 
 DCaseViewer.prototype.setTouchHandler = function() {
 	var self = this;
-	var root = this.root;
+	var root = this.$root;
 	var touchCount = 0;
 	var d = 0;
 	var scale0 = 0;

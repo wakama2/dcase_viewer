@@ -12,11 +12,15 @@ var SVG_NS = "http://www.w3.org/2000/svg";
 
 var DCaseViewer = function(root, model, opts) {
 	root.className = "viewer-root";
-	this.svgroot = $(document.createElementNS(SVG_NS, "svg")).css({
+	this.$svg = $(document.createElementNS(SVG_NS, "svg")).css({
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
-	});
-	this.root = root;
+	}).appendTo(root);
+	this.$dom = $("<div></div>").css({
+		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
+	}).appendTo(root);
+	this.$root = $(root);
 	this.opts = opts;
+	this.argId = 1;//TODO
 	this.moving = false;
 	this.shiftX = 0;
 	this.shiftY = 0;
@@ -26,17 +30,33 @@ var DCaseViewer = function(root, model, opts) {
 	this.drag_flag = true;
 	this.selectedNode = null;
 	this.rootview = null;
+	this.nodeCount = {};
+	this.opQueue = [];
+	this.undoCount = 0;
 	this.model = model;
 	this.setModel(model);
 	this.addEventHandler();
 	this.setTextSelectable(false);
 }
 
+DCaseViewer.prototype.setArgument = function(node) {
+	this.setModel(node);
+};
+
 DCaseViewer.prototype.setModel = function(model) {
-	$(this.svgroot).empty();
-	$(this.root)
-		.empty()
-		.append(this.svgroot);
+	$(this.$svg).empty();
+	$(this.$dom).empty()
+		.append(this.$svg);
+	if(model == null) {
+		//$("<div></div>")
+		//	.html("Argumentを選択して下さい")
+		//	.css({
+		//		"text-align": "center",
+		//		"background": "#CCC",
+		//		"border-radius": "4px",
+		//	}).appendTo(this.root);
+		return;
+	}
 
 	var self = this;
 	function create(node) {
@@ -62,26 +82,62 @@ DCaseViewer.prototype.setModel = function(model) {
 			});
 		}
 		f(self.rootview);
-		self.shiftX = ($(self.root).width() - self.rootview.updateLocation(0, 0).x * self.scale)/2;
+		self.rootview.updateLocation(0, 0);
+		self.shiftX = (self.$root.width() - self.treeSize().w * self.scale)/2;
 		self.shiftY = 20;
 		self.repaintAll();
 	}, 100);
 }
 
 DCaseViewer.prototype.centerize = function(view, ms) {
+	if(this.rootview == null) return;
 	this.selectedNode = view;
 	this.rootview.updateLocation(0, 0);
 	var b = view.bounds;
-	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
-	this.shiftY = -b.y * this.scale + $(this.root).height() / 5 * this.scale;
+	this.shiftX = -b.x * this.scale + (this.$root.width() - b.w * this.scale) / 2;
+	this.shiftY = -b.y * this.scale + this.$root.height() / 5 * this.scale;
 	this.repaintAll(ms);
 }
 
+DCaseViewer.prototype.applyOperation = function(op) {
+	this.opQueue.push(op);
+	this.undoCount = 0;
+	op.redo();
+	this.setModel(this.model);
+}
+
+DCaseViewer.prototype.commit = function(msg) {
+	this.undoCount = 0;
+	this.opQueue = [];
+}
+
+DCaseViewer.prototype.undo = function() {
+	var n = this.opQueue.length;
+	if(n > this.undoCount) {
+		this.undoCount++;
+		var op = this.opQueue[n - this.undoCount];
+		op.undo();
+		this.setModel(this.model);
+	}
+}
+
+DCaseViewer.prototype.redo = function() {
+	if(this.undoCount > 0) {
+		var op = this.opQueue[this.opQueue.length - this.undoCount];
+		this.undoCount--;
+		op.redo();
+		this.setModel(this.model);
+	}
+}
+
 DCaseViewer.prototype.repaintAll = function(ms) {
+	if(this.rootview == null) return;
 	var self = this;
 	var rootview = self.rootview;
 	rootview.updateLocation(
-			(self.shiftX + self.dragX) / self.scale, (self.shiftY + self.dragY) / self.scale);
+		(self.shiftX + self.dragX) / this.scale,
+		(self.shiftY + self.dragY) / this.scale);
+
 	var a = new Animation();
 	rootview.animeStart(a);
 	if(ms == 0) {
@@ -103,42 +159,6 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	}, 1000/60);
 }
 
-DCaseViewer.prototype.prevVersion = function(v) {
-	var node = v.node;
-	var prev = node.prevVersion;
-	if(prev != null) {
-		var parent = node.parents[0];
-		for(var i=0; i<parent.children.length; i++) {
-			if(parent.children[i] == node) {
-				parent.children[i] = prev;
-				if(prev.parents.length == 0) {
-					prev.parents.push(parent);
-				}
-				this.setModel(this.model);
-				break;
-			}
-		}
-	}
-}
-
-DCaseViewer.prototype.nextVersion = function(v) {
-	var node = v.node;
-	var next = node.nextVersion;
-	if(next != null) {
-		var parent = node.parents[0];
-		for(var i=0; i<parent.children.length; i++) {
-			if(parent.children[i] == node) {
-				parent.children[i] = next;
-				if(next.parents.length == 0) {
-					next.parents.push(parent);
-				}
-				this.setModel(this.model);
-				break;
-			}
-		}
-	}
-}
-
 DCaseViewer.prototype.showToolbox = function(node) {
 	var self = this;
 	if(this.toolboxNode != node) {
@@ -158,7 +178,7 @@ DCaseViewer.prototype.showToolbox = function(node) {
 
 			$("#toolbar .tool-left").css("display", data.prevVersion != null ? "inline" : "none");
 			$("#toolbar .tool-right").css("display", data.nextVersion != null ? "inline" : "none");
-			$("#toolbar .tool-play").css("display", data.isDScript() ? "inline" : "none");
+			$("#toolbar .tool-play").css("display", data.isDScript ? "inline" : "none");
 			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
 			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
 		} else {
@@ -166,6 +186,21 @@ DCaseViewer.prototype.showToolbox = function(node) {
 		}
 		this.toolboxNode = node;
 	}
+}
+
+var global_viewer = null;
+
+DCaseViewer.prototype.setSnapshot = function(id) {
+	var ss = this.snapshotList[id]
+	var node = DCaseAPI.call("getNodeTreeFromSnapshotId", {
+		BelongedArgumentId: this.argId, 
+		SnapshotId: ss.id
+	}).Tree;
+	this.setModel(DCaseAPI.createNode(node));
+}
+
+DCaseViewer.prototype.treeSize = function() {
+	return this.rootview.getTreeBounds();
 }
 
 DCaseViewer.prototype.setDragLock = function(b) {
@@ -201,7 +236,7 @@ DCaseViewer.prototype.actExpandBranch = function(view, b) {
 
 DCaseViewer.prototype.setTextSelectable = function(b) {
 	var p = b ? "auto" : "none";
-	$(this.root).css({
+	this.$root.css({
 		"user-select": p,
 		"-moz-user-select": p,
 		"-webkit-user-select": p
@@ -209,13 +244,14 @@ DCaseViewer.prototype.setTextSelectable = function(b) {
 }
 
 DCaseViewer.prototype.fit = function(ms) {
-	var size = this.rootview.updateLocation(0, 0);
+	if(this.rootview == null) return;
+	var size = this.rootview.treeSize();
 	this.scale = Math.min(
-		$(this.root).width()  * 0.98 / size.x,
-		$(this.root).height() * 0.98 / size.y);
+		this.root.width()  * 0.98 / size.x,
+		this.root.height() * 0.98 / size.y);
 	var b = this.rootview.bounds;
-	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
-	this.shiftY = -b.y * this.scale + ($(this.root).height() - size.y * this.scale) / 2;
+	this.shiftX = -b.x * this.scale + (this.$root.width() - b.w * this.scale) / 2;
+	this.shiftY = -b.y * this.scale + (this.$root.height() - size.y * this.scale) / 2;
 	this.repaintAll(ms);
 }
 
@@ -232,7 +268,7 @@ DCaseViewer.prototype.traverseAll = function(f) {
 
 DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
-	this.svgroot.append(obj);
+	this.$svg.append(obj);
 	return obj;
 }
 
@@ -253,7 +289,7 @@ DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
 	}
 	var t = $("<div></div>")
 			.addClass("dscript-exe-window")
-			.appendTo(self.root);
+			.appendTo(self.$root);
 
 	var r1x = document.createElement("div");
 	var t1 = $(r1x).css({

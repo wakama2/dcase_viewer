@@ -36,27 +36,14 @@ body {
 <script type="text/javascript" src="js/sidemenu.js"></script>
 <script type="text/javascript" src="js/api.js"></script>
 <script type="text/javascript" src="js/animation.js"></script>
+<script type="text/javascript" src="js/operation.js"></script>
 <script type="text/javascript">
 
-function getNodeFromServer(id) {
-	var res1 = DCaseAPI.get(["Argument"]);
-	//var id = res1[0].argument_id;
-	//var id = "0";//FIXME
-	console.log("get id=" + id);
-	var res2 = DCaseAPI.get([], id);
-	console.log(res2);
-	var node = createNodeFromJson(res2);
-	return node;
-}
-
 window.addEventListener("load",function() {
-	var node = createSampleNode();
-	var id = "1";
-	//var node = getNodeFromServer(id);
-	var opts = {
-		argument_id: id,
-	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
+	var args = DCaseAPI.call("getArgumentList", {});
+	var tree = DCaseAPI.call("getNodeTree", { BelongedArgumentId: args.id[0]});
+	var node = DCaseAPI.createNode(tree.Tree);
+	var viewer = new DCaseViewer(document.getElementById("viewer"), node);
 	var menu = new SideMenu(document.body, viewer);
 
 	$(".tool-new").click(function() {
@@ -138,6 +125,7 @@ window.addEventListener("load",function() {
 	<div id="menu-export" class="menu-box">
 		<input id="menu-export-json" type="button" value="export json"></input>
 		<input id="menu-export-png"  type="button" value="export png"></input>
+		<input id="menu-export-script"  type="button" value="export script"></input>
 	</div>
 
 	<div id="menu-info-i" class="menu-i" style="left: 80px;">
@@ -148,14 +136,20 @@ window.addEventListener("load",function() {
 	</div>
 
 	<div id="menu-tool-i" class="menu-i" style="left: 120px;">
-		<i class="icon-list"></i>
+		<i class="icon-print"></i>
 	</div>
 	<div id="menu-tool" class="menu-box">
-		<input id="menu-tool-commit" type="button" value="commit"></input>
 	</div>
 
-	<div id="menu-tool-i" class="menu-i" style="left: 160px;">
-		<i class="icon-print"></i>
+	<div id="menu-proc-i" class="menu-i" style="left: 160px;">
+		<i class="icon-plus"></i>
+	</div>
+	<div id="menu-proc" class="menu-box">
+		<input id="menu-proc-commit" type="button" value="commit"></input>
+		<input id="menu-proc-undo" type="button" value="undo"></input>
+		<input id="menu-proc-redo" type="button" value="redo"></input>
+		Arguments:<br>
+		<ul style="list-style-type: none; overflow: auto;"></ul>
 	</div>
 </div>
 
