@@ -184,8 +184,9 @@ var SideMenu = function(root, viewer) {
 		var $res = $("#menu-proc ul");
 		$res.empty();
 		var al = DCaseAPI.call("getArgumentList", {}).commitId;
-		for(var i=0; i<al.length; i++) {
-			var a = al[i];
+		//for(var i=0; i<al.length; i++) {
+		//	var a = al[i];
+		$.each(al, function(i, a) {
 			$("<ul>")
 				.addClass("sidemenu-result")
 				.html("<li>" + a + "</li>")
@@ -195,7 +196,7 @@ var SideMenu = function(root, viewer) {
 					viewer.setArgument(DCaseAPI.createNode(tree.tree), a);
 				})
 				.appendTo($res);
-		}
+		});
 	}
 	updateArgumentList();
 
