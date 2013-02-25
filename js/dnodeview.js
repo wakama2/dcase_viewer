@@ -17,7 +17,7 @@ var DNodeView = function(viewer, node) {
 	var self = this;
 	this.viewer = viewer;
 	this.node = node;
-	this.svg = this.initSvg(node.type);
+	this.svg = new GsnShape[node.type](viewer);
 	this.div = $("<div></div>")
 			.addClass("node-container")
 			.width(DEF_WIDTH)
@@ -82,135 +82,6 @@ var DNodeView = function(viewer, node) {
 			touchinfo.time = null;
 		}
 	});
-}
-
-DNodeView.prototype.initSvg = function(type) {
-	var root = this.viewer;
-	if(type == "Goal") {
-		var n = 10;
-		var o = [ root.createSvg("rect") ];
-		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
-			a.moves(o[0], {
-				x: x,
-				y: y,
-				width : w,
-				height: h,
-			});
-			return { x: n, y: n };//offset
-		}
-		this.getOuterSize = function(w, h) {
-			return { w: w + n*2, h: h + n*2 };
-		}
-		return o;
-	} else if(type == "Context") {
-		var o = [ root.createSvg("rect") ];
-		var n = 20;
-		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
-			a.moves(o[0], {
-				rx: n * scale,
-				ry: n * scale,
-				x : x,
-				y : y,
-				width : w,
-				height: h
-			});
-			return { x: n/2, y: n/2 };
-		}
-		this.getOuterSize = function(w, h) {
-			return { w: w + n, h: h + n };
-		}
-		return o;
-	} else if(type == "DScriptContext") {
-		var o = [
-			root.createSvg("g"),
-			root.createSvg("rect"),
-			root.createSvg("polygon"),
-		];
-		$(o[2]).attr("fill", "gray");
-		o[0].appendChild(o[1]);
-		o[0].appendChild(o[2]);
-		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
-			var n = 20 * scale;
-			a.moves(o[1], {
-				rx: n,
-				ry: n,
-				x : x,
-				y : y,
-				width : w,
-				height: h
-			});
-			a.movePolygon(o[2], [
-				{ x: x+w*5/8, y:y-n },
-				{ x: x+w*5/8, y:y+n },
-				{ x: x+w*5/8+n*2, y:y },
-			]);
-			return  { x: n/2, y: n/2 };
-		}
-		this.getOuterSize = function(w, h) {
-			return { w: w + 20, h: h + 20 };
-		}
-		return o;
-	} else if(type == "Strategy") {
-		var o = [ root.createSvg("polygon") ];
-		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
-			var n = 20 * scale;
-			a.movePolygon(o[0], [
-				{ x: x+n, y: y },
-				{ x: x+w, y: y },
-				{ x: x+w-n, y: y+h },
-				{ x: x, y: y+h }
-			]);
-			return { x: 25, y: 10 };
-		}
-		this.getOuterSize = function(w, h) {
-			return { w: w + 20*2, h: h + 10*2 };
-		}
-		return o;
-	} else if(type == "Evidence" || type == "Monitor" || type == "Rebuttal") {
-		var o = [ root.createSvg("ellipse") ];
-		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
-			a.moves(o[0], {
-				cx: x + w/2,
-				cy: y + h/2,
-				rx: w/2,
-				ry: h/2,
-			});
-			return { x: w/6/scale, y: h/6/scale };
-		}
-		this.getOuterSize = function(w, h) {
-			return { w: w*8/6, h: h*8/6 };
-		}
-		return o;
-	} else if(type == "DScript") {
-		var o = [
-			root.createSvg("g"),
-			root.createSvg("ellipse"),
-			root.createSvg("polygon"),
-		];
-		$(o[2]).attr("fill", "gray");
-		o[0].appendChild(o[1]);
-		o[0].appendChild(o[2]);
-		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
-			a.moves(o[1], {
-				cx: x + w/2,
-				cy: y + h/2,
-				rx: w/2,
-				ry: h/2,
-			});
-			var n = 20 * scale;
-			a.movePolygon(o[2], [
-				{ x: x+w*5/8, y:y-n },
-				{ x: x+w*5/8, y:y+n },
-				{ x: x+w*5/8+n*2, y:y },
-			]);
-			return { x: w/6/scale, y: h/6/scale };
-		}
-		this.getOuterSize = function(w, h) {
-			return { w: w*8/6, h: h*8/6 };
-		}
-		return o;
-	}
-	throw type + " is not GSN type";
 }
 
 function getColorByState(node) {
@@ -370,11 +241,12 @@ DNodeView.prototype.animeStart = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
 	var b = this.bounds;
-	a.show(this.svg[0], this.visible);
+	var sr = this.svg[0] != null ? this.svg[0] : this.svg.elems[0];//TODO
+	a.show(sr, this.visible);
 	a.show(this.div, this.visible);
 	a.show(this.divNodes, !this.childVisible);
 
-	var offset = this.setSvgBounds(a, this.svg, b.x * scale, b.y * scale,
+	var offset = this.svg.animate(a, b.x * scale, b.y * scale,
 			b.w * scale, b.h * scale, scale);
 	a.moves(this.div, {
 		left  : (b.x + offset.x) * scale,
@@ -385,11 +257,11 @@ DNodeView.prototype.animeStart = function(a) {
 
 	this.div.css("fontSize", Math.floor(FONT_SIZE*scale));
 
-	this.svg[0].setAttribute("fill", getColorByState(this.node));
+	sr.setAttribute("fill", getColorByState(this.node));
 	if(this.viewer.selectedNode == this) {
-		this.svg[0].setAttribute("stroke", "orange");
+		sr.setAttribute("stroke", "orange");
 	} else {
-		this.svg[0].setAttribute("stroke", "none");
+		sr.setAttribute("stroke", "none");
 	}
 	if(scale < MIN_DISP_SCALE) {
 		a.show(this.divText, false);
