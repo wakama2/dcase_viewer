@@ -6,6 +6,7 @@ var TimeLine = function(root, viewer) {
 		.appendTo(root);
 
 	var $canvas = $("<canvas></canvas>")
+		.css("position", "absolute")
 		.appendTo($tl);
 	var $container = $("<div></div>").css({
 		position: "absolute", left: 0, top: 0,
@@ -34,6 +35,8 @@ var TimeLine = function(root, viewer) {
 
 	this.drag = function() {
 		$container.css("left", scroll + dragX);
+		$canvas.attr("left", scroll + dragX);
+		$canvas.css("left", scroll + dragX);
 		//var ctx = $canvas[0].getContext("2d");
 		//ctx.beginPath();
 		//var y = 20 + 32 / 2;
@@ -52,13 +55,26 @@ var TimeLine = function(root, viewer) {
 		}).appendTo($container)
 	}
 
-	function puts(mm, x, y, id) {
+	var wid = 0;
+
+	function puts(ctx, mm, x, y, id) {
 		put(x, y, id);
+		wid = Math.max(wid, x);
 		var c = mm[id];
 		if(c != null) {
-			y = puts(mm, x+50, y, c[0]);
+			var y0 = y;
+			y = puts(ctx, mm, x+50, y, c[0]);
+			ctx.beginPath();
+			ctx.moveTo(x+12, y0+12);
+			ctx.lineTo(x+62, y0+12);
+			ctx.stroke();
 			for(var i=1; i<c.length; i++) {
-				y = puts(mm, x+50, y+30, c[1]);
+				y = puts(ctx, mm, x+50, y+30, c[1]);
+				ctx.beginPath();
+				ctx.moveTo(x+12, y0+12);
+				ctx.lineTo(x+12, y+12);
+				ctx.lineTo(x+62, y+12);
+				ctx.stroke();
 			}
 		}
 		return y;
@@ -98,9 +114,17 @@ var TimeLine = function(root, viewer) {
 			}
 		});
 
-		var y = puts(mm, 0, 0, l[0]);
+		wid = 0;
+		var ctx = $canvas[0].getContext("2d");
+		ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
+		var y = puts(ctx, mm, 0, 0, l[0]);
 		console.log(y);
 		$tl.height(y + 30);
+		wid += 24;
+
+		scroll = ($tl.width() - wid) / 2;
+		console.log(scroll);
+		self.drag();
 	};
 
 	this.repaint();
@@ -288,16 +312,17 @@ var SideMenu = function(root, viewer) {
 		$res.empty();
 		$.each(DCaseAPI.getArgumentList(), function(i, arg) {
 			$.each(DCaseAPI.getBranchList(arg), function(i, br) {
-				$("<ul>")
+				$("<li>")
 					.addClass("sidemenu-result")
-					.html("<li>" + br + "</li>")
+					.html(br)
 					.click(function() {
 						viewer.setArgument(DCaseAPI.getArgument(br));
 						timeline.repaint(arg, br);
 					})
 					.appendTo($res);
 			});
-			$("<ul>").html("---------------").appendTo($res);
+			$("<hr>").appendTo($res);
+			//$("<li>").html("---------------").appendTo($res);
 		});
 	}
 	updateArgumentList();
