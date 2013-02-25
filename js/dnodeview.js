@@ -85,50 +85,53 @@ var DNodeView = function(viewer, node) {
 }
 
 DNodeView.prototype.initSvg = function(type) {
-	var o = null;
 	var root = this.viewer;
 	if(type == "Goal") {
 		var n = 10;
-		o = root.createSvg("rect");
-		o.setBounds = function(a, x, y, w, h) {
-			a.moves(this, {
+		var o = [ root.createSvg("rect") ];
+		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
+			a.moves(o[0], {
 				x: x,
 				y: y,
 				width : w,
 				height: h,
 			});
+			return { x: n, y: n };//offset
 		}
 		this.getOuterSize = function(w, h) {
 			return { w: w + n*2, h: h + n*2 };
 		}
-		o.offset = { x: n, y: n };
+		return o;
 	} else if(type == "Context") {
-		o = root.createSvg("rect");
+		var o = [ root.createSvg("rect") ];
 		var n = 20;
-		o.setBounds = function(a, x, y, w, h) {
-			a.moves(this, {
-				rx: n * root.scale,
-				ry: n * root.scale,
+		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
+			a.moves(o[0], {
+				rx: n * scale,
+				ry: n * scale,
 				x : x,
 				y : y,
 				width : w,
 				height: h
 			});
+			return { x: n/2, y: n/2 };
 		}
 		this.getOuterSize = function(w, h) {
 			return { w: w + n, h: h + n };
 		}
-		o.offset = { x: n/2, y: n/2 };
+		return o;
 	} else if(type == "DScriptContext") {
-		var o = root.createSvg("g");
-		var o1 = root.createSvg("rect");
-		var o2 = root.createSvg("polygon");
-		$(o2).attr({ stroke: "gray", fill:"gray" });
-		o.appendChild(o1);
-		o.appendChild(o2);
-		o.setBounds = function(a, x, y, w, h) {
-			var n = 20 * root.scale;
-			a.moves(o1, {
+		var o = [
+			root.createSvg("g"),
+			root.createSvg("rect"),
+			root.createSvg("polygon"),
+		];
+		$(o[2]).attr("fill", "gray");
+		o[0].appendChild(o[1]);
+		o[0].appendChild(o[2]);
+		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
+			var n = 20 * scale;
+			a.moves(o[1], {
 				rx: n,
 				ry: n,
 				x : x,
@@ -136,77 +139,78 @@ DNodeView.prototype.initSvg = function(type) {
 				width : w,
 				height: h
 			});
-			a.movePolygon(o2, [
+			a.movePolygon(o[2], [
 				{ x: x+w*5/8, y:y-n },
 				{ x: x+w*5/8, y:y+n },
 				{ x: x+w*5/8+n*2, y:y },
 			]);
-			o.offset = { x: n/2, y: n/2 };
+			return  { x: n/2, y: n/2 };
 		}
 		this.getOuterSize = function(w, h) {
 			return { w: w + 20, h: h + 20 };
 		}
-		o.offset = { x: 1, y: 1 };
+		return o;
 	} else if(type == "Strategy") {
-		o = root.createSvg("polygon");
-		o.setBounds = function(a, x, y, w, h) {
-			var n = 20 * root.scale;
-			a.movePolygon(this, [
+		var o = [ root.createSvg("polygon") ];
+		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
+			var n = 20 * scale;
+			a.movePolygon(o[0], [
 				{ x: x+n, y: y },
 				{ x: x+w, y: y },
 				{ x: x+w-n, y: y+h },
 				{ x: x, y: y+h }
 			]);
+			return { x: 25, y: 10 };
 		}
 		this.getOuterSize = function(w, h) {
 			return { w: w + 20*2, h: h + 10*2 };
 		}
-		o.offset = { x: 25, y: 10 };
+		return o;
 	} else if(type == "Evidence" || type == "Monitor" || type == "Rebuttal") {
-		o = root.createSvg("ellipse");
-		o.setBounds = function(a, x, y, w, h) {
-			a.moves(this, {
+		var o = [ root.createSvg("ellipse") ];
+		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
+			a.moves(o[0], {
 				cx: x + w/2,
 				cy: y + h/2,
 				rx: w/2,
 				ry: h/2,
 			});
-			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
+			return { x: w/6/scale, y: h/6/scale };
 		}
 		this.getOuterSize = function(w, h) {
 			return { w: w*8/6, h: h*8/6 };
 		}
-		o.offset = { x: 0, y: 0 };
+		return o;
 	} else if(type == "DScript") {
-		var o1 = root.createSvg("ellipse");
-		var o2 = root.createSvg("polygon");
-		$(o2).attr({ stroke: "gray", fill:"gray" });
-		var o = root.createSvg("g");
-		o.appendChild(o1);
-		o.appendChild(o2);
-		o.setBounds = function(a, x, y, w, h) {
-			a.moves(o1, {
+		var o = [
+			root.createSvg("g"),
+			root.createSvg("ellipse"),
+			root.createSvg("polygon"),
+		];
+		$(o[2]).attr("fill", "gray");
+		o[0].appendChild(o[1]);
+		o[0].appendChild(o[2]);
+		this.setSvgBounds = function(a, o, x, y, w, h, scale) {
+			a.moves(o[1], {
 				cx: x + w/2,
 				cy: y + h/2,
 				rx: w/2,
 				ry: h/2,
 			});
-			var n = 20 * root.scale;
-			a.movePolygon(o2, [
+			var n = 20 * scale;
+			a.movePolygon(o[2], [
 				{ x: x+w*5/8, y:y-n },
 				{ x: x+w*5/8, y:y+n },
 				{ x: x+w*5/8+n*2, y:y },
 			]);
-			o.offset = { x: w/6/root.scale, y: h/6/root.scale };
+			return { x: w/6/scale, y: h/6/scale };
 		}
 		this.getOuterSize = function(w, h) {
 			return { w: w*8/6, h: h*8/6 };
 		}
-		o.offset = { x: 200/6, y: 200/6 };
-	} else {
-		throw type + " is not GSN type";
+		return o;
 	}
-	return o;
+	throw type + " is not GSN type";
 }
 
 function getColorByState(node) {
@@ -366,25 +370,26 @@ DNodeView.prototype.animeStart = function(a) {
 	var self = this;
 	var scale = this.viewer.scale;
 	var b = this.bounds;
-	a.show(this.svg, this.visible);
+	a.show(this.svg[0], this.visible);
 	a.show(this.div, this.visible);
 	a.show(this.divNodes, !this.childVisible);
 
-	this.svg.setBounds(a, b.x * scale, b.y * scale,
-			b.w * scale, b.h * scale);
+	var offset = this.setSvgBounds(a, this.svg, b.x * scale, b.y * scale,
+			b.w * scale, b.h * scale, scale);
 	a.moves(this.div, {
-		left  : (b.x + this.svg.offset.x) * scale,
-		top   : (b.y + this.svg.offset.y) * scale,
-		width : (b.w - this.svg.offset.x*2) * scale,
-		height: (b.h - this.svg.offset.y*2) * scale,
-		fontSize: Math.floor(FONT_SIZE*scale),
+		left  : (b.x + offset.x) * scale,
+		top   : (b.y + offset.y) * scale,
+		width : (b.w - offset.x*2) * scale,
+		height: (b.h - offset.y*2) * scale,
 	});
 
-	this.svg.setAttribute("fill", getColorByState(this.node));
+	this.div.css("fontSize", Math.floor(FONT_SIZE*scale));
+
+	this.svg[0].setAttribute("fill", getColorByState(this.node));
 	if(this.viewer.selectedNode == this) {
-		this.svg.setAttribute("stroke", "orange");
+		this.svg[0].setAttribute("stroke", "orange");
 	} else {
-		this.svg.setAttribute("stroke", "none");
+		this.svg[0].setAttribute("stroke", "none");
 	}
 	if(scale < MIN_DISP_SCALE) {
 		a.show(this.divText, false);

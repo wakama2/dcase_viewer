@@ -38,26 +38,9 @@ body {
 <script type="text/javascript" src="js/animation.js"></script>
 <script type="text/javascript">
 
-function getNodeFromServer(id) {
-	var res1 = DCaseAPI.get(["Argument"]);
-	//var id = res1[0].argument_id;
-	//var id = "0";//FIXME
-	console.log("get id=" + id);
-	var res2 = DCaseAPI.get([], id);
-	console.log(res2);
-	var node = createNodeFromJson(res2);
-	return node;
-}
-
 window.addEventListener("load",function() {
 	var node = createSampleNode();
-	var id = "1";
-	//var node = getNodeFromServer(id);
-	var opts = {
-		argument_id: id,
-	};
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node, opts);
-	//var menu = new SideMenu(document.body, viewer);
+	var viewer = new DCaseViewer(document.getElementById("viewer"), node, null);
 	// hide url bar for ipod touch
 	setTimeout(function(){
 		window.scrollTo(0, 0);
@@ -125,15 +108,6 @@ window.addEventListener("load",function() {
 	<div id="menu-tool-i" class="menu-i" style="left: 160px;">
 		<i class="icon-print"></i>
 	</div>
-</div>
-
-<div id="edit">
-	<h1>Type</h1>
-	<select></select>
-	<h1>Description</h1>
-	<textarea rows=4 cols=40></textarea><br>
-	<input id="edit-ok" type="button" value="OK"></input>
-	<input id="edit-cancel"type="button" value="Cancel"></input>
 </div>
 
 </body>

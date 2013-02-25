@@ -32,6 +32,17 @@ var DCaseViewer = function(root, model, opts) {
 	this.setTextSelectable(false);
 }
 
+function create(self, node) {
+	var view = new DNodeView(self, node);
+	if(node.context != null) {
+		view.addChild(create(self, node.context));
+	}
+	for(var i=0; i<node.children.length; i++) {
+		view.addChild(create(self, node.children[i]));
+	}
+	return view;
+}
+
 DCaseViewer.prototype.setModel = function(model) {
 	$(this.svgroot).empty();
 	$(this.root)
@@ -39,19 +50,8 @@ DCaseViewer.prototype.setModel = function(model) {
 		.append(this.svgroot);
 
 	var self = this;
-	function create(node) {
-		var view = new DNodeView(self, node);
-		if(node.context != null) {
-			view.addChild(create(node.context));
-		}
-		for(var i=0; i<node.children.length; i++) {
-			view.addChild(create(node.children[i]));
-		}
-		return view;
-	}
-	this.rootview = create(model);
+	this.rootview = create(self, model);
 	this.model = model;
-
 	this.shiftX = ($(self.root).width() - self.rootview.updateLocation(0, 0).x * self.scale)/2;
 	this.shiftY = 20;
 	this.repaintAll();
