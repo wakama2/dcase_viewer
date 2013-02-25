@@ -182,6 +182,7 @@ var SideMenu = function(root, viewer) {
 
 	function updateArgumentList() {
 		var $res = $("#menu-proc ul");
+		$res.empty();
 		var al = DCaseAPI.call("getArgumentList", {}).commitId;
 		for(var i=0; i<al.length; i++) {
 			var a = al[i];
