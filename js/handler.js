@@ -48,7 +48,6 @@ DCaseViewer.prototype.setDragHandler = function() {
 	this.dragEnd = function(view) {
 		if(flag) {
 			if(self.dragX == 0 && self.dragY == 0) {
-          console.log(view);
 				self.setSelectedNode(view);
 			} else {
 				self.shiftX += self.dragX;

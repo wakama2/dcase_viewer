@@ -1,5 +1,4 @@
 //-------------------------------------
-// const
 var ANIME_MSEC = 250;
 var X_MARGIN = 30;
 var Y_MARGIN = 100;
@@ -8,7 +7,6 @@ var SCALE_MAX = 6.0;
 var SVG_NS = "http://www.w3.org/2000/svg";
 
 //-------------------------------------
-// global
 
 var DCaseViewer = function(root, model, opts) {
 	root.className = "viewer-root";
@@ -20,7 +18,6 @@ var DCaseViewer = function(root, model, opts) {
 	}).appendTo(root);
 	this.$root = $(root);
 	this.opts = opts;
-	this.argId = 1;//TODO
 	this.moving = false;
 	this.shiftX = 0;
 	this.shiftY = 0;
@@ -30,17 +27,18 @@ var DCaseViewer = function(root, model, opts) {
 	this.drag_flag = true;
 	this.selectedNode = null;
 	this.rootview = null;
-	this.nodeCount = {};
 	this.opQueue = [];
 	this.undoCount = 0;
 	this.model = model;
+	this.commitId = 0;
 	this.setModel(model);
 	this.addEventHandler();
 	this.setTextSelectable(false);
 }
 
-DCaseViewer.prototype.setArgument = function(node) {
+DCaseViewer.prototype.setArgument = function(node, commitId) {
 	this.setModel(node);
+	this.commitid = commitId;
 };
 
 DCaseViewer.prototype.setModel = function(model) {
@@ -107,12 +105,12 @@ DCaseViewer.prototype.applyOperation = function(op) {
 }
 
 DCaseViewer.prototype.commit = function(msg) {
-	var ops = [];
-	for(var i=0; i<this.opQueue.length - this.undoCount; i++) {
-		var op = this.opQueue[i];
-		ops.push(op.toJson());
-	}
-	alert(JSON.stringify(ops));
+	var r = DCaseAPI.call("commit", {
+		tree: this.model.toJson(),
+		message: msg,
+		commitId: this.commitId,
+	});
+	this.commitId = r.commitId;
 	this.undoCount = 0;
 	this.opQueue = [];
 }
@@ -194,26 +192,26 @@ DCaseViewer.prototype.showToolbox = function(node) {
 	}
 }
 
-DCaseViewer.prototype.setSnapshot = function(id) {
-	var ss = this.snapshotList[id]
-	var node = DCaseAPI.call("getNodeTreeFromSnapshotId", {
-		BelongedArgumentId: this.argId, 
-		SnapshotId: ss.id
-	}).Tree;
-	this.setModel(DCaseAPI.createNode(node));
-}
+//DCaseViewer.prototype.setSnapshot = function(id) {
+//	var ss = this.snapshotList[id]
+//	var node = DCaseAPI.call("getNodeTreeFromSnapshotId", {
+//		BelongedArgumentId: this.argId, 
+//		SnapshotId: ss.id
+//	}).Tree;
+//	this.setModel(DCaseAPI.createNode(node));
+//}
 
 DCaseViewer.prototype.treeSize = function() {
 	return this.rootview.getTreeBounds();
 }
 
-DCaseViewer.prototype.setDragLock = function(b) {
-	this.drag_flag = b;
-}
-
-DCaseViewer.prototype.getDragLock = function() {
-	return this.drag_flag;
-}
+//DCaseViewer.prototype.setDragLock = function(b) {
+//	this.drag_flag = b;
+//}
+//
+//DCaseViewer.prototype.getDragLock = function() {
+//	return this.drag_flag;
+//}
 
 DCaseViewer.prototype.setSelectedNode = function(node) {
 	this.selectedNode = node;

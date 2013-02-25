@@ -41,10 +41,10 @@ body {
 <script type="text/javascript">
 
 window.addEventListener("load",function() {
-	var args = DCaseAPI.call("getArgumentList", {});
-	var tree = DCaseAPI.call("getNodeTree", { BelongedArgumentId: args.id[0]});
-	var node = DCaseAPI.createNode(tree.Tree);
-	var viewer = new DCaseViewer(document.getElementById("viewer"), node);
+	//var args = DCaseAPI.call("getArgumentList", {});
+	//var tree = DCaseAPI.call("getNodeTree", { commitId: args.commitId[0]});
+	//var node = DCaseAPI.createNode(tree.tree);
+	var viewer = new DCaseViewer(document.getElementById("viewer"));
 	var menu = new SideMenu(document.body, viewer);
 
 	$(".tool-new").click(function() {
@@ -149,6 +149,7 @@ window.addEventListener("load",function() {
 		<input id="menu-proc-commit" type="button" value="commit"></input>
 		<input id="menu-proc-undo" type="button" value="undo"></input>
 		<input id="menu-proc-redo" type="button" value="redo"></input>
+		<input id="menu-proc-newarg" type="button" value="Argumentの新規作成"></input>
 		Arguments:<br>
 		<ul style="list-style-type: none; overflow: auto;"></ul>
 	</div>

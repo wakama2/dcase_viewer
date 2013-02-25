@@ -35,9 +35,9 @@ DNode.prototype.eachNode = function(f) {
 	$.each(this.children, function(i, node) {
 		f(node);
 	});
-	$.each(this.contexts, function(i, node) {
-		f(node);
-	});
+	if(this.context != null) {
+		f(this.context);
+	}
 };
 
 DNode.prototype.traverse = function(f, parent, index) {
@@ -46,9 +46,9 @@ DNode.prototype.traverse = function(f, parent, index) {
 	$.each(this.children, function(i, node) {
 		node.traverse(f, self, i);
 	});
-	$.each(this.contexts, function(i, node) {
-		node.traverse(f, self, i);
-	});
+	if(this.context != null) {
+		f(this.context);
+	}
 };
 
 //-----------------------------------------------------------------------------
@@ -92,6 +92,22 @@ DNode.prototype.getHtmlDescription = function() {
 			.replace(/\n/g, "<br>");
 	}
 };
+
+DNode.prototype.toJson = function() {
+	var children = [];
+	this.eachNode(function(node) {
+		children.push(node.toJson());
+	});
+	return {
+		id: this.id,
+		name: this.name,
+		type: this.type,
+		description: this.desc,
+		children: children
+	};
+};
+
+//-----------------------------------------------------------------------------
 
 DNode.TYPES = [
 	"Goal", "Context", "DScriptContext",

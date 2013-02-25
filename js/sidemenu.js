@@ -12,7 +12,6 @@ var SideMenu = function(root, viewer) {
 	}
 
 	this.actInsertToSelectedNode = function() {
-      console.log(viewer);
 		var view = viewer.getSelectedNode();
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {
@@ -184,7 +183,6 @@ var SideMenu = function(root, viewer) {
 	$("#menu-proc-commit").click(function() {
 		var msg = prompt("コミットメッセージを入力して下さい");
 		if(msg != null) {
-			//DCaseAPI.commit(msg);
 			viewer.commit(msg);
 		}
 	});
@@ -196,6 +194,16 @@ var SideMenu = function(root, viewer) {
 	$("#menu-proc-redo").click(function() {
 		viewer.redo();
 	});
+
+	$("#menu-proc-newarg").click(function() {
+		DNodeEditWindow.open(null, function(newNode) {
+			var r = DCaseAPI.call("CreateTopGoal", { tree: {
+				description: newNode.desc
+			} });
+			viewer.setArgument(newNode, r.commitId);
+		});
+	});
+
 }
 
 
