@@ -32,7 +32,11 @@ DCaseAPI.call = function(method, params) {
 //-------------------------------------
 
 DCaseAPI.getArgumentList = function() {
-	return this.call("getArgumentList", {}).commitIdList;
+	return this.call("getArgumentList", {}).argumentIdList;
+};
+
+DCaseAPI.getBranchList = function(arg) {
+	return this.call("getBranchList", { argumentId: arg }).commitIdList;
 };
 
 DCaseAPI.getArgument = function(commitId) {

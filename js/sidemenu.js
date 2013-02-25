@@ -1,14 +1,9 @@
 var TimeLine = function(root, viewer) {
 	var self = this;
 
-	var $tl = $("<div></div>").css({
-		position: "absolute",
-		left: 0,
-		bottom: 0,
-		width: "100%",
-		height: "80px",
-		background: "#CCC",
-	}).appendTo(root);
+	var $tl = $("<div></div>")
+		.addClass("timeline")
+		.appendTo(root);
 
 	var $canvas = $("<canvas></canvas>")
 		.appendTo($tl);
@@ -58,7 +53,7 @@ var TimeLine = function(root, viewer) {
 			var X = 50;
 			pos = i * X;
 			$("<div></div>").css({
-				left: pos, top: 20,
+				left: pos, top: 16,
 			}).addClass("timeline-commit")
 			.click(function() {
 				console.log("arguemnt " + a);
@@ -252,15 +247,18 @@ var SideMenu = function(root, viewer) {
 	function updateArgumentList() {
 		var $res = $("#menu-proc ul");
 		$res.empty();
-		$.each(DCaseAPI.getArgumentList(), function(i, a) {
-			$("<ul>")
-				.addClass("sidemenu-result")
-				.html("<li>" + a + "</li>")
-				.click(function() {
-					viewer.setArgument(DCaseAPI.getArgument(a));
-					timeline.repaint();
-				})
-				.appendTo($res);
+		$.each(DCaseAPI.getArgumentList(), function(i, arg) {
+			$.each(DCaseAPI.getBranchList(arg), function(i, br) {
+				$("<ul>")
+					.addClass("sidemenu-result")
+					.html("<li>" + br + "</li>")
+					.click(function() {
+						viewer.setArgument(DCaseAPI.getArgument(br));
+						timeline.repaint();
+					})
+					.appendTo($res);
+			});
+			$("<ul>").html("---------------").appendTo($res);
 		});
 	}
 	updateArgumentList();
