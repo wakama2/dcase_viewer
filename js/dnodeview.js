@@ -102,17 +102,18 @@ DNodeView.prototype.showInplace = function() {
 		.mousewheel(function(e) { e.stopPropagation(); })
 		.blur(function() {
 			var newDesc = $(this).attr("value");
-			console.log(newDesc);
-			var op = new EditOperation(self.node, self.node.desc, newDesc);
-			self.viewer.applyOperation(op);
+			if(self.node.desc != newDesc) {
+				var op = new EditOperation(self.node, self.node.desc, newDesc);
+				self.viewer.applyOperation(op);
+				setTimeout(function() {
+					var b = self.svg.outer(200, self.divText.height() / self.viewer.scale + 60);
+					self.bounds.h = b.h;
+					self.viewer.repaintAll();
+				}, 100);
+			}
 			self.divText.html(self.node.getHtmlDescription());
 			$(this).remove();
 			self.editflag = false;
-			setTimeout(function() {
-				var b = self.svg.outer(200, self.divText.height() / self.viewer.scale + 60);
-				self.bounds.h = b.h;
-				self.viewer.repaintAll();
-			}, 100);
 		});
 };
 
