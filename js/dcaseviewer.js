@@ -50,6 +50,7 @@ DCaseViewer.prototype.setArgument = function(arg) {
 	$(this.$svg).empty();
 	$(this.$dom).empty()
 		.append(this.$svg);
+	this.showToolbox(null);
 
 	if(arg == null) {
 		//TODO show new_argument button
@@ -145,11 +146,11 @@ DCaseViewer.prototype.showToolbox = function(node) {
 				height: 30,
 			});
 
-			$("#toolbar .tool-left").css("display", data.prevVersion != null ? "inline" : "none");
-			$("#toolbar .tool-right").css("display", data.nextVersion != null ? "inline" : "none");
+			var hasChild = data.getNodeCount() != 0;
+			var visibleChild = node.childVisible;
 			$("#toolbar .tool-play").css("display", data.isDScript ? "inline" : "none");
-			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
-			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
+			$("#toolbar .tool-up")  .css("display", hasChild && visibleChild ? "inline" : "none");
+			$("#toolbar .tool-down").css("display", hasChild && !visibleChild ? "inline" : "none");
 		} else {
 			$("#toolbar").css("display", "none");
 		}
@@ -171,7 +172,7 @@ DCaseViewer.prototype.getSelectedNode = function() {
 	return this.selectedNode;
 }
 
-DCaseViewer.prototype.actExpandBranch = function(view, b) {
+DCaseViewer.prototype.expandBranch = function(view, b) {
 	if(b == undefined || b != view.childVisible) {
 		this.rootview.updateLocation(0, 0);
 		var b0 = view.bounds;

@@ -69,7 +69,7 @@ var DNodeView = function(viewer, node) {
 	}).bind("touchend", function(e) {
 		viewer.dragEnd(self);
 		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
-			viewer.actExpandBranch(self);
+			viewer.expandBranch(self);
 			touchinfo.time = null;
 		}
 		if(touchinfo.count == 1) {
@@ -78,7 +78,6 @@ var DNodeView = function(viewer, node) {
 			touchinfo.time = null;
 		}
 	});
-
 	//this.div.hover(function() {
 	//	viewer.showToolbox(self);
 	//}, function() {

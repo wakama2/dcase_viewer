@@ -9,7 +9,7 @@ var DNodeEditWindow = (function() {
 	function init() {
 		$desc = $("#edit textarea");
 		$("#edit").css({
-			left: ($(document).width() - $("#edit").width()) / 2,
+			left: ($(document).width()  - $("#edit").width()) / 2,
 			top : ($(document).height() - $("#edit").height()) / 2,
 		});
 		$("#edit-ok").click(function() {
