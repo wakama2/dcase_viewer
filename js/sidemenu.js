@@ -180,6 +180,24 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 
+	function updateArgumentList() {
+		var $res = $("#menu-proc ul");
+		var al = DCaseAPI.call("getArgumentList", {}).commitId;
+		for(var i=0; i<al.length; i++) {
+			var a = al[i];
+			$("<ul>")
+				.addClass("sidemenu-result")
+				.html("<li>" + a + "</li>")
+				.click(function() {
+					//viewer.centerize(v, 500);
+					var tree = DCaseAPI.call("getNodeTree", { commitId: a });
+					viewer.setArgument(DCaseAPI.createNode(tree.tree), a);
+				})
+				.appendTo($res);
+		}
+	}
+	updateArgumentList();
+
 	$("#menu-proc-commit").click(function() {
 		var msg = prompt("コミットメッセージを入力して下さい");
 		if(msg != null) {
@@ -203,6 +221,7 @@ var SideMenu = function(root, viewer) {
 				description: newNode.desc
 			} });
 			viewer.setArgument(newNode, r.commitId);
+			updateArgumentList();
 		});
 	});
 
