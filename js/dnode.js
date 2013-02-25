@@ -13,7 +13,7 @@ var DNode = function(id, name, type, desc) {
 
 	this.updateFlags();
 	if(type == "DScriptEvidence") {
-		this.isDScript = false;
+		this.isDScript = true;
 	}
 	if(type == "Context" || type == "DScriptContext") {
 		this.isContext = true;

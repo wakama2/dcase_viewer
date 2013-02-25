@@ -1,12 +1,12 @@
 var DCaseAPI = new Object();
 
-DCaseAPI.cgi = "cgi/interface.cgi";
+DCaseAPI.cgi = "http://localhost/cgi-bin/api.cgi";
 
 DCaseAPI.call = function(method, params) {
 	var cmd = {
-		jsonproc: "2.0",
+		jsonrpc: "2.0",
 		method: method,
-		version: "1",
+		version: "1.0",
 		params: params
 	};
 	var res = $.ajax({
@@ -16,12 +16,13 @@ DCaseAPI.call = function(method, params) {
 		data: JSON.stringify(cmd),
 		dataType: "json",
 		error: function(req, stat, err) {
-			console.log("ajax error! " + stat);
+			//alert(stat);
 		}
 	});
-	console.log(res.responseText);
+	var resText = res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, "");
 	try {
-		var jres = JSON.parse(res.responseText);
+		var jres = JSON.parse(resText);
+		//var jres = JSON.parse(res.responseText);
 		return jres.result;
 	} catch(e) {
 		console.log("json parse error!");
@@ -64,3 +65,6 @@ DCaseAPI.createNode = function(tree) {
 	return create(topId);
 }
 
+DCaseAPI.search = function(args) {
+	return this.call("FindNodeByDescription", args);
+}
