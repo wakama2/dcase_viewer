@@ -42,7 +42,7 @@ body {
 <script type="text/javascript" src="js/operation.js"></script>
 <script type="text/javascript">
 
-window.addEventListener("load",function() {
+$(function() {
 	var viewer = new DCaseViewer(document.getElementById("viewer"));
 	var menu = new SideMenu(document.body, viewer);
 
@@ -75,6 +75,14 @@ window.addEventListener("load",function() {
 	setTimeout(function(){
 		window.scrollTo(0, 0);
 	}, 0);
+
+	// move page
+	$(window).bind("beforeunload", function(e) {
+		var a = viewer.getArgument();
+		if(a != null && a.isChanged()) {
+			return "未コミットの変更があります";
+		}
+	});
 });
 </script>
 </head>

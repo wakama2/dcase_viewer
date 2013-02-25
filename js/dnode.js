@@ -134,6 +134,10 @@ var Argument = function(topGoal, argId, commitId) {
 	this.undoCount = 0;
 };
 
+Argument.prototype.isChanged = function() {
+	return this.opQueue.length - this.undoCount > 0;
+};
+
 Argument.prototype.getCommitList = function() {
 	var list = DCaseAPI.call("getCommitList", { commitId: this.commitId });
 	return list.commitIdList;
