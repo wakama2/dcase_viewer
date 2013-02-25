@@ -58,15 +58,8 @@ var TimeLine = function(root, viewer) {
 			var X = 50;
 			pos = i * X;
 			$("<div></div>").css({
-				position: "absolute",
-				width : "32px",
-				height: "32px",
-				left: pos,
-				top: 20,
-				"border-style": "solid",
-				"border-color": "blue",
-				background: "#ACF",
-			})
+				left: pos, top: 20,
+			}).addClass("timeline-commit")
 			.click(function() {
 				console.log("arguemnt " + a);
 				var arg = DCaseAPI.getArgument(a);
@@ -77,7 +70,6 @@ var TimeLine = function(root, viewer) {
 	};
 
 	this.repaint();
-	
 };
 
 var SideMenu = function(root, viewer) {

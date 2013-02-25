@@ -43,7 +43,13 @@ DCaseAPI.getArgument = function(commitId) {
 DCaseAPI.createArgument = function(newNode) {
 	var r = this.call("createTopGoal", {
 		tree: {
-			description: newNode.desc
+			NodeList: [{
+				ThisNodeId: newNode.id,
+				NodeType: newNode.type,
+				Description: newNode.desc,
+				Children: [],
+			}],
+			TopGoalId: newNode.id,
 		}
 	});
 	return new Argument(newNode, r.commitId);
