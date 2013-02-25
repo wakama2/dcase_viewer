@@ -117,15 +117,18 @@ DCaseViewer.prototype.commit = function(msg) {
 			c.push(node.id);
 		});
 		tl.push({
-			type: node.type,
-			name: node.name,
-			description: node.desc,
-			children: c,
+			ThisNodeId: node.id,
+			NodeType: node.type,
+			Description: node.desc,
+			Children: c,
 		});
 	});
 
 	var r = DCaseAPI.call("commit", {
-		tree: tl,
+		tree: {
+			NodeList: tl,
+			TopGoalId: node.id,
+		},
 		message: msg,
 		commitId: this.commitId,
 	});
