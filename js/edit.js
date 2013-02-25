@@ -26,37 +26,28 @@ var DNodeEditWindow = (function() {
 		});
 	}
 
-	this.open = function(node, success) {
+	this.open = function(node, selectable, success) {
 		self.success = success;
 		self.node = node;
-
+		if(selectable == null) {
+			selectable = DNode.TYPES;
+		}
+		$select.empty();
+		$.each(selectable, function(i, type) {
+			$("<option></option>")
+				.attr("id", "edit-option-" + type)
+				.html(type)
+				.appendTo($select);
+		});
 		if(node != null) {
 			selectedType = node.type;
 			$select.attr("disabled", true);
 			$desc.attr("value", node.text);
-
-			$select.empty();
-			$.each(DNode.SELECTABLE_TYPES[node.type], function(i, type) {
-				$("<option></option>")
-					.attr("id", "edit-option-" + type)
-					.html(type)
-					.appendTo($select);
-			});
-
 		} else {
-			selectedType = DNode.TYPES[0];
+			selectedType = selectable[0];
 			$select.attr("disabled", false);
 			$desc.attr("value", "");
-
-			$select.empty();
-			$.each(DNode.TYPES, function(i, type) {
-				$("<option></option>")
-					.attr("id", "edit-option-" + type)
-					.html(type)
-					.appendTo($select);
-			});
 		}
-
 		$("edit-option-" + selectedType).attr("selected", true);
 		$("#edit").show();
 	}

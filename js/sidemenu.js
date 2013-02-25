@@ -1,48 +1,46 @@
 var TimeLine = function(root, viewer) {
 	var self = this;
 
-	var $tl = $("<div></div>")
+	var $timeline = $("<div></div>")
 		.addClass("timeline")
 		.appendTo(root);
-
 	var $canvas = $("<canvas></canvas>")
 		.css("position", "absolute")
-		.appendTo($tl);
+		.appendTo($timeline);
 	var $container = $("<div></div>").css({
 		position: "absolute", left: 0, top: 0,
-	}).appendTo($tl);
+	}).appendTo($timeline);
+
+	//--------------------------------------------------------
 
 	var scroll = 0;
 	var mouseX = null;
 	var dragX = 0;
-	$tl.mousedown(function(e) {
+
+	$timeline.mousedown(function(e) {
 		mouseX = e.pageX;
 	});
 
-	$tl.mousemove(function(e) {
+	$timeline.mousemove(function(e) {
 		if(mouseX != null) {
 			dragX = e.pageX - mouseX;
 			self.drag();
 		}
 	});
 
-	$tl.mouseup(function(e) {
+	$timeline.mouseup(function(e) {
 		scroll += dragX;
 		dragX = 0;
 		mouseX = null;
 		self.drag();
 	});
 
+	//--------------------------------------------------------
+
 	this.drag = function() {
 		$container.css("left", scroll + dragX);
 		$canvas.attr("left", scroll + dragX);
 		$canvas.css("left", scroll + dragX);
-		//var ctx = $canvas[0].getContext("2d");
-		//ctx.beginPath();
-		//var y = 20 + 32 / 2;
-		//ctx.moveTo(scroll, y);
-		//ctx.lineTo(pos, y);
-		//ctx.stroke();
 	};
 
 	function put(x, y, commitId) {
@@ -119,10 +117,10 @@ var TimeLine = function(root, viewer) {
 		ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
 		var y = puts(ctx, mm, 0, 0, l[0]);
 		console.log(y);
-		$tl.height(y + 30);
+		$timeline.height(y + 30);
 		wid += 24;
 
-		scroll = ($tl.width() - wid) / 2;
+		scroll = ($timeline.width() - wid) / 2;
 		console.log(scroll);
 		self.drag();
 	};
@@ -139,7 +137,8 @@ var SideMenu = function(root, viewer) {
 	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
 		if(view != null) {
-			DNodeEditWindow.open(null, function(newNode) {
+			var sel = DNode.SELECTABLE_TYPES[view.node.type];
+			DNodeEditWindow.open(null, sel, function(newNode) {
 				var op = new InsertOperation(view.node, newNode);
 				viewer.getArgument().applyOperation(op);
 				viewer.structureUpdated();
@@ -322,7 +321,6 @@ var SideMenu = function(root, viewer) {
 					.appendTo($res);
 			});
 			$("<hr>").appendTo($res);
-			//$("<li>").html("---------------").appendTo($res);
 		});
 	}
 	updateArgumentList();
@@ -348,7 +346,7 @@ var SideMenu = function(root, viewer) {
 	});
 
 	$("#menu-proc-newarg").click(function() {
-		DNodeEditWindow.open(null, function(newNode) {
+		DNodeEditWindow.open(null, ["Goal"], function(newNode) {
 			viewer.setArgument(DCaseAPI.createArgument(newNode));
 			timeline.repaint();
 			updateArgumentList();

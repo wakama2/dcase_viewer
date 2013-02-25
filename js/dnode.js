@@ -115,10 +115,13 @@ DNode.TYPES = [
 ];
 
 DNode.SELECTABLE_TYPES = {
-	"Goal": [ "Context", "Strategy", "Evidence" ],
+	"Goal": [ "Context", "DScriptContext", "Strategy", "Evidence" ],
 	"Context": [],
+	"DScriptContext": [],
 	"Strategy": [ "Context", "Goal" ],
 	"Evidence": [ "Context" ],
+	"DScriptEvidence": [ "Context", "Rebuttal" ],
+	"Rebuttal": [],
 };
 
 //-----------------------------------------------------------------------------
