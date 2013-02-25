@@ -74,7 +74,7 @@ DCaseViewer.prototype.setModel = function(model) {
 
 	setTimeout(function() {
 		function f(v) {
-			var b = v.getOuterSize(200, v.divText.height() / self.scale + 60);
+			var b = v.svg.outer(200, v.divText.height() / self.scale + 60);
 			v.bounds.w = b.w;
 			v.bounds.h = b.h;
 			v.forEachNode(function(e) {
@@ -187,8 +187,6 @@ DCaseViewer.prototype.showToolbox = function(node) {
 		this.toolboxNode = node;
 	}
 }
-
-var global_viewer = null;
 
 DCaseViewer.prototype.setSnapshot = function(id) {
 	var ss = this.snapshotList[id]

@@ -1,6 +1,6 @@
 var DCaseAPI = new Object();
 
-DCaseAPI.cgi = "http://localhost/cgi-bin/api.cgi";
+DCaseAPI.cgi = "cgi/interface.cgi";
 
 DCaseAPI.call = function(method, params) {
 	var cmd = {
@@ -19,10 +19,10 @@ DCaseAPI.call = function(method, params) {
 			//alert(stat);
 		}
 	});
-	var resText = res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, "");
+	//var resText = res.responseText.replace(/\n/g, " \\n ").replace(/\t/g, "");
 	try {
-		var jres = JSON.parse(resText);
-		//var jres = JSON.parse(res.responseText);
+		//var jres = JSON.parse(resText);
+		var jres = JSON.parse(res.responseText);
 		return jres.result;
 	} catch(e) {
 		console.log("json parse error!");
