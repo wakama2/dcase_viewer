@@ -1,0 +1,10 @@
+.timeline-commit {
+	position: absolute;
+	width : 24px;
+	height: 24px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #6AB;
+	background  : #BCF;
+}
+
