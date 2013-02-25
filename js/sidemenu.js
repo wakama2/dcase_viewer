@@ -42,26 +42,65 @@ var TimeLine = function(root, viewer) {
 		//ctx.stroke();
 	};
 
-	this.repaint = function() {
+	function put(x, y, commitId) {
+		$("<div></div>").css({
+			left: x, top: y,
+		}).addClass("timeline-commit").click(function() {
+			console.log("arguemnt " + commitId);
+			var arg = DCaseAPI.getArgument(commitId);
+			viewer.setArgument(arg);
+		}).appendTo($container)
+	}
+
+	function puts(mm, x, y, id) {
+		put(x, y, id);
+		var c = mm[id];
+		if(c != null) {
+			y = puts(mm, x+50, y, c[0]);
+			for(var i=1; i<c.length; i++) {
+				y = puts(mm, x+50, y+30, c[1]);
+			}
+		}
+		return y;
+	}
+
+	var argId0 = null;
+
+	this.repaint = function(argId, brId) {
 		var arg = viewer.getArgument();
 		if(arg == null) return;
+		if(argId == null) argId = argId0;
+		if(argId == null) return;
+		argId0 = argId;
+		if(brId == null) brId = arg.commitId;
 
 		$container.empty();
-		var pos = 0;
 
-		$.each(arg.getCommitList(), function(i, a) {
-			var X = 50;
-			pos = i * X;
-			$("<div></div>").css({
-				left: pos, top: 16,
-			}).addClass("timeline-commit")
-			.click(function() {
-				console.log("arguemnt " + a);
-				var arg = DCaseAPI.getArgument(a);
-				viewer.setArgument(arg);
-			})
-			.appendTo($container)
+		var mm = {};
+
+		var l = arg.getCommitList();
+		for(var i=0; i<l.length-1; i++) {
+			var x = mm[l[i]];
+			if(x == null) x = [];
+			if(x.indexOf(l[i+1]) == -1) x.push(l[i + 1]);
+			mm[l[i]] = x;
+		}
+
+		$.each(DCaseAPI.getBranchList(argId), function(i, br) {
+			if(br != brId) {
+				var l = DCaseAPI.call("getCommitList", { commitId: br }).commitIdList;
+				for(var i=0; i<l.length-1; i++) {
+					var x = mm[l[i]];
+					if(x == null) x = [];
+					if(x.indexOf(l[i+1]) == -1) x.push(l[i + 1]);
+					mm[l[i]] = x;
+				}
+			}
 		});
+
+		var y = puts(mm, 0, 0, l[0]);
+		console.log(y);
+		$tl.height(y + 30);
 	};
 
 	this.repaint();
@@ -254,7 +293,7 @@ var SideMenu = function(root, viewer) {
 					.html("<li>" + br + "</li>")
 					.click(function() {
 						viewer.setArgument(DCaseAPI.getArgument(br));
-						timeline.repaint();
+						timeline.repaint(arg, br);
 					})
 					.appendTo($res);
 			});
