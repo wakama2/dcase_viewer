@@ -27,7 +27,7 @@ DCaseViewer.prototype.setDragHandler = function() {
 			var dx = (x - x0) * scale;
 			var dy = (y - y0) * scale;
 			if(dx != 0 || dy != 0) {
-				self.showToolbox(null);
+				//self.showToolbox(null);
 				self.dragX = Math.max(bounds.l, Math.min(bounds.r, dx));
 				self.dragY = Math.max(bounds.t, Math.min(bounds.b, dy));
 				self.repaintAll(0);
@@ -79,7 +79,7 @@ DCaseViewer.prototype.setMouseDragHandler = function() {
 		e.preventDefault();
 		e.stopPropagation();
 		if(self.moving) return;
-		self.showToolbox(null);
+		//self.showToolbox(null);
 		var b = 1.0 + delta * 0.04;
 		self.scale = Math.min(Math.max(self.scale * b, SCALE_MIN), SCALE_MAX);
 		if(self.scale != SCALE_MIN && self.scale != SCALE_MAX) {

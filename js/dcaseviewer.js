@@ -52,20 +52,9 @@ DCaseViewer.prototype.setModel = function(model) {
 	this.rootview = create(model);
 	this.model = model;
 
-	setTimeout(function() {
-		function f(v) {
-			var b = v.getOuterSize(200, v.divText.height() / self.scale + 60);
-			v.bounds.w = b.w;
-			v.bounds.h = b.h;
-			v.forEachNode(function(e) {
-				f(e);
-			});
-		}
-		f(self.rootview);
-		self.shiftX = ($(self.root).width() - self.rootview.updateLocation(0, 0).x * self.scale)/2;
-		self.shiftY = 20;
-		self.repaintAll();
-	}, 100);
+	this.shiftX = ($(self.root).width() - self.rootview.updateLocation(0, 0).x * self.scale)/2;
+	this.shiftY = 20;
+	this.repaintAll();
 }
 
 DCaseViewer.prototype.centerize = function(view, ms) {
@@ -103,83 +92,9 @@ DCaseViewer.prototype.repaintAll = function(ms) {
 	}, 1000/60);
 }
 
-DCaseViewer.prototype.prevVersion = function(v) {
-	var node = v.node;
-	var prev = node.prevVersion;
-	if(prev != null) {
-		var parent = node.parents[0];
-		for(var i=0; i<parent.children.length; i++) {
-			if(parent.children[i] == node) {
-				parent.children[i] = prev;
-				if(prev.parents.length == 0) {
-					prev.parents.push(parent);
-				}
-				this.setModel(this.model);
-				break;
-			}
-		}
-	}
-}
-
-DCaseViewer.prototype.nextVersion = function(v) {
-	var node = v.node;
-	var next = node.nextVersion;
-	if(next != null) {
-		var parent = node.parents[0];
-		for(var i=0; i<parent.children.length; i++) {
-			if(parent.children[i] == node) {
-				parent.children[i] = next;
-				if(next.parents.length == 0) {
-					next.parents.push(parent);
-				}
-				this.setModel(this.model);
-				break;
-			}
-		}
-	}
-}
-
-DCaseViewer.prototype.showToolbox = function(node) {
-	var self = this;
-	if(this.toolboxNode != node) {
-		if(node != null) {
-			var data = node.node;
-			var b = node.div.offset();
-			var w = node.div.width();
-			var x = 120;
-
-			$("#toolbar").css({
-				display: "block",
-				left: b.left + (w - x)/2,
-				top: b.top - 40,
-				width: x,
-				height: 30,
-			});
-
-			$("#toolbar .tool-left").css("display", data.prevVersion != null ? "inline" : "none");
-			$("#toolbar .tool-right").css("display", data.nextVersion != null ? "inline" : "none");
-			$("#toolbar .tool-play").css("display", data.isDScript() ? "inline" : "none");
-			$("#toolbar .tool-up").css("display", node.childVisible ? "inline" : "none");
-			$("#toolbar .tool-down").css("display", node.childVisible ? "none" : "inline");
-		} else {
-			$("#toolbar").css("display", "none");
-		}
-		this.toolboxNode = node;
-	}
-}
-
-DCaseViewer.prototype.setDragLock = function(b) {
-	this.drag_flag = b;
-}
-
-DCaseViewer.prototype.getDragLock = function() {
-	return this.drag_flag;
-}
-
 DCaseViewer.prototype.setSelectedNode = function(node) {
 	this.selectedNode = node;
 	this.repaintAll();
-	this.showToolbox(node);
 }
 
 DCaseViewer.prototype.getSelectedNode = function() {
@@ -208,72 +123,9 @@ DCaseViewer.prototype.setTextSelectable = function(b) {
 	});
 }
 
-DCaseViewer.prototype.fit = function(ms) {
-	var size = this.rootview.updateLocation(0, 0);
-	this.scale = Math.min(
-		$(this.root).width()  * 0.98 / size.x,
-		$(this.root).height() * 0.98 / size.y);
-	var b = this.rootview.bounds;
-	this.shiftX = -b.x * this.scale + ($(this.root).width() - b.w * this.scale) / 2;
-	this.shiftY = -b.y * this.scale + ($(this.root).height() - size.y * this.scale) / 2;
-	this.repaintAll(ms);
-}
-
-DCaseViewer.prototype.traverseAll = function(f) {
-	function traverse(node) {
-		f(node);
-		if(node.context != null) f(node.context);
-		for(var i=0; i<node.children.length; i++) {
-			traverse(node.children[i]);
-		}
-	}
-	traverse(this.model);
-}
-
 DCaseViewer.prototype.createSvg = function(name) {
 	var obj = document.createElementNS(SVG_NS, name);
 	this.svgroot.append(obj);
 	return obj;
-}
-
-DCaseViewer.prototype.showDScriptExecuteWindow = function(scriptName) {
-	var self = this;
-	self.showToolbox(null);
-	var r = DCaseAPI.call("search", { filter: ["Context"] });
-	var nn = null;
-	for(var i=0; i<r[0].length; i++) {
-		if(r[0][i].value === scriptName) {
-			var n = DCaseAPI.get([], r[0][i].argument_id);
-			nn = createNodeFromJson(n);
-			break;
-		}
-	}
-	if(nn.context != null) {
-		nn.context.type = "DScriptContext";
-	}
-	var t = $("<div></div>")
-			.addClass("dscript-exe-window")
-			.appendTo(self.root);
-
-	var r1x = document.createElement("div");
-	var t1 = $(r1x).css({
-		position: "absolute",
-		left: "20px", top: "20px", right: "20px", bottom: "60px",
-	}).attr("id", "subviewer");
-	t.append(t1);
-	var v = new DCaseViewer(r1x, nn, {
-		argument_id: self.opts.id
-	});
-	t.append($("<input></input>").attr({
-		type: "button", value: "実行"
-	}).click(function() {
-		var r = DCaseAPI.call("run", {});
-		alert(r);
-	}));
-	t.append($("<input></input>").attr({
-		type: "button", value: "キャンセル"
-	}).click(function() {
-		t.remove();
-	}));
 }
 

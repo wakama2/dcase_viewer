@@ -58,48 +58,15 @@ var DNodeView = function(viewer, node) {
 	this.lines = [];
 	this.contextLine = null;
 	// for animation
-	this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };//200, h: this.div.height() + 60 };
+	this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };
 	this.visible = true;
 	this.childVisible = true;
 
 	var touchinfo = {};
-	var editflag = false;
 	this.div.mouseup(function(e) {
-		if(self == viewer.getSelectedNode() && !editflag) {
-			editflag = true;
-			self.divText.text("");
-			$("<textarea></textarea>").css({
-				position: "absolute",
-				left: "0",
-				top: self.divText.attr("top"),
-				width: "100%",
-				height: "75%",
-				background: "#CCC",
-				borderStyle: "none",
-				resizable: false,
-				zIndex: 99,
-			})
-			.attr("value", node.text)
-			.appendTo(self.div)
-			.focus()
-			.mousedown(function(e) { e.stopPropagation(); })
-			.mouseup(function(e) { e.stopPropagation(); })
-			.mousemove(function(e) { e.stopPropagation(); })
-			.click(function(e) { e.stopPropagation(); })
-			.mousewheel(function(e) { e.stopPropagation(); })
-			.blur(function() {
-				node.text = $(this).attr("value");
-				self.divText.html(toHTML(node.text));
-				$(this).remove();
-				editflag = false;
-				setTimeout(function() {
-					var b = self.getOuterSize(200, self.divText.height() / self.viewer.scale + 60);
-					self.bounds.h = b.h;
-					viewer.repaintAll();
-				}, 100);
-			});
-		}
 		viewer.dragEnd(self);
+	}).dblclick(function(e) {
+		viewer.actExpandBranch(self);
 	}).bind("touchstart", function(e) {
 		var touches = e.originalEvent.touches;
 		touchinfo.count = touches.length;
@@ -115,12 +82,6 @@ var DNodeView = function(viewer, node) {
 			touchinfo.time = null;
 		}
 	});
-
-	//this.div.hover(function() {
-	//	viewer.showToolbox(self);
-	//}, function() {
-	//	viewer.showToolbox(null);
-	//});
 }
 
 DNodeView.prototype.initSvg = function(type) {
