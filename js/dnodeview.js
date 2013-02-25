@@ -51,7 +51,7 @@ var DNodeView = function(viewer, node) {
 	this.lines = [];
 	this.contextLine = null;
 	// for animation
-	this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };//200, h: this.div.height() + 60 };
+	this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };
 	this.visible = true;
 	this.childVisible = true;
 

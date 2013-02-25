@@ -16,7 +16,8 @@ var SideMenu = function(root, viewer) {
 		if(view != null) {
 			DNodeEditWindow.open(null, function(newNode) {
 				var op = new InsertOperation(view.node, newNode);
-				viewer.applyOperation(op);
+				viewer.getArgument().applyOperation(op);
+				viewer.structureUpdated();
 			});
 		}
 	}
@@ -28,7 +29,8 @@ var SideMenu = function(root, viewer) {
 			if(parent.length > 0) {
 				if(confirm("ノードを削除しますか？")) {
 					var op = new RemoveOperation(parent, view.node);
-					viewer.applyOperation(op);
+					viewer.getArgument().applyOperation(op);
+					viewer.structureUpdated();
 				}
 			}
 		}
@@ -183,17 +185,12 @@ var SideMenu = function(root, viewer) {
 	function updateArgumentList() {
 		var $res = $("#menu-proc ul");
 		$res.empty();
-		var al = DCaseAPI.call("getArgumentList", {}).commitId;
-		//for(var i=0; i<al.length; i++) {
-		//	var a = al[i];
-		$.each(al, function(i, a) {
+		$.each(DCaseAPI.getArgumentList(), function(i, a) {
 			$("<ul>")
 				.addClass("sidemenu-result")
 				.html("<li>" + a + "</li>")
 				.click(function() {
-					//viewer.centerize(v, 500);
-					var tree = DCaseAPI.call("getNodeTree", { commitId: a });
-					viewer.setArgument(DCaseAPI.createNode(tree.tree), a);
+					viewer.setArgument(DCaseAPI.getArgument(a));
 				})
 				.appendTo($res);
 		});
@@ -203,26 +200,25 @@ var SideMenu = function(root, viewer) {
 	$("#menu-proc-commit").click(function() {
 		var msg = prompt("コミットメッセージを入力して下さい");
 		if(msg != null) {
-			if(viewer.commit(msg)) {
+			if(viewer.getArgument().commit(msg)) {
 				alert("コミットしました");
 			}
 		}
 	});
 
 	$("#menu-proc-undo").click(function() {
-		viewer.undo();
+		viewer.getArgument().undo();
+		viewer.structureUpdated();
 	});
 
 	$("#menu-proc-redo").click(function() {
-		viewer.redo();
+		viewer.getArgument().redo();
+		viewer.structureUpdated();
 	});
 
 	$("#menu-proc-newarg").click(function() {
 		DNodeEditWindow.open(null, function(newNode) {
-			var r = DCaseAPI.call("CreateTopGoal", { tree: {
-				description: newNode.desc
-			} });
-			viewer.setArgument(newNode, r.commitId);
+			viewer.setArgument(DCaseAPI.createArgument(newNode));
 			updateArgumentList();
 		});
 	});

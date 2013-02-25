@@ -8,7 +8,8 @@ var SVG_NS = "http://www.w3.org/2000/svg";
 
 //-------------------------------------
 
-var DCaseViewer = function(root, model, opts) {
+var DCaseViewer = function(root, arg) {
+
 	root.className = "viewer-root";
 	this.$svg = $(document.createElementNS(SVG_NS, "svg")).css({
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
@@ -17,7 +18,10 @@ var DCaseViewer = function(root, model, opts) {
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
 	}).appendTo(root);
 	this.$root = $(root);
-	this.opts = opts;
+
+	//------------------------------------
+
+	this.argument = null;
 	this.moving = false;
 	this.shiftX = 0;
 	this.shiftY = 0;
@@ -27,36 +31,31 @@ var DCaseViewer = function(root, model, opts) {
 	this.drag_flag = true;
 	this.selectedNode = null;
 	this.rootview = null;
-	this.opQueue = [];
-	this.undoCount = 0;
-	this.model = model;
-	this.commitId = 0;
-	this.setModel(model);
+
+	//------------------------------------
+
+	this.setArgument(arg);
 	this.addEventHandler();
 	this.setTextSelectable(false);
 }
 
-DCaseViewer.prototype.setArgument = function(node, commitId) {
-	this.setModel(node);
-	this.commitid = commitId;
+DCaseViewer.prototype.getArgument = function() {
+	return this.argument;
 };
 
-DCaseViewer.prototype.setModel = function(model) {
+DCaseViewer.prototype.setArgument = function(arg) {
+	var self = this;
+	this.argument = arg;
+
 	$(this.$svg).empty();
 	$(this.$dom).empty()
 		.append(this.$svg);
-	if(model == null) {
-		//$("<div></div>")
-		//	.html("Argumentを選択して下さい")
-		//	.css({
-		//		"text-align": "center",
-		//		"background": "#CCC",
-		//		"border-radius": "4px",
-		//	}).appendTo(this.root);
+
+	if(arg == null) {
+		//TODO show new_argument button
 		return;
 	}
 
-	var self = this;
 	function create(node) {
 		var view = new DNodeView(self, node);
 		if(node.context != null) {
@@ -67,11 +66,10 @@ DCaseViewer.prototype.setModel = function(model) {
 		}
 		return view;
 	}
-	this.rootview = create(model);
-	this.model = model;
+	this.rootview = create(arg.getTopGoal());
 
 	setTimeout(function() {
-		function f(v) {
+		function f(v) {//FIXME
 			var b = v.svg.outer(200, v.divText.height() / self.scale + 60);
 			v.bounds.w = b.w;
 			v.bounds.h = b.h;
@@ -87,6 +85,10 @@ DCaseViewer.prototype.setModel = function(model) {
 	}, 100);
 }
 
+DCaseViewer.prototype.structureUpdated = function(ms) {
+	this.setArgument(this.argument);//TODO animation
+};
+
 DCaseViewer.prototype.centerize = function(view, ms) {
 	if(this.rootview == null) return;
 	this.selectedNode = view;
@@ -95,66 +97,6 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 	this.shiftX = -b.x * this.scale + (this.$root.width() - b.w * this.scale) / 2;
 	this.shiftY = -b.y * this.scale + this.$root.height() / 5 * this.scale;
 	this.repaintAll(ms);
-}
-
-DCaseViewer.prototype.applyOperation = function(op) {
-	this.opQueue.push(op);
-	this.undoCount = 0;
-	op.redo();
-	this.setModel(this.model);
-}
-
-DCaseViewer.prototype.commit = function(msg) {
-	var tl = [];
-	var id = 1;
-	var node = this.model;
-	node.traverse(function(node) {
-		node.id = id++;
-	});
-	node.traverse(function(node) {
-		var c = [];
-		node.eachNode(function(node) {
-			c.push(node.id);
-		});
-		tl.push({
-			ThisNodeId: node.id,
-			NodeType: node.type,
-			Description: node.desc,
-			Children: c,
-		});
-	});
-
-	var r = DCaseAPI.call("commit", {
-		tree: {
-			NodeList: tl,
-			TopGoalId: node.id,
-		},
-		message: msg,
-		commitId: this.commitId,
-	});
-	this.commitId = r.commitId;
-	this.undoCount = 0;
-	this.opQueue = [];
-	return true;
-}
-
-DCaseViewer.prototype.undo = function() {
-	var n = this.opQueue.length;
-	if(n > this.undoCount) {
-		this.undoCount++;
-		var op = this.opQueue[n - this.undoCount];
-		op.undo();
-		this.setModel(this.model);
-	}
-}
-
-DCaseViewer.prototype.redo = function() {
-	if(this.undoCount > 0) {
-		var op = this.opQueue[this.opQueue.length - this.undoCount];
-		this.undoCount--;
-		op.redo();
-		this.setModel(this.model);
-	}
 }
 
 DCaseViewer.prototype.repaintAll = function(ms) {
@@ -215,26 +157,9 @@ DCaseViewer.prototype.showToolbox = function(node) {
 	}
 }
 
-//DCaseViewer.prototype.setSnapshot = function(id) {
-//	var ss = this.snapshotList[id]
-//	var node = DCaseAPI.call("getNodeTreeFromSnapshotId", {
-//		BelongedArgumentId: this.argId, 
-//		SnapshotId: ss.id
-//	}).Tree;
-//	this.setModel(DCaseAPI.createNode(node));
-//}
-
 DCaseViewer.prototype.treeSize = function() {
 	return this.rootview.getTreeBounds();
 }
-
-//DCaseViewer.prototype.setDragLock = function(b) {
-//	this.drag_flag = b;
-//}
-//
-//DCaseViewer.prototype.getDragLock = function() {
-//	return this.drag_flag;
-//}
 
 DCaseViewer.prototype.setSelectedNode = function(node) {
 	this.selectedNode = node;
@@ -278,17 +203,6 @@ DCaseViewer.prototype.fit = function(ms) {
 	this.shiftX = -b.x * this.scale + (this.$root.width() - b.w * this.scale) / 2;
 	this.shiftY = -b.y * this.scale + (this.$root.height() - size.y * this.scale) / 2;
 	this.repaintAll(ms);
-}
-
-DCaseViewer.prototype.traverseAll = function(f) {
-	function traverse(node) {
-		f(node);
-		if(node.context != null) f(node.context);
-		for(var i=0; i<node.children.length; i++) {
-			traverse(node.children[i]);
-		}
-	}
-	traverse(this.model);
 }
 
 DCaseViewer.prototype.createSvg = function(name) {

@@ -121,7 +121,82 @@ DNode.SELECTABLE_TYPES = {
 	"Evidence": [ "Context" ],
 };
 
-//var id_count = 1;
+//-----------------------------------------------------------------------------
+
+var Argument = function(topGoal, commitId) {
+	this.node = topGoal;
+	this.commitId = commitId;
+	this.opQueue = [];
+	this.undoCount = 0;
+};
+
+Argument.prototype.undo = function() {
+	var n = this.opQueue.length;
+	if(n > this.undoCount) {
+		this.undoCount++;
+		var op = this.opQueue[n - this.undoCount];
+		op.undo();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+Argument.prototype.redo = function() {
+	if(this.undoCount > 0) {
+		var op = this.opQueue[this.opQueue.length - this.undoCount];
+		this.undoCount--;
+		op.redo();
+		return true;
+	} else {
+		return false;
+	}
+};
+
+Argument.prototype.applyOperation = function(op) {
+	this.opQueue.push(op);
+	this.undoCount = 0;
+	op.redo();
+};
+
+Argument.prototype.commit = function(msg) {
+	var tl = [];
+	var id = 1;
+	var node = this.node;
+	node.traverse(function(node) {//FIXME
+		node.id = id++;
+	});
+	node.traverse(function(node) {
+		var c = [];
+		node.eachNode(function(node) {
+			c.push(node.id);
+		});
+		tl.push({
+			ThisNodeId: node.id,
+			NodeType: node.type,
+			Description: node.desc,
+			Children: c,
+		});
+	});
+	var r = DCaseAPI.call("commit", {
+		tree: {
+			NodeList: tl,
+			TopGoalId: node.id,
+		},
+		message: msg,
+		commitId: this.commitId,
+	});
+	this.commitId = r.commitId;
+	this.undoCount = 0;
+	this.opQueue = [];
+	return true;
+};
+
+Argument.prototype.getTopGoal = function() {
+	return this.node;
+};
+
+///var id_count = 1;
 //function createNodeFromJson2(json) {
 //	var id = json.id != null ? parseInt(json.id) : id_count++;
 //	var desc = json.desc ? json.desc : contextParams(json.prop);

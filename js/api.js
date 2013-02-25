@@ -31,6 +31,24 @@ DCaseAPI.call = function(method, params) {
 
 //-------------------------------------
 
+DCaseAPI.getArgumentList = function() {
+	return this.call("getArgumentList", {}).commitIdList;
+};
+
+DCaseAPI.getArgument = function(commitId) {
+	var r = this.call("getNodeTree", { commitId: commitId });
+	return new Argument(this.createNode(r.tree), commitId);
+};
+
+DCaseAPI.createArgument = function(newNode) {
+	var r = this.call("createTopGoal", {
+		tree: {
+			description: newNode.desc
+		}
+	});
+	return new Argument(newNode, r.commitId);
+};
+
 function contextParams(params) {
 	var s = "";
 	for(key in params) {
@@ -68,3 +86,4 @@ DCaseAPI.createNode = function(tree) {
 DCaseAPI.search = function(args) {
 	return this.call("FindNodeByDescription", args);
 }
+
