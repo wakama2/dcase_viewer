@@ -3,6 +3,7 @@ var TimeLine = function(root, viewer) {
 
 	var $timeline = $("<div></div>")
 		.addClass("timeline")
+		.css("display", "none")
 		.appendTo(root);
 	var $canvas = $("<canvas></canvas>")
 		.css("position", "absolute")
@@ -10,6 +11,11 @@ var TimeLine = function(root, viewer) {
 	var $container = $("<div></div>").css({
 		position: "absolute", left: 0, top: 0,
 	}).appendTo($timeline);
+
+	$("<div></div>")
+		.addClass("timeline-title")
+		.html("Commit History")
+		.appendTo($timeline);
 
 	this.argument = viewer.getArgument();
 
@@ -40,9 +46,10 @@ var TimeLine = function(root, viewer) {
 	//--------------------------------------------------------
 
 	var selected = null;
-	var graphWidth = 0;
-	var MX = 20;
-	var MY = 20;
+	var MX = 24;
+	var MY = 24;
+	var NX = 50;
+	var NY = 30;
 
 	this.drag = function() {
 		$container.css("left", scroll + dragX);
@@ -71,13 +78,26 @@ var TimeLine = function(root, viewer) {
 		}
 	}
 
-	function put(ctx, mm, x, y, id) {
-		addCommitMark(x, y, id);
-		graphWidth = Math.max(graphWidth, x);
+	function calcSize(mm, x, y, id) {
+		var b = { w: x, h: y };
 		var c = mm[id];
 		if(c != null) {
-			var NX = 50;
-			var NY = 30;
+			var b1 = calcSize(mm, x+NX, y, c[0]);
+			b.w = Math.max(b.w, b1.w);
+			b.h = Math.max(b.h, b1.h);
+			for(var i=1; i<c.length; i++) {
+				var b2 = calcSize(mm, x+NX, y+NY, c[i]);
+				b.w = Math.max(b.w, b2.w);
+				b.h = Math.max(b.h, b2.h);
+			}
+		}
+		return b;
+	}
+
+	function put(ctx, mm, x, y, id) {
+		addCommitMark(x, y, id);
+		var c = mm[id];
+		if(c != null) {
 			var y0 = y;
 			y = put(ctx, mm, x+NX, y, c[0]);
 			ctx.moveTo(x+MX/2   , y0+MY/2);
@@ -97,7 +117,10 @@ var TimeLine = function(root, viewer) {
 		self.argument = arg;
 		$container.empty();
 
-		if(arg == null) return;
+		$timeline.css("display", arg != null ? "block" : "none");
+		if(arg == null) {
+			return;
+		}
 
 		var mm = {};
 		var l = arg.getCommitList();
@@ -119,20 +142,26 @@ var TimeLine = function(root, viewer) {
 				}
 			}
 		});
-		graphWidth = 0;
 		selected = null;
+
+		var b = calcSize(mm, 0, 0, l[0]);
+		b.w += MX * 2;
+		b.h += MY * 2;
+		$timeline.height(b.h);
+		$canvas.css("height" , b.h);
+		$canvas.attr("height", b.h);
+
+		$container.css("top", MX/2);
+		$canvas.attr("top", MX/2);
+		$canvas.css("top", MX/2);
 
 		var ctx = $canvas[0].getContext("2d");
 		ctx.clearRect(0, 0, $canvas.width(), $canvas.height());
 		ctx.beginPath();
 		var y = put(ctx, mm, 0, 0, l[0]);
 		ctx.stroke();
-		$timeline.height(y + 30);
-		//$canvas.css("height", y + 30);
-		//$canvas.attr("height", y + 30);
-		graphWidth += 24;
 
-		scroll = ($timeline.width() - graphWidth) / 2;
+		scroll = ($timeline.width() - b.w) / 2;
 		self.drag();
 	};
 };
