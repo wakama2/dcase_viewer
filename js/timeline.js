@@ -12,6 +12,11 @@ var TimeLine = function(root, viewer) {
 		position: "absolute", left: 0, top: 0,
 	}).appendTo($timeline);
 
+	var $control = $("<div></div>")
+		.addClass("timeline-control")
+		.html("▼")
+		.appendTo(root);
+
 	$("<div></div>")
 		.addClass("timeline-title")
 		.html("Commit History")
@@ -41,6 +46,13 @@ var TimeLine = function(root, viewer) {
 		dragX = 0;
 		mouseX = null;
 		self.drag();
+	});
+
+	var visible = true;
+	$control.click(function() {
+		visible = !visible;
+		$timeline.css("display", visible ? "block" : "none");
+		$control.html(visible ? "▼" : "▲");
 	});
 
 	//--------------------------------------------------------
