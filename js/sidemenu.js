@@ -181,7 +181,7 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 
-	$("#menu-tool-commit").click(function() {
+	$("#menu-proc-commit").click(function() {
 		var msg = prompt("コミットメッセージを入力して下さい");
 		if(msg != null) {
 			//DCaseAPI.commit(msg);
@@ -189,11 +189,11 @@ var SideMenu = function(root, viewer) {
 		}
 	});
 
-	$("#menu-tool-undo").click(function() {
+	$("#menu-proc-undo").click(function() {
 		viewer.undo();
 	});
 
-	$("#menu-tool-redo").click(function() {
+	$("#menu-proc-redo").click(function() {
 		viewer.redo();
 	});
 }

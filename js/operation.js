@@ -5,14 +5,6 @@ var DNodeOperation = function() {
 	
 };
 
-DNodeOperation.prototype.undo = function() {
-	return false;
-}
-
-DNodeOperation.prototype.redo = function() {
-	return false;
-}
-
 /* class InsertOperation extends DNodeOperation */
 var InsertOperation = function(parent, node, index) {
 	this.parent = parent;
@@ -28,6 +20,19 @@ InsertOperation.prototype.undo = function() {
 
 InsertOperation.prototype.redo = function() {
 	this.parent.addChild(this.node, this.index);
+};
+
+InsertOperation.prototype.toJson = function() {
+	return {
+		"command": "insert",
+		"NodeList": [ {
+			"ParentNodeId": this.parent.id,
+			"ThisNodeId": this.node.id,
+			"NodeType": this.node.type,
+			"Description": this.node.desc,
+			"Children": [],
+		}]
+	};
 };
 
 /* class RemoveOperation extends DNodeOperation */
@@ -50,6 +55,19 @@ RemoveOperation.prototype.redo = function() {
 	this.parent.removeChild(this.node);
 };
 
+RemoveOperation.prototype.toJson = function() {
+	return {
+		"command": "remove",
+		"NodeList": [ {
+			"ParentNodeId": this.parent.id,
+			"ThisNodeId": this.node.id,
+			"NodeType": this.node.type,
+			"Description": this.node.desc,
+			"Children": [],
+		}]
+	};
+};
+
 /* class EditOperation extends DNodeOperation */
 var EditOperation = function(node, prevDesc, nextDesc) {
 	this.node = node;
@@ -65,5 +83,17 @@ EditOperation.prototype.undo = function() {
 
 EditOperation.prototype.redo = function() {
 	this.node.desc = this.nextDesc;
+};
+
+EditOperation.prototype.toJson = function() {
+	return {
+		"command": "update",
+		"NodeList": [ {
+			"ThisNodeId": this.node.id,
+			"NodeType": this.node.type,
+			"Description": this.nextDesc,
+			"Children": [],
+		}]
+	};
 };
 

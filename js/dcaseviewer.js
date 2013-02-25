@@ -107,6 +107,12 @@ DCaseViewer.prototype.applyOperation = function(op) {
 }
 
 DCaseViewer.prototype.commit = function(msg) {
+	var ops = [];
+	for(var i=0; i<this.opQueue.length - this.undoCount; i++) {
+		var op = this.opQueue[i];
+		ops.push(op.toJson());
+	}
+	alert(JSON.stringify(ops));
 	this.undoCount = 0;
 	this.opQueue = [];
 }
