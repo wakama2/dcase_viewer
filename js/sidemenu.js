@@ -1,15 +1,90 @@
-var SideMenu = function(root, viewer) {
-	var width = 200;
-	var animeTime = 250;
+var TimeLine = function(root, viewer) {
 	var self = this;
 
+	var $tl = $("<div></div>").css({
+		position: "absolute",
+		left: 0,
+		bottom: 0,
+		width: "100%",
+		height: "80px",
+		background: "#CCC",
+	}).appendTo(root);
+
+	var $canvas = $("<canvas></canvas>")
+		.appendTo($tl);
+	var $container = $("<div></div>").css({
+		position: "absolute", left: 0, top: 0,
+	}).appendTo($tl);
+
+	var scroll = 0;
+	var mouseX = null;
+	var dragX = 0;
+	$tl.mousedown(function(e) {
+		mouseX = e.pageX;
+	});
+
+	$tl.mousemove(function(e) {
+		if(mouseX != null) {
+			dragX = e.pageX - mouseX;
+			self.drag();
+		}
+	});
+
+	$tl.mouseup(function(e) {
+		scroll += dragX;
+		dragX = 0;
+		mouseX = null;
+		self.drag();
+	});
+
+	this.drag = function() {
+		$container.css("left", scroll + dragX);
+		//var ctx = $canvas[0].getContext("2d");
+		//ctx.beginPath();
+		//var y = 20 + 32 / 2;
+		//ctx.moveTo(scroll, y);
+		//ctx.lineTo(pos, y);
+		//ctx.stroke();
+	};
+
+	this.repaint = function() {
+		var arg = viewer.getArgument();
+		if(arg == null) return;
+
+		$container.empty();
+		var pos = 0;
+
+		$.each(arg.getCommitList(), function(i, a) {
+			var X = 50;
+			pos = i * X;
+			$("<div></div>").css({
+				position: "absolute",
+				width : "32px",
+				height: "32px",
+				left: pos,
+				top: 20,
+				"border-style": "solid",
+				"border-color": "blue",
+				background: "#ACF",
+			})
+			.click(function() {
+				console.log("arguemnt " + a);
+				var arg = DCaseAPI.getArgument(a);
+				viewer.setArgument(arg);
+			})
+			.appendTo($container)
+		});
+	};
+
+	this.repaint();
+	
+};
+
+var SideMenu = function(root, viewer) {
+	var self = this;
+	var timeline = new TimeLine(root, viewer);
+
 	//--------------------------------------------------------
-	this.actChangeLock = function() {
-		var flag = !viewer.getDragLock();
-		viewer.setDragLock(flag);
-		this.value = flag ? "lock" : "unlock";
-		viewer.setTextSelectable(!flag);
-	}
 
 	this.actInsertToSelectedNode = function() {
 		var view = viewer.getSelectedNode();
@@ -191,6 +266,7 @@ var SideMenu = function(root, viewer) {
 				.html("<li>" + a + "</li>")
 				.click(function() {
 					viewer.setArgument(DCaseAPI.getArgument(a));
+					timeline.repaint();
 				})
 				.appendTo($res);
 		});
@@ -201,6 +277,7 @@ var SideMenu = function(root, viewer) {
 		var msg = prompt("コミットメッセージを入力して下さい");
 		if(msg != null) {
 			if(viewer.getArgument().commit(msg)) {
+				timeline.repaint();
 				alert("コミットしました");
 			}
 		}
@@ -219,6 +296,7 @@ var SideMenu = function(root, viewer) {
 	$("#menu-proc-newarg").click(function() {
 		DNodeEditWindow.open(null, function(newNode) {
 			viewer.setArgument(DCaseAPI.createArgument(newNode));
+			timeline.repaint();
 			updateArgumentList();
 		});
 	});

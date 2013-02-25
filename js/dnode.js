@@ -130,6 +130,11 @@ var Argument = function(topGoal, commitId) {
 	this.undoCount = 0;
 };
 
+Argument.prototype.getCommitList = function() {
+	var list = DCaseAPI.call("getCommitList", { commitId: this.commitId });
+	return list.commitIdList;
+};
+
 Argument.prototype.undo = function() {
 	var n = this.opQueue.length;
 	if(n > this.undoCount) {
