@@ -158,7 +158,7 @@ DNodeView.prototype.addChild = function(view) {
 	switch(view.node.type) {
 	case "Context":
 	case "Rebuttal":
-	case "DScriptContext":
+	case "Subject":
 		var l = this.viewer.createSvg("line");
 		$(l).attr({
 			fill: "none",

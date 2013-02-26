@@ -12,10 +12,10 @@ var DNode = function(id, name, type, desc) {
 	this.nextVersion = null;
 
 	this.updateFlags();
-	if(type == "DScriptEvidence") {
+	if(type == "Solution") {
 		this.isDScript = true;
 	}
-	if(type == "Context" || type == "DScriptContext") {
+	if(type == "Context" || type == "Subject") {
 		this.isContext = true;
 	}
 };
@@ -110,17 +110,17 @@ DNode.prototype.toJson = function() {
 //-----------------------------------------------------------------------------
 
 DNode.TYPES = [
-	"Goal", "Context", "DScriptContext",
-	"Strategy", "Evidence", "DScriptEvidence", "Rebuttal"
+	"Goal", "Context", "Subject",
+	"Strategy", "Evidence", "Solution", "Rebuttal"
 ];
 
 DNode.SELECTABLE_TYPES = {
-	"Goal": [ "Context", "DScriptContext", "Strategy", "Evidence" ],
+	"Goal": [ "Context", "Subject", "Strategy", "Evidence" ],
 	"Context": [],
-	"DScriptContext": [],
+	"Subject": [],
 	"Strategy": [ "Context", "Goal" ],
 	"Evidence": [ "Context" ],
-	"DScriptEvidence": [ "Context", "Rebuttal" ],
+	"Solution": [ "Context", "Rebuttal" ],
 	"Rebuttal": [],
 };
 
@@ -232,7 +232,7 @@ Argument.prototype.getTopGoal = function() {
 //		{
 //			name: "SubGoal 1", type: "Goal", desc: "description",
 //			children: [ 
-//				{ name: "C", type: "DScriptContext", prop: { "D-Script.Name": "test" } },
+//				{ name: "C", type: "Subject", prop: { "D-Script.Name": "test" } },
 //				{ name: "test", type: "Goal", desc: "goal1" },
 //				{ name: "test", type: "Goal", desc: "goal2" }
 //			]
