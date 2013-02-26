@@ -10,8 +10,8 @@
 	text-align: center;
 }
 
-#menu-search inpput {
-	margin-left: 15px;
+#menu-search input {
+	width: 90%;
 }
 
 .menu-i:hover {

@@ -73,15 +73,22 @@ var TimeLine = function(root, viewer) {
 		var d = $("<div></div>").css({
 			left: x, top: y, width: MX, height: MY,
 		}).addClass("timeline-commit").click(function() {
-			var argId = self.argument.argId;
-			var arg = DCaseAPI.getArgument(argId, commitId);
-			viewer.setArgument(arg);
-			if(selected != null) {
-				selected.css("border-color", "");
-				selected = d;
-				d.css("border-color", "orange");
-			}
 			console.log("arguemnt " + commitId);
+			if(selected != d) {
+				if(viewer.getArgument().isChanged()) {
+					if(!confirm("未コミットの変更がありますが，破棄しますか?")) {
+						return;
+					}
+				}
+				var argId = self.argument.argId;
+				var arg = DCaseAPI.getArgument(argId, commitId);
+				viewer.setArgument(arg);
+				if(selected != null) {
+					selected.css("border-color", "");
+					selected = d;
+					d.css("border-color", "orange");
+				}
+			}
 		}).appendTo($container)
 		console.log(commitId + ", " + self.argument.commitId);
 		if(commitId == self.argument.commitId) {
