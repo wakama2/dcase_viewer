@@ -103,7 +103,7 @@ DNodeView.prototype.showInplace = function() {
 			var newDesc = $(this).attr("value");
 			if(self.node.desc != newDesc) {
 				var op = new EditOperation(self.node, self.node.desc, newDesc);
-				self.viewer.applyOperation(op);
+				self.viewer.getArgument().applyOperation(op);
 				setTimeout(function() {
 					var b = self.svg.outer(200, self.divText.height() / self.viewer.scale + 60);
 					self.bounds.h = b.h;
