@@ -90,7 +90,6 @@ var TimeLine = function(root, viewer) {
 				}
 			}
 		}).appendTo($container)
-		console.log(commitId + ", " + self.argument.commitId);
 		if(commitId == self.argument.commitId) {
 			d.css("border-color", "orange");
 			selected = d;
