@@ -32,9 +32,9 @@ var GsnShape = {
 		};
 		return Context;
 	}()),
-	"DScriptContext": (function() {
+	"Subject": (function() {
 		var N = 20;
-		var DScriptContext = function($svg) {
+		var Subject = function($svg) {
 			this.elems = [
 				$svg.createSvg("g"),
 				$svg.createSvg("rect"),
@@ -44,7 +44,7 @@ var GsnShape = {
 			this.elems[0].appendChild(this.elems[1]);
 			this.elems[0].appendChild(this.elems[2]);
 		};
-		DScriptContext.prototype.animate = function(a, x, y, w, h, scale) {
+		Subject.prototype.animate = function(a, x, y, w, h, scale) {
 			var n = N * scale;
 			a.moves(this.elems[1], {
 				rx: n, ry: n, x : x, y : y, width : w, height: h
@@ -56,10 +56,10 @@ var GsnShape = {
 			]);
 			return  { x: n/2, y: n/2 };
 		};
-		DScriptContext.prototype.outer = function(w, h) {
+		Subject.prototype.outer = function(w, h) {
 			return { w: w + N, h: h + N };
 		};
-		return DScriptContext;
+		return Subject;
 	}()),
 	"Strategy": (function() {
 		var N = 20;
@@ -97,9 +97,9 @@ var GsnShape = {
 		};
 		return Evidence;
 	}()),
-	"DScriptEvidence": (function() {
+	"Solution": (function() {
 		var N = 20;
-		var DScriptEvidence = function($svg) {
+		var Solution = function($svg) {
 			this.elems = [
 				$svg.createSvg("g"),
 				$svg.createSvg("ellipse"),
@@ -109,7 +109,7 @@ var GsnShape = {
 			this.elems[0].appendChild(this.elems[1]);
 			this.elems[0].appendChild(this.elems[2]);
 		};
-		DScriptEvidence.prototype.animate = function(a, x, y, w, h, scale) {
+		Solution.prototype.animate = function(a, x, y, w, h, scale) {
 			a.moves(this.elems[1], {
 				cx: x + w/2, cy: y + h/2,
 				rx: w/2, ry: h/2,
@@ -122,10 +122,10 @@ var GsnShape = {
 			]);
 			return { x: w/6/scale, y: h/6/scale };
 		};
-		DScriptEvidence.prototype.outer = function(w, h) {
+		Solution.prototype.outer = function(w, h) {
 			return { w: w*8/6, h: h*8/6 };
 		};
-		return DScriptEvidence;
+		return Solution;
 	}()),
 };
 
