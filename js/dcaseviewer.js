@@ -10,15 +10,17 @@ var SVG_NS = "http://www.w3.org/2000/svg";
 
 var DCaseViewer = function(root, arg) {
 
+	this.$root = $(root);
 	root.className = "viewer-root";
-	this.$svg = $(document.createElementNS(SVG_NS, "svg")).css({
+
+	var $svgroot = $(document.createElementNS(SVG_NS, "svg")).css({
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
-	}).appendTo(root);
+	}).appendTo(this.$root);
+	this.$svg = $(document.createElementNS(SVG_NS, "g"))
+		.appendTo($svgroot);
 	this.$dom = $("<div></div>").css({
 		position: "absolute", left: 0, top: 0, width: "100%", height: "100%"
-	}).appendTo(root);
-	this.$root = $(root);
-
+	}).appendTo(this.$root);
 	//------------------------------------
 
 	this.argument = null;
@@ -47,9 +49,9 @@ DCaseViewer.prototype.setArgument = function(arg) {
 	var self = this;
 	this.argument = arg;
 
-	$(this.$svg).empty();
-	$(this.$dom).empty()
-		.append(this.$svg);
+	this.$svg.empty();
+	this.$dom.empty();
+	this.$root.css("display", "none");
 	this.showToolbox(null);
 
 	if(arg == null) {
@@ -83,6 +85,7 @@ DCaseViewer.prototype.setArgument = function(arg) {
 		self.shiftX = (self.$root.width() - self.treeSize().w * self.scale)/2;
 		self.shiftY = 20;
 		self.repaintAll();
+		self.$root.css("display", "block");
 	}, 100);
 }
 
@@ -103,14 +106,15 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 DCaseViewer.prototype.repaintAll = function(ms) {
 	if(this.rootview == null) return;
 	var self = this;
-	var rootview = self.rootview;
-	rootview.updateLocation(
-		(self.shiftX + self.dragX) / this.scale,
-		(self.shiftY + self.dragY) / this.scale);
-
+	this.$dom.css({
+		left: (self.shiftX + self.dragX),
+		top : (self.shiftY + self.dragY)
+	});
+	this.$svg.attr("transform", "translate(" +
+			Math.floor(self.shiftX+self.dragX)+"," + Math.floor(self.shiftY+self.dragY)+")");
 	var a = new Animation();
-	rootview.animeStart(a);
-	if(ms == 0) {
+	self.rootview.animeStart(a);
+	if(ms == 0 || ms == null) {
 		a.animeFinish();
 		return;
 	}
