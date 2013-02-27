@@ -7,9 +7,9 @@ var DNodeEditWindow = (function() {
 	var success = null;
 	var node = null;
 
-	DNodeEditWindow.open = function(node, selectable, success) {
-		self.success = success;
-		self.node = node;
+	DNodeEditWindow.open = function(_node, selectable, _success) {
+		success = _success;
+		node = _node;
 		if(selectable == null) {
 			selectable = DNode.TYPES;
 		}
@@ -40,7 +40,7 @@ var DNodeEditWindow = (function() {
 			node = new DNode(-1, "NewNode", selectedType, $desc.attr("value"));
 		}
 		self.close();
-		self.success(node);
+		success(node);
 	};
 
 	DNodeEditWindow.close = function() {
