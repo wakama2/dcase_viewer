@@ -1,32 +1,13 @@
 var DNodeEditWindow = (function() {
-	var self = this;
+	var DNodeEditWindow = function(){};
+	var self = DNodeEditWindow;
 	var $select;
 	var $desc;
 	var selectedType = null;
 	var success = null;
 	var node = null;
 
-	function init() {
-		$desc = $("#edit textarea");
-		$("#edit").css({
-			left: ($(document).width()  - $("#edit").width()) / 2,
-			top : ($(document).height() - $("#edit").height()) / 2,
-		});
-		$("#edit-ok").click(function() {
-			DNodeEditWindow.applyAndClose();
-		});
-		$("#edit-cancel").click(function() {
-			DNodeEditWindow.close();
-		});
-		$select = $("#edit select");
-		$select.change(function() {
-			$("select option:selected").each(function() {
-				selectedType = this.text;
-			});
-		});
-	}
-
-	this.open = function(node, selectable, success) {
+	DNodeEditWindow.prototype.open = function(node, selectable, success) {
 		self.success = success;
 		self.node = node;
 		if(selectable == null) {
@@ -50,10 +31,9 @@ var DNodeEditWindow = (function() {
 		}
 		$("edit-option-" + selectedType).attr("selected", true);
 		$("#edit").show();
-	}
+	};
 
-	this.applyAndClose = function() {
-		var node = self.node;
+	DNodeEditWindow.prototype.applyAndClose = function() {
 		if(node != null) {
 			node.text = $desc.attr("value");
 		} else {
@@ -61,16 +41,32 @@ var DNodeEditWindow = (function() {
 		}
 		self.close();
 		self.success(node);
-	}
+	};
 
-	this.close = function() {
+	DNodeEditWindow.prototype.close = function() {
 		$("#edit").hide();
-	}
+	};
 
 	$(function() {
-		init();
+		$desc = $("#edit textarea");
+		$("#edit").css({
+			left: ($(document).width()  - $("#edit").width()) / 2,
+			top : ($(document).height() - $("#edit").height()) / 2,
+		});
+		$("#edit-ok").click(function() {
+			DNodeEditWindow.applyAndClose();
+		});
+		$("#edit-cancel").click(function() {
+			DNodeEditWindow.close();
+		});
+		$select = $("#edit select");
+		$select.change(function() {
+			$("select option:selected").each(function() {
+				selectedType = this.text;
+			});
+		});
 	});
 
-	return this;
+	return DNodeEditWindow;
 }());
 

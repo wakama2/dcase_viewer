@@ -60,19 +60,16 @@ DCaseViewer.prototype.setArgument = function(arg) {
 
 	function create(node) {
 		var view = new DNodeView(self, node);
-		if(node.context != null) {
-			view.addChild(create(node.context));
-		}
-		for(var i=0; i<node.children.length; i++) {
-			view.addChild(create(node.children[i]));
-		}
+		node.eachNode(function(child) {
+			view.addChild(create(child));
+		});
 		return view;
 	}
 	this.rootview = create(arg.getTopGoal());
 
 	setTimeout(function() {
 		function f(v) {//FIXME
-			var b = v.svg.outer(200, v.divText.height() / self.scale + 60);
+			var b = v.svg.outer(200, v.divText.height() + 60);
 			v.bounds.w = b.w;
 			v.bounds.h = b.h;
 			v.forEachNode(function(e) {

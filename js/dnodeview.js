@@ -118,7 +118,7 @@ var InplaceEditor = function(viewer, view, onClose) {
 			var op = new EditOperation(node, node.desc, newDesc);
 			viewer.getArgument().applyOperation(op);
 			setTimeout(function() {
-				var b = view.svg.outer(200, view.divText.height() / viewer.scale + 60);
+				var b = view.svg.outer(200, view.divText.height() + 60);
 				view.bounds.h = b.h;
 				viewer.repaintAll();
 			}, 100);
