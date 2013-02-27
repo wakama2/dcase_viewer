@@ -176,6 +176,16 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 
+	function checkCommited() {
+		var arg = viewer.getArgument();
+		if(arg != null && arg.isChanged()) {
+			if(!confirm("未コミットの変更がありますが，破棄しますか?")) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	function updateArgumentList() {
 		var $res = $("#menu-proc ul");
 		$res.empty();
@@ -185,8 +195,10 @@ var SideMenu = function(root, viewer) {
 					.addClass("sidemenu-result")
 					.html(br)
 					.click(function() {
-						viewer.setArgument(DCaseAPI.getArgument(arg, br));
-						timeline.repaint();
+						if(checkCommited()) {
+							viewer.setArgument(DCaseAPI.getArgument(arg, br));
+							timeline.repaint();
+						}
 					})
 					.appendTo($res);
 			});
@@ -219,9 +231,11 @@ var SideMenu = function(root, viewer) {
 
 	$("#menu-proc-newarg").click(function() {
 		DNodeEditWindow.open(null, ["Goal"], function(newNode) {
-			viewer.setArgument(DCaseAPI.createArgument(newNode));
-			timeline.repaint();
-			updateArgumentList();
+			if(checkCommited()) {
+				viewer.setArgument(DCaseAPI.createArgument(newNode));
+				timeline.repaint();
+				updateArgumentList();
+			}
 		});
 	});
 

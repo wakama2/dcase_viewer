@@ -102,11 +102,11 @@ var TimeLine = function(root, viewer) {
 		if(c != null) {
 			var b1 = calcSize(mm, x+NX, y, c[0]);
 			b.w = Math.max(b.w, b1.w);
-			b.h = Math.max(b.h, b1.h);
+			y = b.h = Math.max(b.h, b1.h);
 			for(var i=1; i<c.length; i++) {
 				var b2 = calcSize(mm, x+NX, y+NY, c[i]);
 				b.w = Math.max(b.w, b2.w);
-				b.h = Math.max(b.h, b2.h);
+				y = b.h = Math.max(b.h, b2.h);
 			}
 		}
 		return b;
@@ -121,10 +121,11 @@ var TimeLine = function(root, viewer) {
 			ctx.moveTo(x+MX/2   , y0+MY/2);
 			ctx.lineTo(x+MX/2+NX, y0+MY/2);
 			for(var i=1; i<c.length; i++) {
+				var y1 = y;
 				y = put(ctx, mm, x+NX, y+NY, c[i]);
 				ctx.moveTo(x+MX/2   , y0+MY/2);
-				ctx.lineTo(x+MX/2   , y +MY/2);
-				ctx.lineTo(x+MX/2+NX, y +MY/2);
+				ctx.lineTo(x+MX/2   , y1+NY+MY/2);
+				ctx.lineTo(x+MX/2+NX, y1+NY+MY/2);
 			}
 		}
 		return y;
@@ -166,6 +167,8 @@ var TimeLine = function(root, viewer) {
 		b.w += MX * 2;
 		b.h += MY * 2;
 		$timeline.height(b.h);
+		$canvas.css("width" , b.w);
+		$canvas.attr("width", b.w);
 		$canvas.css("height" , b.h);
 		$canvas.attr("height", b.h);
 
