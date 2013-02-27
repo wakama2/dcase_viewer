@@ -30,16 +30,6 @@ var SideMenu = function(root, viewer) {
 		}
 	}
 
-	this.actExportJson = function() {
-		//TODO
-		alert("TODO");
-	}
-
-	this.actExportPng = function() {
-		//TODO
-		alert("TODO");
-	}
-
 	this.show = function(m) {
 		var ids = [
 			"#menu-search",
@@ -68,9 +58,7 @@ var SideMenu = function(root, viewer) {
 	}).keydown(function (e) {
 		if (e.keyCode == 13) { // Enter key
 			var i = this;
-			var r = DCaseAPI.search({
-				SearchText: i.value
-			});
+			var r = DCaseAPI.search(i.value);
 			self.search_inc(i.value);
 		}
 	});
@@ -128,12 +116,24 @@ var SideMenu = function(root, viewer) {
 			})
 			.appendTo(root);
 
+	var URL_EXPORT = "cgi/view.cgi";
+
+	this.exportTree = function(type) {
+		var commitId = viewer.getArgument().commitId;
+		var url = URL_EXPORT + "?" + commitId + "." + type;
+		window.open(url, "_black");
+	};
+
 	$("#menu-export-json").click(function() {
-		self.actExportJson();
+		self.exportTree("json");
 	});
 
 	$("#menu-export-png").click(function() {
-		self.actExportPng();
+		self.exportTree("png");
+	});
+
+	$("#menu-export-script").click(function() {
+		self.exportTree("dscript");
 	});
 
 	//--------------------------------------------------------
@@ -225,6 +225,5 @@ var SideMenu = function(root, viewer) {
 		});
 	});
 
-}
-
+};
 

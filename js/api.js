@@ -93,7 +93,7 @@ DCaseAPI.createNode = function(tree) {
 	return create(topId);
 }
 
-DCaseAPI.search = function(args) {
-	return this.call("FindNodeByDescription", args);
+DCaseAPI.search = function(text) {
+	return this.call("search", {text: text});
 }
 
