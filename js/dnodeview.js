@@ -28,7 +28,6 @@ var DNodeView = function(viewer, node) {
 			"stroke-dasharray": 3,
 		}).appendTo(viewer.$svg);
 	}
-	this.argumentBounds = {};
 
 	this.divName = $("<div></div>")
 		.addClass("node-name")
@@ -45,17 +44,14 @@ var DNodeView = function(viewer, node) {
 	this.divNodesText = "";
 	this.divNodesVisible = false;
 	
-	this.childOpen = true;
-	// child node
 	this.children = [];
 	this.context = null;
-	// line
-	this.lines = [];
-	this.contextLine = null;
-	// for animation
+	this.line = null;
 	this.bounds = { x: 0, y: 0, w: DEF_WIDTH, h: 100 };
+	this.argumentBounds = {};
 	this.visible = true;
 	this.childVisible = true;
+	this.childOpen = true;
 
 	var touchinfo = {};
 	this.editflag = false;
@@ -157,36 +153,28 @@ DNodeView.prototype.setVisible = function(b) {
 }
 
 DNodeView.prototype.addChild = function(view) {
-	switch(view.node.type) {
-	case "Context":
-	case "Rebuttal":
-	case "Subject":
-		var l = this.viewer.createSvg("line");
+	var l;
+	if(view.node.isContext) {
+		l = this.viewer.createSvg("line");
 		$(l).attr({
 			fill: "none",
 			stroke: "#404040",
 			x1: 0, y1: 0, x2: 0, y2: 0,
-			"marker-end": "url(#Triangle-black)",
+			"marker-end": "url(#Triangle-white)",
 		});
-
-		this.contextLine = l;
 		this.context = view;
-		break;
-	default:
+	} else {
 		var l = this.viewer.createSvg("path");
 		$(l).attr({
-			d: "M0,0 C0,0 0,0 0,0",
 			fill: "none",
 			stroke: "#404040",
+			d: "M0,0 C0,0 0,0 0,0",
 			"marker-end": "url(#Triangle-black)",
 		});
-
-		this.lines.push(l);
 		this.children.push(view);
-		break;
 	}
-	this.divNodesText = (this.lines.length + (this.contextLine!=null?1:0))
-			 + " nodes...";
+	view.line = l;
+	this.divNodesText = this.node.getNodeCount() + " nodes...";
 	this.divNodesVisible = true;
 }
 
@@ -275,7 +263,7 @@ DNodeView.prototype.updateLocation = function(x, y) {
 	};
 }
 
-DNodeView.prototype.animeStart = function(a) {
+DNodeView.prototype.animeStart = function(a, parent) {
 	var self = this;
 	var scale = this.viewer.scale;
 	var b = this.bounds;
@@ -290,7 +278,6 @@ DNodeView.prototype.animeStart = function(a) {
 		top   : (b.y + offset.y) * scale,
 		width : (b.w - offset.x*2) * scale,
 		height: (b.h - offset.y*2) * scale,
-		//fontSize: Math.floor(FONT_SIZE*scale),
 	});
 	this.div.css("fontSize", Math.floor(FONT_SIZE * scale));
 
@@ -314,40 +301,37 @@ DNodeView.prototype.animeStart = function(a) {
 		}
 	}
 	
-	$.each(this.lines, function(i, l) {
-		var e = self.children[i];
-		var start = l.pathSegList.getItem(0); // SVG_PATHSEG_MOVETO_ABS(M)
-		var curve = l.pathSegList.getItem(1); // SVG_PATHSEG_CURVETO_CUBIC_ABS(C)
-		
-		var x1 = (b.x + b.w/2) * scale;
-		var y1 = (b.y + b.h  ) * scale;
-		var x2 = (e.bounds.x + e.bounds.w/2) * scale;
-		var y2 = (e.bounds.y) * scale;
-
-		a.show(l, self.childVisible);
-	
-		a.moves(start, {
-			x: x1,
-			y: y1,
-		});
-		a.moves(curve, {
-			x1: (9 * x1 + x2) / 10,
-			y1: (y1 + y2) / 2,
-			x2: (9 * x2 + x1) / 10,
-			y2: (y1 + y2) / 2,
-			x: x2,
-			y: y2,
-		});
-	});
-	if(this.contextLine != null) {
-		var e = self.context;
-		var l = self.contextLine;
-		a.moves(l, {
-			x1: (b.x + b.w  ) * scale,
-			y1: (b.y + b.h/2) * scale,
-			x2: (e.bounds.x) * scale,
-			y2: (e.bounds.y + e.bounds.h/2) * scale,
-		}).show(l, self.childVisible);
+	if(this.line != null) {
+		var l = this.line;
+		var pb = parent.bounds;
+		if(!this.node.isContext) {
+			var start = l.pathSegList.getItem(0); // SVG_PATHSEG_MOVETO_ABS(M)
+			var curve = l.pathSegList.getItem(1); // SVG_PATHSEG_CURVETO_CUBIC_ABS(C)
+			var x1 = (pb.x + pb.w/2) * scale;
+			var y1 = (pb.y + pb.h  ) * scale;
+			var x2 = (b.x + b.w/2) * scale;
+			var y2 = (b.y) * scale;
+			a.show(l, parent.childVisible);
+			a.moves(start, {
+				x: x1,
+				y: y1,
+			});
+			a.moves(curve, {
+				x1: (9 * x1 + x2) / 10,
+				y1: (y1 + y2) / 2,
+				x2: (9 * x2 + x1) / 10,
+				y2: (y1 + y2) / 2,
+				x: x2,
+				y: y2,
+			});
+		} else {
+			a.moves(l, {
+				x1: (pb.x + pb.w  ) * scale,
+				y1: (pb.y + pb.h/2) * scale,
+				x2: (b.x) * scale,
+				y2: (b.y + b.h/2) * scale,
+			}).show(l, parent.childVisible);
+		}
 	}
 	if(this.svgUndevel != null) {
 		var sx = (b.x + b.w/2) * scale;
@@ -363,16 +347,17 @@ DNodeView.prototype.animeStart = function(a) {
 	}
 	if(this.argumentBorder != null) {
 		var n = 10;
-		var b = this.argumentBorder.context;
-		a.moves(b, {
-			x     : this.argumentBounds.x * scale,
-			y     : this.argumentBounds.y * scale,
-			width : this.argumentBounds.w * scale,
-			height: this.argumentBounds.h * scale,
-		}).show(b, this.visible);
+		var b = this.argumentBounds;
+		a.moves(this.argumentBorder[0], {
+			x     : b.x * scale,
+			y     : b.y * scale,
+			width : b.w * scale,
+			height: b.h * scale,
+		});
+		a.show(this.argumentBorder[0], this.visible);
 	}
 	this.forEachNode(function(e) {
-		e.animeStart(a);
+		e.animeStart(a, self);
 	});
 }
 

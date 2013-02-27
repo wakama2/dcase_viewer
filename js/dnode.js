@@ -15,7 +15,7 @@ var DNode = function(id, name, type, desc) {
 	if(type == "Solution") {
 		this.isDScript = true;
 	}
-	if(type == "Context" || type == "Subject") {
+	if(type == "Context" || type == "Subject" || type == "Rebuttal") {
 		this.isContext = true;
 	}
 };
