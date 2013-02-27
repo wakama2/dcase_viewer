@@ -51,7 +51,6 @@ DCaseViewer.prototype.setArgument = function(arg) {
 
 	this.$svg.empty();
 	this.$dom.empty();
-	this.$root.css("display", "none");
 	this.showToolbox(null);
 
 	if(arg == null) {
@@ -85,7 +84,6 @@ DCaseViewer.prototype.setArgument = function(arg) {
 		self.shiftX = (self.$root.width() - self.treeSize().w * self.scale)/2;
 		self.shiftY = 20;
 		self.repaintAll();
-		self.$root.css("display", "block");
 	}, 100);
 }
 

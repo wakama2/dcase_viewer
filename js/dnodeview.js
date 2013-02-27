@@ -11,6 +11,8 @@ var DNodeView = function(viewer, node) {
 	this.div = $("<div></div>")
 			.addClass("node-container")
 			.width(DEF_WIDTH)
+			.css("left", $(document).width())//FIXME
+			.css("fontSize", FONT_SIZE)
 			.appendTo(viewer.$dom);
 
 	if(node.isUndeveloped) {
