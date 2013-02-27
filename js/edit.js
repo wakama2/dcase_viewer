@@ -1,5 +1,5 @@
 var DNodeEditWindow = (function() {
-	var DNodeEditWindow = function(){};
+	var DNodeEditWindow = new Object();
 	var self = DNodeEditWindow;
 	var $select;
 	var $desc;
@@ -7,7 +7,7 @@ var DNodeEditWindow = (function() {
 	var success = null;
 	var node = null;
 
-	DNodeEditWindow.prototype.open = function(node, selectable, success) {
+	DNodeEditWindow.open = function(node, selectable, success) {
 		self.success = success;
 		self.node = node;
 		if(selectable == null) {
@@ -33,7 +33,7 @@ var DNodeEditWindow = (function() {
 		$("#edit").show();
 	};
 
-	DNodeEditWindow.prototype.applyAndClose = function() {
+	DNodeEditWindow.applyAndClose = function() {
 		if(node != null) {
 			node.text = $desc.attr("value");
 		} else {
@@ -43,7 +43,7 @@ var DNodeEditWindow = (function() {
 		self.success(node);
 	};
 
-	DNodeEditWindow.prototype.close = function() {
+	DNodeEditWindow.close = function() {
 		$("#edit").hide();
 	};
 
