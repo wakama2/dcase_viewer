@@ -106,13 +106,12 @@ DCaseViewer.prototype.centerize = function(view, ms) {
 DCaseViewer.prototype.repaintAll = function(ms) {
 	if(this.rootview == null) return;
 	var self = this;
-	this.$dom.css({
-		left: (self.shiftX + self.dragX),
-		top : (self.shiftY + self.dragY)
-	});
-	this.$svg.attr("transform", "translate(" +
-			Math.floor(self.shiftX+self.dragX)+"," + Math.floor(self.shiftY+self.dragY)+")");
+
+	var dx = Math.floor(self.shiftX + self.dragX);
+	var dy = Math.floor(self.shiftY + self.dragY);
+
 	var a = new Animation();
+	self.rootview.updateLocation(dx / self.scale, dy / self.scale);
 	self.rootview.animeStart(a);
 	if(ms == 0 || ms == null) {
 		a.animeFinish();

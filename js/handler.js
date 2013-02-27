@@ -108,7 +108,7 @@ DCaseViewer.prototype.setTouchHandler = function() {
 		if(self.moving || !self.drag_flag) return;
 		var touches = e.originalEvent.touches;
 		e.preventDefault();
-		r = root.getBoundingClientRect();
+		r = root[0].getBoundingClientRect();
 		if(touches.length == 1) {
 			touchCount = 1;
 			var x = touches[0].pageX;
