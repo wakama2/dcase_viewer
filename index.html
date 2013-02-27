@@ -60,16 +60,6 @@ $(function() {
 	$(".tool-remove").click(function() {
 		menu.actRemoveSelectedNode();
 	});
-	$(".tool-up").click(function() {
-		viewer.expandBranch(viewer.getSelectedNode(), false);
-		$(".tool-up").css("display", "none");
-		$(".tool-down").css("display", "inline");
-	});
-	$(".tool-down").click(function() {
-		viewer.expandBranch(viewer.getSelectedNode(), true);
-		$(".tool-up").css("display", "inline");
-		$(".tool-down").css("display", "none");
-	});
 
 	$(".tool-play").click(function() {
 		var v = viewer.getSelectedNode();
@@ -112,8 +102,6 @@ $(function() {
 	<a href="#" class="tool-new"><i class="icon-plus"></i></a>
 	<a href="#" class="tool-remove"><i class="icon-remove"></i></a>
 	<a href="#" class="tool-play"><i class="icon-play"></i></a>
-	<a href="#" class="tool-up"><i class="icon-circle-arrow-up"></i></a>
-	<a href="#" class="tool-down"><i class="icon-circle-arrow-down"></i></a>
 </div>
 
 <div id="menu">

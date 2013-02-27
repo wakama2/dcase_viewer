@@ -52,21 +52,27 @@ var DNodeView = function(viewer, node) {
 	this.visible = true;
 	this.childVisible = true;
 	this.childOpen = true;
+	this.edit = null;
 
 	var touchinfo = {};
-	this.editflag = false;
 	this.div.mouseup(function(e) {
-		if(self == viewer.getSelectedNode() && !self.editflag) {
-			self.editflag = true;
+		if(self == viewer.getSelectedNode()) {
 			self.showInplace();
 		}
 		viewer.dragEnd(self);
+	}).dblclick(function(e) {
+		if(self.edit != null) {
+			self.edit.close();
+		}
+		viewer.expandBranch(self);
 	}).bind("touchstart", function(e) {
 		var touches = e.originalEvent.touches;
 		touchinfo.count = touches.length;
 	}).bind("touchend", function(e) {
+		var DBLTOUCH_THRESHOLD = 300;
 		viewer.dragEnd(self);
-		if(touchinfo.time != null && (new Date() - touchinfo.time) < 300) {
+		if(touchinfo.time != null &&
+				(new Date() - touchinfo.time) < DBLTOUCH_THRESHOLD) {
 			viewer.expandBranch(self);
 			touchinfo.time = null;
 		}
@@ -83,35 +89,53 @@ var DNodeView = function(viewer, node) {
 	//});
 };
 
-DNodeView.prototype.showInplace = function() {
+var InplaceEditor = function(viewer, view, onClose) {
 	var self = this;
-	self.divText.text("");
-	$("<textarea></textarea>")
+	var node = view.node;
+	var cc = 0;
+	var $txt = $("<textarea></textarea>")
 		.addClass("node-inplace")
-		.css("top", self.divText.attr("top"))
-		.attr("value", self.node.desc)
-		.appendTo(self.div)
+		.css("top", view.divText.attr("top"))
+		.attr("value", node.desc)
+		.appendTo(view.div)
 		.focus()
 		.mousedown(function(e) { e.stopPropagation(); })
 		.mouseup(function(e) { e.stopPropagation(); })
 		.mousemove(function(e) { e.stopPropagation(); })
-		.click(function(e) { e.stopPropagation(); })
+		.dblclick(function(e) {
+			if(cc == 2) e.stopPropagation();
+			cc = 0;
+		})
+		.click(function(e) { cc++; e.stopPropagation(); })
 		.mousewheel(function(e) { e.stopPropagation(); })
-		.blur(function() {
-			var newDesc = $(this).attr("value");
-			if(self.node.desc != newDesc) {
-				var op = new EditOperation(self.node, self.node.desc, newDesc);
-				self.viewer.getArgument().applyOperation(op);
-				setTimeout(function() {
-					var b = self.svg.outer(200, self.divText.height() / self.viewer.scale + 60);
-					self.bounds.h = b.h;
-					self.viewer.repaintAll();
-				}, 100);
-			}
-			self.divText.html(self.node.getHtmlDescription());
-			$(this).remove();
-			self.editflag = false;
+		.blur(function() { self.close(); });
+
+	view.divText.text("");
+
+	this.close = function() {
+		var newDesc = $txt.attr("value");
+		if(node.desc != newDesc) {
+			var op = new EditOperation(node, node.desc, newDesc);
+			viewer.getArgument().applyOperation(op);
+			setTimeout(function() {
+				var b = view.svg.outer(200, view.divText.height() / viewer.scale + 60);
+				view.bounds.h = b.h;
+				viewer.repaintAll();
+			}, 100);
+		}
+		view.divText.html(node.getHtmlDescription());
+		$txt.remove();
+		onClose();
+	};
+};
+
+DNodeView.prototype.showInplace = function() {
+	var self = this;
+	if(this.edit == null) {
+		this.edit = new InplaceEditor(this.viewer, this, function() {
+			self.edit = null;
 		});
+	}
 };
 
 DNodeView.prototype.getTreeBounds = function() {
